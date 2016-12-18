@@ -7,6 +7,12 @@ const assert = require('assert');
 class AccountManager{
 	static createAccount(userId, password){
 		return new Promise((resolve, reject) =>{
+			if(!userId || !password
+				|| typeof userId !== 'string' || typeof password !== 'string'){
+				return reject(new InvalidDataTypeError());
+			}
+
+
 			Utils.encrypt(password).then((hash) => {
 				MongoConnection.insert('account', {
 					userId: userId,

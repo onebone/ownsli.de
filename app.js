@@ -21,7 +21,10 @@ app.set('view engine', 'ejs');
 app.use(session({
 	secret: '!@$13498!@(SD@(&%#@', // TODO
 	saveUninitialized: false,
-	resave: false
+	resave: false,
+	cookie: {
+		maxAge: 900000
+	}
 }));
 
 app.use(logger('dev'));

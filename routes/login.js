@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const {AccountManager} = require('../src/account');
+const {SessionManager} = require('../src/session');
 
 // login error
 
@@ -14,9 +15,16 @@ const ERROR_INVALID_DATA = 1;
 // Server processing error
 // Cannot compare password or create account due to error
 const ERROR_SERVER_SIDE = 2;
+// Other user is already logged in
+// Session already exists with same userId
+const ERROR_OTHER_ALREADY_LOGGED_IN = 3;
+// Already logged in
+const ERROR_ALREADY_LOGGED_IN = 4;
 
 router.get('/', function(req, res) {
-	res.render('login');
+	res.render('login/index', { // TODO: Improve front end
+		title: 'Login'
+	});
 });
 
 router.post('/', (req, res) => {
@@ -32,13 +40,44 @@ router.post('/', (req, res) => {
 		}));
 	}
 
+	if(req.session.token){
+		const session = SessionManager.getSession(req.session.token);
+
+		if(session !== null){
+			return res.send(JSON.stringify({
+				status: true,
+				error: true,
+				errCode: ERROR_ALREADY_LOGGED_IN
+			}));
+		}
+	}
+
 	AccountManager.comparePassword(userId, password).then((result) => {
-		res.send(JSON.stringify({
-			status: true,
-			error: result,
-			errCode: result ? ERROR_INVALID_DATA : undefined
-		}));
-	}).catch(() => {
+		if(result){
+			if(SessionManager.getSessionByUserId(userId) !== null){
+				return res.send(JSON.stringify({
+					status: true,
+					error: true,
+					errCode: ERROR_OTHER_ALREADY_LOGGED_IN
+				}));
+			}
+			const session = SessionManager.addSession(userId);
+
+			req.session.token = session.getToken();
+
+			res.send(JSON.stringify({
+				status: true,
+				error: false
+			}));
+		}else{
+			res.send(JSON.stringify({
+				status: true,
+				error: true,
+				errCode: ERROR_INVALID_DATA
+			}));
+		}
+	}).catch((err) => {
+		console.log(err);
 		res.send(JSON.stringify({
 			status: true,
 			error: true,
@@ -48,21 +87,7 @@ router.post('/', (req, res) => {
 });
 
 
-// test
-/*router.get('/test', (req, res) => {
-	const userId = req.query.userId;
-	const password = req.query.password;
-
-	if(!userId || !password){
-		res.send('not set');
-		return;
-	}
-
-	AccountManager.comparePassword(userId, password).then((result) => {
-		res.send(result);
-	}).catch((err) => res.send('error: ' + err));
-});
-
+// test //
 router.get('/create', (req, res) => {
 	const userId = req.query.userId;
 	const password = req.query.password;
@@ -73,6 +98,7 @@ router.get('/create', (req, res) => {
 	}
 
 	AccountManager.createAccount(userId, password).then(() => res.send('success')).catch((err) => res.send('err ' + err));
-});*/
+});
+// test end //
 
 module.exports = router;

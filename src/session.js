@@ -2,14 +2,13 @@
 
 const Utils = require('./utils');
 
-const sessions = {};
+const sessions = new Map();
 
 class SessionManager{
 	/**
 	 * Add online session
 	 *
 	 * @param userId
-	 * @param token
 	 * @returns {Session}
 	 */
 	static addSession(userId){
@@ -31,12 +30,52 @@ class SessionManager{
 
 		return false;
 	}
+
+	/**
+	 * Returns session matching with certain userId
+	 *
+	 * @param userId
+	 * @returns Session
+	 */
+	static getSessionByUserId(userId){
+		userId = userId.toLowerCase();
+
+		for(const token in sessions){
+			if(sessions.hasOwnProperty(token)){
+				const session = sessions[token];
+				if(session.getUserId() === userId){
+					return session;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns session matching with certain token
+	 *
+	 * @param token
+	 * @returns Session
+	 */
+	static getSession(token){
+		for(const token in sessions){
+			if(sessions.hasOwnProperty(token)){
+				const session = sessions[token];
+				if(session.getToken() === token){
+					return session;
+				}
+			}
+		}
+		return null;
+	}
 }
 
 class Session{
 	constructor(userId, token){
-		this._userId = userId;
+		this._userId = userId.toLowerCase();
 		this._token = token;
+		this._creationTime = Date.now();
 	}
 
 	getUserId(){
@@ -46,6 +85,10 @@ class Session{
 	getToken(){
 		return this._token;
 	}
+
+	getCreationTime(){
+		return this._creationTime;
+	}
 }
 
-module.exports = SessionManager;
+module.exports = {SessionManager, Session};

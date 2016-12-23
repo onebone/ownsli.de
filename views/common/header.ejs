@@ -1,0 +1,44 @@
+<meta charset="utf-8">
+<title><%= translator('title') %> - <%= title %></title>
+
+<meta name="description" content="<%= translator('desc') %>">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+
+<% if(typeof no_ogp === 'undefined' || !no_ogp){ %>
+	<meta property="og:title" content="<%= title %>">
+	<meta property="og:site_name" content="<%= translator('title') %>">
+	<meta property="og:type" content="game">
+	<meta property="og:url" content="<%= url %>">
+	<meta property="og:image" content="<%= config.url + config.url %>">
+<% } %>
+
+<link rel="stylesheet" type="text/css" href="/materialize/dist/css/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/mdi/css/materialdesignicons.min.css">
+<link rel="stylesheet" type="text/css" href="/resources/css/main.css">
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+<meta name="apple-mobile-web-app-title" content="<%= translator('title') %>">
+<meta name="application-name" content="<%= translator('title') %>">
+<meta name="theme-color" content="#ff5722">
+<style>
+	nav {
+		background: <%= global.theme['background-0'] %>;
+		color: <%= global.theme['foreground-0'] %>;
+	}
+	.nav-wrapper {
+		max-width: 942px;
+		margin: 0 auto;
+	}
+	@media (min-width: 1050px) {
+		.main-section {
+			background: <%= global.theme['background-2'] %>;
+		}
+	}
+</style>
+
+<script src="/jquery/dist/jquery.min.js"></script>
+<script src="/materialize/dist/js/materialize.min.js"></script>

@@ -1,0 +1,26 @@
+{
+  "name": "ownsli.de",
+  "description": "Create your own slide with others on your server!",
+  "main": "bin/www",
+  "authors": [
+    "HelloWorld017 <deu07115@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "slide"
+  ],
+  "homepage": "https://github.com/onebone/ownsli.de",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "materialize": "^0.97.8",
+    "socket.io-client": "^1.7.2",
+    "mdi": "^1.7.22"
+  }
+}

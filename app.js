@@ -1,23 +1,24 @@
 require('./init');
 
-const express = require('express');
-const path = require('path');
-const favicon = require('serve-favicon');
-const logger = require('morgan');
-const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const express = require('express');
+const favicon = require('serve-favicon');
+const httpErrors = require('./src/error');
+const logger = require('morgan');
+const path = require('path');
+const preventInjection = require('./src/prevent-injection');
+const requestLanguage = require('express-request-language');
+const resolveLanguage = require('./src/resolve-language');
 const session = require('express-session');
 
-var index = require('./routes/index');
-
-var app = express();
+const index = require('./routes/index');
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(session({
 	secret: '!@$13498!@(SD@(&%#@', // TODO
 	saveUninitialized: false,
@@ -32,6 +33,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(requestLanguage({
+	languages: config.langs
+}));
+
+app.use((req, res, next) => {
+	res.locals.url = req.url;
+});
+
+app.use(httpErrors);
+app.use(preventInjection);
+app.use(resolveLanguage);
 
 app.use('/', index);
 app.use('/login', require('./routes/login'));

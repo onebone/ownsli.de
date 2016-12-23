@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const {AccountManager} = require('../src/account');
+const {AccountManager, NoAccountError} = require('../src/account');
 const {SessionManager} = require('../src/session');
 
 // login error
@@ -77,7 +77,16 @@ router.post('/', (req, res) => {
 			}));
 		}
 	}).catch((err) => {
+		if(err instanceof NoAccountError){
+			return res.send(JSON.stringify({
+				status: true,
+				error: true,
+				errCode: ERROR_INVALID_DATA
+			}));
+		}
+
 		console.log(err);
+
 		res.send(JSON.stringify({
 			status: true,
 			error: true,

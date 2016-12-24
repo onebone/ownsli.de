@@ -12,7 +12,6 @@ const requestLanguage = require('express-request-language');
 const resolveLanguage = require('./src/resolve-language');
 const session = require('express-session');
 
-const index = require('./routes/index');
 const app = express();
 
 // view engine setup
@@ -37,15 +36,16 @@ app.use(requestLanguage({
 	languages: config.langs
 }));
 
-app.use((req, res, next) => {
+/*app.use((req, res, next) => {
 	res.locals.url = req.url;
 });
 
 app.use(httpErrors);
 app.use(preventInjection);
 app.use(resolveLanguage);
+*/ // //FIXME This code interrupts routing
 
-app.use('/', index);
+app.use('/', require('./routes/index'));
 app.use('/login', require('./routes/login'));
 
 // catch 404 and forward to error handler

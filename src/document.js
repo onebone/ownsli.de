@@ -1,6 +1,5 @@
 'use strict';
 
-const {Vector2} = require('./math');
 const MongoConnection = require('./mongo');
 const Utils = require('./utils');
 

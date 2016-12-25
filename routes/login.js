@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const {AccountManager} = require('../src/account');
+const {AccountManager, NoAccountError} = require('../src/account');
 const {SessionManager} = require('../src/session');
 
 // login error
@@ -21,13 +21,14 @@ const ERROR_OTHER_ALREADY_LOGGED_IN = 3;
 // Already logged in
 const ERROR_ALREADY_LOGGED_IN = 4;
 
-router.get('/', function(req, res) {
+router.get('/', function(req, res, next) {
+	console.log('hello');
 	res.render('login/index', { // TODO: Improve front end
 		title: 'Login'
 	});
 });
 
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => {
 	const userId = req.body.userId;
 	const password = req.body.password;
 
@@ -77,7 +78,16 @@ router.post('/', (req, res) => {
 			}));
 		}
 	}).catch((err) => {
+		if(err instanceof NoAccountError){
+			return res.send(JSON.stringify({
+				status: true,
+				error: true,
+				errCode: ERROR_INVALID_DATA
+			}));
+		}
+
 		console.log(err);
+
 		res.send(JSON.stringify({
 			status: true,
 			error: true,
@@ -88,7 +98,7 @@ router.post('/', (req, res) => {
 
 
 // test //
-router.get('/create', (req, res) => {
+router.get('/create', (req, res, next) => {
 	const userId = req.query.userId;
 	const password = req.query.password;
 

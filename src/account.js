@@ -12,7 +12,6 @@ class AccountManager{
 				return reject(new InvalidDataTypeError());
 			}
 
-
 			Utils.encrypt(password).then((hash) => {
 				MongoConnection.insert('account', {
 					userId: userId,

@@ -1,3 +1,5 @@
+'use strict';
+
 const mongo = require('mongodb').MongoClient;
 
 let db = null;
@@ -6,6 +8,10 @@ mongo.connect(`mongodb://${global.config.database.url || 'localhost'}:${global.c
 
 	db = client;
 	db.createCollection('account').catch((err) => {
+		if(err) throw err;
+	});
+
+	db.createCollection('document').catch((err) => {
 		if(err) throw err;
 	});
 });
@@ -22,6 +28,10 @@ class MongoConnection{
 
 	static insert(dbname, query){
 		return db.collection(dbname).insertOne(query);
+	}
+
+	static replace(dbname, query, replace){
+		return db.collection(dbname).replaceOne(query, replace);
 	}
 }
 

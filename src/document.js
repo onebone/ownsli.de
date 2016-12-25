@@ -1,19 +1,28 @@
 'use strict';
 
 const {Vector2} = require('./math');
-const {MongoConnection} = require('./mongo');
+const MongoConnection = require('./mongo');
 
 // Document is wrapper of a presentation
 class Document{
 	/**
-	 * @param slides Slide[] | Key of the array is page
+	 * @param name string       | Name of document
+	 * @param slides Slide[]    | Key of the array is page
 	 */
-	constructor(slides = []){
+	constructor(name, slides = []){
+		this._name = name;
 		this._slides = slides;
 	}
 
 	/**
-	 * @returns Slide[]
+	 * @return string
+	 */
+	getName(){
+		return this._name;
+	}
+
+	/**
+	 * @return Slide[]
 	 */
 	getSlides(){
 		return this._slides;
@@ -36,6 +45,7 @@ class Document{
 
 	toArray(){
 		let data = {
+			name: this._name,
 			slides: []
 		};
 
@@ -66,10 +76,16 @@ class Slide{
 		this._shapes = shapes;
 	}
 
+	/**
+	 * @return Vector2
+	 */
 	getPosition(){
 		return this._vec.add();
 	}
 
+	/**
+	 * @return Shape[]
+	 */
 	getShapes(){
 		return this._shapes;
 	}
@@ -92,7 +108,7 @@ class Shape{
 	 * @return Vector2
 	 */
 	getPosition(){
-		return this._vec;
+		return this._vec.add();
 	}
 
 	/**
@@ -118,7 +134,6 @@ class Shape{
 	}
 }
 
-const documents = new Map();
 class DocumentManager{
 	/**
 	 * Creates one document
@@ -129,13 +144,33 @@ class DocumentManager{
 	static addDocument(name){
 		return MongoConnection.insert('document', {
 			name: name,
-			document: {}
+			slides: []
 		});
 	}
 
+	/**
+	 * @param name string
+	 */
+	static getDocument(name){
+		return new Promise((resolve, reject) => {
+			MongoConnection.query('document', {
+				name: name
+			}, true).toArray((err, rows) => {
+				if(err) return reject(err);
+				if(rows.length < 1) return resolve(null);
+
+				resolve(new Document(rows[0].name, rows[0].slides));
+			});
+		});
+	}
+
+	/**
+	 * @param document Document
+	 */
 	static saveDocument(document){
-		// TODO update document
-		// document.toArray() should be the value of 'document' key
+		return MongoConnection.replace('document', {
+			name: document.getName()
+		}, document.toArray());
 	}
 }
 

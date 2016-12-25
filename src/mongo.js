@@ -29,6 +29,10 @@ class MongoConnection{
 	static insert(dbname, query){
 		return db.collection(dbname).insertOne(query);
 	}
+
+	static replace(dbname, query, replace){
+		return db.collection(dbname).replaceOne(query, replace);
+	}
 }
 
 module.exports = MongoConnection;

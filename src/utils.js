@@ -38,6 +38,14 @@ class Utils{
 			});
 		});
 	}
+
+	/**
+	 * @param min
+	 * @param max
+	 */
+	static rand(min, max){
+		return Math.floor(Math.random() * (max - max + 1)) + min;
+	}
 }
 
 module.exports = Utils;

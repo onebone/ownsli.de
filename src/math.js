@@ -2,33 +2,33 @@
 
 class Vector2{
 	constructor(x, y){
-		this._x = x;
-		this._y = y;
+		this.x = x;
+		this.y = y;
 	}
 
 	add(x = 0, y = 0){
-		return new Vector2(this._x + x, this._y + y);
+		return new Vector2(this.x + x, this.y + y);
 	}
 
 	getX(){
-		return this._x;
+		return this.x;
 	}
 
 	getY(){
-		return this._y;
+		return this.y;
 	}
 
 	getFloorX(){
-		return Math.floor(this._x);
+		return Math.floor(this.x);
 	}
 
 	getFloorY(){
-		return Math.floor(this._y);
+		return Math.floor(this.y);
 	}
 
 	distance(vec){
 		vec = vec || new Vector2(0, 0);
-		return Math.hypot(this._x - vec.x, this._y - vec.y);
+		return Math.hypot(this.x - vec.x, this.y - vec.y);
 	}
 }
 

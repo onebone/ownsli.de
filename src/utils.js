@@ -21,10 +21,14 @@ class Utils{
 	 */
 	static encrypt(password){
 		return new Promise((resolve, reject) => {
-			bcrypt.hash(password, bcrypt.genSaltSync(), null, (err, hash) => {
+			bcrypt.genSalt((err, salt) => {
 				if(err) return reject(err);
 
-				resolve(hash);
+				bcrypt.hash(password, salt, null, (err, hash) => {
+					if(err) return reject(err);
+
+					resolve(hash);
+				});
 			});
 		});
 	}
@@ -36,7 +40,7 @@ class Utils{
 	 * @return Promise
 	 */
 	static compareHash(data, hash){
-		return new Promise((resolve, reject) =>{
+		return new Promise((resolve, reject) => {
 			bcrypt.compare(data, hash, (err, res) => {
 				if(err) return reject(err);
 

@@ -1,4 +1,4 @@
-var chalk = require('chalk');
+const chalk = require('chalk');
 const COLOR_MAPPING = {
 	'0': chalk.black,
 	'1': chalk.red,
@@ -24,8 +24,13 @@ const COLOR_MAPPING = {
 	'H': chalk.bgWhite
 };
 
-var translate = (lang, key, options) => {
-	var translation = require(`../translation-${lang}.json`);
+const cache = {};
+
+const translate = (lang, key, options) => {
+	let translation;
+	if(cache[lang]) translation = cahce[lang];
+	else translation = cache[lang] = require(`../translation-${lang}.json`);
+	
 	options = options || {};
 
 	Object.keys(options).forEach((k) => {
@@ -50,13 +55,13 @@ var translate = (lang, key, options) => {
 	return translation;
 };
 
-var translator = (request, key, ...args) => {
-	var lang = request.language;
+const translator = (request, key, ...args) => {
+	const lang = request.language;
 	return translate(lang, key, ...args);
 };
 
 translator.deflang = (key, ...args) => {
-	var lang = global.config.langs[0];
+	const lang = global.config.langs[0];
 	return translate(lang, key, ...args);
 };
 

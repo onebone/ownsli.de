@@ -21,6 +21,9 @@
   "dependencies": {
     "materialize": "^0.97.8",
     "socket.io-client": "^1.7.2",
-    "mdi": "^1.7.22"
+    "mdi": "^1.7.22",
+    "font-d2coding": "Joungkyun/font-d2coding#^1.2.1",
+    "nanum-sqaure": "hiun/NanumSquare",
+    "nanum-barun-gothic": "hiun/NanumBarunGothic#^1.0.0"
   }
 }

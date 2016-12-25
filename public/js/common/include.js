@@ -1,3 +1,4 @@
+//webpack과 같이 패키징할 때 생기는 귀차니즘으로부터...
 window.include = function(srclist, cb){
 	var requireModule = (function(index){
 		var moduleName = Object.keys(srclist)[index];

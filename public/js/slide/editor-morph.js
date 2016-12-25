@@ -1,67 +1,123 @@
-(function(){
-	//상수 선언
-	var ANCHOR_SIZE_HALF = '5px';
-	var WIDTH_HALF = 'width_half',
-	var WIDTH = 'width_full';
-	var HEIGHT_HALF = 'height_half';
-	var HEIGHT = 'height_full';
+//상수 선언
+var ANCHOR_SIZE_HALF = '5px';
+var WIDTH_HALF = 'width_half',
+var WIDTH = 'width_full';
+var HEIGHT_HALF = 'height_half';
+var HEIGHT = 'height_full';
 
-	var ANCHORS = [
-		{
-			//left-up
-			x: '-' + ANCHOR_SIZE_HALF,
-			y: '-' + ANCHOR_SIZE_HALF
-		}, {
-			//left
-			x: '-' + ANCHOR_SIZE_HALF,
-			y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF
-		}, {
-			//left-down
-			x: '-' + ANCHOR_SIZE_HALF,
-			y: HEIGHT + ' - ' + ANCHOR_SIZE_HALF
-		}, {
-			//down
-			x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
-			y: HEIGHT + ' - ' + ANCHOR_SIZE_HALF
-		}, {
-			//down-right
-			x: WIDTH + ' - ' + ANCHOR_SIZE_HALF,
-			y: HEIGHT + ' - ' + ANCHOR_SIZE_HALF
-		}, {
-			//right
-			x: WIDTH + ' - ' + ANCHOR_SIZE_HALF,
-			y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF
-		}, {
-			//right-up
-			x: WIDTH + ' - ' + ANCHOR_SIZE_HALF,
-			y: '-' + ANCHOR_SIZE_HALF
-		}, {
-			//up
-			x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
-			y: '-' + ANCHOR_SIZE_HALF
-		}, {
-			//rotation
-			x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
-			y: '-' + '20px'
-		}
-	];
-
-	Object.freeze(ANCHORS);
-
-	//Morph 제작
-	function Morph(node){
-		this.object = node;
-		var _this = this;
-		['x', 'y', 'width', 'height', 'rotation'].forEach(function(v){
-			utils.bindPropertyToAttribute(this.object, this, v, function(prev, curr){
-				_this.onUpdate(prev, curr);
-			});
-		});
-
-		this.anchors = ANCHORS.forEach(function(v){
-			//TODO
-		});
+var ANCHORS = [
+	{
+		//left-up
+		x: '-' + WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		y: '-' + HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		pointer: 'nwse-resize',
+		do: 'left-up-diagonal'
+	}, {
+		//left
+		x: '-' + WEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		y: '-' + ANCHOR_SIZE_HALF,
+		pointer: 'ew-resize',
+		do: 'left-right'
+	}, {
+		//left-down
+		x: '-' + WEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		pointer: 'nesw-resize',
+		do: 'left-down-diagonal'
+	}, {
+		//down
+		x: '-' + ANCHOR_SIZE_HALF,
+		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		pointer: 'ns-resize',
+		do: 'up-down'
+	}, {
+		//down-right
+		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		pointer: 'nwse-resize',
+		do: 'left-up-diagonal'
+	}, {
+		//right
+		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		y: '-' + ANCHOR_SIZE_HALF,
+		pointer: 'ew-resize',
+		do: 'left-right'
+	}, {
+		//right-up
+		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		y: '-' + HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		pointer: 'nesw-resize',
+		do: 'left-down-diagonal'
+	}, {
+		//up
+		x: '-' + ANCHOR_SIZE_HALF,
+		y: '-' + HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		pointer: 'ns-resize',
+		do: 'up-down'
+	}, {
+		//rotation
+		x: '-' + ANCHOR_SIZE_HALF,
+		y: '-' + HEIGHT_HALF + ' - ' + '20px',
+		pointer: 'url(cursor/cursor-rotate.cur), all-scroll',
+		do: 'rotate'
 	}
+];
 
-	Morph.prototype
-})();
+Object.freeze(ANCHORS);
+
+//Morph 제작
+function Morph(node, workspace){
+	this.object = node;
+	this.workspace = workspace;
+	var _this = this;
+	['x', 'y', 'width', 'height', 'rotation'].forEach(function(v){
+		utils.bindPropertyToAttribute(this.object, this, v, function(prev, curr){
+			_this.onUpdate(prev, curr);
+		});
+	});
+
+	this.anchors = ANCHORS.map(function(v){
+		var anchor = document.createElement('div');
+		anchor.setAttribute('class', 'oc-morph-anchor');
+		anchor.setAttribute('data-oc-morph-anchor-x', v.x);
+		anchor.setAttribute('data-oc-morph-anchor-y', v.y);
+		anchor.setAttribute('data-oc-morph-anchor-do', v.do);
+		anchor.style.cursor = v.pointer;
+		_this.workspace.append(anchor);
+	});
+
+	node.addEventListener('os:update', function(){
+		_this.updateAnchor();
+	});
+
+	this.updateAnchor();
+}
+
+Morph.parseAnchorSyntax = function(statement, width, height){
+	return statement
+		.split(WIDTH).join(width + 'px')
+		.split(WIDTH_HALF).join(Math.round(width / 2) + 'px')
+		.split(HEIGHT).join(height + 'px')
+		.split(HEIGHT_HALF).join(Math.round(height / 2) + 'px');
+};
+
+Morph.prototype.updateAnchor = function(){
+	var obj = this.object;
+	var objW = parseInt(obj.getAttribute('data-oc-width'));
+	var objH = parseInt(obj.getAttribute('data-oc-height'));
+	var objX = Math.round(parseInt(obj.getAttribute('data-oc-x')) + objW / 2);
+	var objY = Math.round(parseInt(obj.getAttribute('data-oc-y')) + objH / 2);
+	var objZ = Math.round(parseInt(obj.getAttribute('data-oc-z')));
+	var objRotation = Math.round(parseInt(obj.getAttribute('data-oc-rotation')));
+
+	this.anchors.forEach(function(v){
+		var anchorX = Morph.parseAnchorSyntax(obj.getAttribute("data-oc-morph-anchor-x"));
+		var anchorY = Morph.parseAnchorSyntax(obj.getAttribute("data-oc-morph-anchor-y"));
+
+		v.style.transformOrigin = objX + ' ' + objY + ' ' + objZ;
+		v.style.transform = "rotate(" + objRotation + "deg) translate(calc(" + anchorX + "), calc(" + anchorY + "))"
+	});
+};
+
+
+module.exports = Morph;

@@ -1,9 +1,15 @@
 const crypto = require('crypto');
 const bcrypt = require('bcrypt-nodejs');
 
+const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
 class Utils{
-	static createToken(){
-		return crypto.randomBytes(64).toString('hex');
+	static createToken(len = 64){
+		let str = '';
+		for(let i = 0; i < len; i++){
+			str += letters[Utils.rand(0, letters.length - 1)];
+		}
+		return str;
 	}
 
 	/**
@@ -44,7 +50,7 @@ class Utils{
 	 * @param max
 	 */
 	static rand(min, max){
-		return Math.floor(Math.random() * (max - max + 1)) + min;
+		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 }
 

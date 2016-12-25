@@ -2,16 +2,26 @@
 
 const {Vector2} = require('./math');
 const MongoConnection = require('./mongo');
+const Utils = require('./utils');
 
 // Document is wrapper of a presentation
 class Document{
 	/**
+	 * @param id string         | Id of document
 	 * @param name string       | Name of document
 	 * @param slides Slide[]    | Key of the array is page
 	 */
-	constructor(name, slides = []){
+	constructor(id, name, slides = []){
+		this._id = id;
 		this._name = name;
 		this._slides = slides;
+	}
+
+	/**
+	 * @returns string
+	 */
+	getId(){
+		return this._id;
 	}
 
 	/**
@@ -45,6 +55,7 @@ class Document{
 
 	toArray(){
 		let data = {
+			id: this._id,
 			name: this._name,
 			slides: []
 		};
@@ -143,6 +154,7 @@ class DocumentManager{
 	 */
 	static addDocument(name){
 		return MongoConnection.insert('document', {
+			id: Utils.createToken(32), // TODO Check if same id exist
 			name: name,
 			slides: []
 		});
@@ -159,7 +171,7 @@ class DocumentManager{
 				if(err) return reject(err);
 				if(rows.length < 1) return resolve(null);
 
-				resolve(new Document(rows[0].name, rows[0].slides));
+				resolve(new Document(rows[0].id, rows[0].name, rows[0].slides));
 			});
 		});
 	}
@@ -169,7 +181,7 @@ class DocumentManager{
 	 */
 	static saveDocument(document){
 		return MongoConnection.replace('document', {
-			name: document.getName()
+			id: document.getId()
 		}, document.toArray());
 	}
 }

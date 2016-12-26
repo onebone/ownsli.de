@@ -1,4 +1,4 @@
-require('../bin/www');
+require('../app');
 
 const assert = require('assert');
 
@@ -13,9 +13,11 @@ describe('Group', () => {
 		const now = Date.now();
 		Sync.createGroup(new Document('testId', 'name', []), new Session('test', 'thisisatoken', now), new Session('test2', 'thisisatoken2', now));
 
+		const sess1 = new Session('test', 'thisisatoken', now), sess2 =  new Session('test2', 'thisisatoken2', now);
+		sess1._group = sess2._group = 'testId';
 		assert.deepEqual({
 			'testId': [
-				new Session('test', 'thisisatoken', now), new Session('test2', 'thisisatoken2', now)
+				sess1, sess2
 			]
 		}, Sync.getGroups());
 
@@ -28,11 +30,14 @@ describe('Group', () => {
 		Sync.createGroup(new Document('testId', 'name', []));
 
 		const now = Date.now();
-		Sync.joinSession('testId', new Session('test', 'thisisatoken', now));
+		const session = new Session('test', 'thisisatoken', now);
+		Sync.joinSession('testId', session);
 
+		const session2 = new Session('test', 'thisisatoken', now);
+		session2._group = 'testId';
 		assert.deepEqual({
 			'testId': [
-				new Session('test', 'thisisatoken', now)
+				session2
 			]
 		}, Sync.getGroups());
 
@@ -45,8 +50,9 @@ describe('Group', () => {
 		Sync.createGroup(new Document('testId', 'name', []));
 
 		const now = Date.now();
-		Sync.joinSession('testId', new Session('test', 'thisisatoken', now));
-		Sync.leaveSession('testId', 'test');
+		const session = new Session('test', 'thisisatoken', now);
+		Sync.joinSession('testId', session);
+		Sync.leaveSession(session);
 
 		assert.deepEqual({
 			'testId': [
@@ -61,14 +67,23 @@ describe('Group', () => {
 		Sync.resetGroups();
 
 		const now = Date.now();
-		Sync.createGroup(new Document('testId', 'name', []), new Session('test', 'thisisatoken', now), new Session('test2', 'thisisatoken2', now));
-		Sync.createGroup(new Document('testId2', 'name', []), new Session('test3', 'thisisatoken3', now), new Session('test4', 'thisisatoken4', now));
+
+		let sessions = [];
+		for(let i = 0; i < 4; i++){
+			sessions[i] = new Session('test'+i, 'thisisatoken'+i, now);
+		}
+
+		Sync.createGroup(new Document('testId', 'name', []), sessions[0], sessions[1]);
+		Sync.createGroup(new Document('testId2', 'name', []), sessions[2], sessions[3]);
 
 		Sync.removeGroup('testId2');
 
+		const sess1 = new Session('test0', 'thisisatoken0', now);
+		const sess2 = new Session('test1', 'thisisatoken1', now);
+		sess1._group = sess2._group = 'testId';
 		assert.deepEqual({
 			'testId': [
-				new Session('test', 'thisisatoken', now), new Session('test2', 'thisisatoken2', now)
+				sess1, sess2
 			]
 		}, Sync.getGroups());
 

@@ -1,6 +1,7 @@
 'use strict';
 
 const Utils = require('./utils');
+const Sync = require('./sync');
 
 const sessions = new Map();
 
@@ -24,6 +25,9 @@ class SessionManager{
 	 */
 	static removeSession(token){
 		if(sessions[token]){
+			const sess = sessions[token];
+			Sync.leaveSession(sess);
+
 			sessions.delete(token);
 			return true;
 		}
@@ -76,6 +80,7 @@ class Session{
 		this._userId = userId.toLowerCase();
 		this._token = token;
 		this._creationTime = creationTime;
+		this._group = null;
 	}
 
 	getUserId(){
@@ -88,6 +93,17 @@ class Session{
 
 	getCreationTime(){
 		return this._creationTime;
+	}
+
+	/**
+	 * @param {string|null} group
+	 */
+	__setGroup(group){
+		this._group = group;
+	}
+
+	getGroup(){
+		return this._group;
 	}
 }
 

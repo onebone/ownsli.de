@@ -1,4 +1,7 @@
+'use strict';
+
 const {Document} = require('./document');
+const {SessionManager} = require('./session');
 
 let io = null;
 let groups = {};
@@ -8,8 +11,20 @@ class Sync{
 	 * This function not for general use
 	 * This should be called once when starting http
 	 */
-	static setServer(server){
+	static setServer(server, session){
 		io = require('socket.io')(server);
+
+		io.use((socket, next) => {
+			session(socket.request, socket.request.res, next);
+		});
+
+		io.sockets.on('connection', (socket) => {
+			const session = SessionManager.getSession(socket.request.session.token);
+
+			if(session === null){
+				return;
+			}
+		});
 	}
 
 	/**
@@ -26,6 +41,12 @@ class Sync{
 		if(typeof document !== 'string'){
 			return false;
 		}
+
+		session.forEach((sess) => {
+			if(!sess) return;
+			// TODO check if session already has group
+			sess.__setGroup(document);
+		});
 
 		groups[document] = session;
 		return true;
@@ -47,6 +68,7 @@ class Sync{
 
 		if(groups[document]){
 			session.forEach((sess) => {
+				sess.__setGroup(document);
 				groups[document].push(sess);
 			});
 			return true;
@@ -60,25 +82,17 @@ class Sync{
 	 * @param sessions Session
 	 * @return boolean
 	 */
-	static leaveSession(document, ...sessions){
-		if(document instanceof Document){
-			document = document.getId();
-		}
-
-		if(typeof document !== 'string'){
-			return false;
-		}
-
-		if(groups[document]){
+	static leaveSession(...sessions){
+		sessions.forEach((session) => {
+			const document = session.getGroup();
 			groups[document].forEach((sess, index) => {
-				for(const session of sessions){
-					if(sess.getUserId() === session){
-						groups[document].splice(index, 1);
-						break;
-					}
+				if(!sess) return;
+
+				if(sess.getUserId() === session.getUserId()){
+					groups[document].splice(index, 1);
 				}
 			});
-		}
+		});
 	}
 
 	/**
@@ -95,6 +109,12 @@ class Sync{
 		}
 
 		if(groups[document]){
+			groups[document].forEach((sess) => {
+				if(!sess) return;
+
+				sess.__setGroup(null);
+			});
+
 			delete groups[document];
 			return true;
 		}

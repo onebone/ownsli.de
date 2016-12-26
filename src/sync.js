@@ -78,7 +78,6 @@ class Sync{
 
 	/**
 	 * Removes session from a group
-	 * @param document Document
 	 * @param sessions Session
 	 * @return boolean
 	 */

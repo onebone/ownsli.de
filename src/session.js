@@ -72,10 +72,10 @@ class SessionManager{
 }
 
 class Session{
-	constructor(userId, token){
+	constructor(userId, token, creationTime = Date.now()){
 		this._userId = userId.toLowerCase();
 		this._token = token;
-		this._creationTime = Date.now();
+		this._creationTime = creationTime;
 	}
 
 	getUserId(){

@@ -1,6 +1,6 @@
 require('../init');
 const {DocumentManager, Slide} = require('../src/document');
-const {Vector2} = require('../src/math');
+const {Vector3} = require('../src/math');
 const Utils = require('../src/utils');
 
 describe('Document', () => {
@@ -16,7 +16,7 @@ describe('Document', () => {
 			let len = Utils.rand(1, 5);
 			document._slides = [];
 			for(let i = 0; i < len; i++){
-				document._slides.push(new Slide(new Vector2(Utils.rand(-100, 100), Utils.rand(-100, 100)), []));
+				document._slides.push(new Slide(new Vector3(Utils.rand(-100, 100), Utils.rand(-100, 100), Utils.rand(-100, 100)), []));
 			}
 
 			DocumentManager.saveDocument(document).then(() => done());

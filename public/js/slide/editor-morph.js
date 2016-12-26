@@ -89,6 +89,8 @@ function Morph(node, workspace){
 			h: parseInt(node.getAttribute('data-os-height'))
 		};
 
+		var last = {w: initialScale.w, h: initialScale.h};
+
 		interact(anchor)
 			.origin('self')
 			.draggable({
@@ -109,6 +111,13 @@ function Morph(node, workspace){
 				var oy = parseInt(node.getAttribute('data-os-y'));
 				var ow = parseInt(node.getAttribute('data-os-width'));
 				var oh = parseInt(node.getAttribute('data-os-height'));
+
+				event.dx += (ow - last.w);
+				event.dy += (oh - last.h);
+				last = {
+					w: ow, h: oh
+				};
+				// FIXME 대각선으로 조정한 경우 다음 조정이 제대로 이루어지지 않음
 
 				//Updated values
 				var nw = Math.max(0, ow + event.dx);
@@ -191,6 +200,7 @@ function Morph(node, workspace){
 
 				_this.updateNode();
 				//_this.updateAnchor();
+
 			});
 		_this.workspace.append(anchor);
 
@@ -198,7 +208,7 @@ function Morph(node, workspace){
 	});
 
 	node.addEventListener('os:update', function(){
-		//_this.updateAnchor();
+		_this.updateAnchor();
 	});
 
 	this.updateAnchor();

@@ -21,7 +21,7 @@ class Utils{
 	 */
 	static encrypt(password){
 		return new Promise((resolve, reject) => {
-			bcrypt.genSalt((err, salt) => {
+			bcrypt.genSalt(null, (err, salt) => {
 				if(err) return reject(err);
 
 				bcrypt.hash(password, salt, null, (err, hash) => {

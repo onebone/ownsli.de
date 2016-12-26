@@ -66,7 +66,7 @@ class Document{
 			});
 
 			data.slides.push({ // slide info
-				vec: [slide.getPosition().getX(), slide.getPosition().getY()],
+				vec: [slide.getPosition().getX(), slide.getPosition().getY(), slide.getPosition().getZ()],
 				shapes: shapes
 			});
 		});
@@ -78,7 +78,7 @@ class Document{
 // Slide is a wrapper of slide which is included in Document
 class Slide{
 	/**
-	 * @param vec Vector2       | Position of slide where slide will be placed
+	 * @param vec Vector3       | Position of slide where slide will be placed
 	 * @param shapes Shape[]    | Shapes which is included in slide
 	 */
 	constructor(vec, shapes){
@@ -87,7 +87,7 @@ class Slide{
 	}
 
 	/**
-	 * @return Vector2
+	 * @return Vector3
 	 */
 	getPosition(){
 		return this._vec.add();

@@ -122,8 +122,9 @@ function Morph(node, workspace){
 				var ow = parseInt(_this['os-width']);
 				var oh = parseInt(_this['os-height']);
 
-				event.dx += (ow - last.w);
-				event.dy += (oh - last.h);
+				var needsRev = (v.do.includes('left') || v.do.includes('up')) && v.do !== 'right-up';
+				event.dx += (ow - last.w) * (needsRev ? -1 : 1);
+				event.dy += (oh - last.h) * (needsRev ? -1 : 1);
 				last = {
 					w: ow, h: oh
 				};

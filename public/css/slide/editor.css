@@ -1,11 +1,16 @@
-.oc-morph-anchor {
+.os-morph-anchor {
 	background: #00bcd4;
 	border: 2px solid #222;
 	width: 6px;
 	height: 6px;
 	border-radius: 5px;
+	position: absolute;
 }
 
-.oc-editor-workspace {
-
+.os-editor-workspace {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
 }

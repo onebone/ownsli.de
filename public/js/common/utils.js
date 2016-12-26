@@ -1,3 +1,6 @@
+if(window.jQuery) window.jQuery.noConflict();
+window.$ = document.querySelector.bind(document);
+
 module.exports.bindPropertyToAttribute = function(original, target, propertyName, onUpdate){
 	if(!onUpdate) onUpdate = function(){};
 

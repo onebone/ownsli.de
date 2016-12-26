@@ -1,5 +1,6 @@
 //webpack과 같이 패키징할 때 생기는 귀차니즘으로부터...
 window.include = function(srclist, cb){
+	if(!cb) cb = function(){};
 	var requireModule = (function(index){
 		var moduleName = Object.keys(srclist)[index];
 		var src = srclist[moduleName];
@@ -48,6 +49,7 @@ window.include = function(srclist, cb){
 			}
 		};
 		xhr.send(null);
+		console.log('Loading a module : ' + moduleName);
 	});
 
 	requireModule(0);

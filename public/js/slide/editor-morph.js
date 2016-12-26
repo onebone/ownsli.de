@@ -78,11 +78,12 @@ function Morph(node, workspace){
 
 	this.anchors = ANCHORS.map(function(v){
 		var anchor = document.createElement('div');
-		anchor.setAttribute('class', 'oc-morph-anchor');
-		anchor.setAttribute('data-oc-morph-anchor-x', v.x);
-		anchor.setAttribute('data-oc-morph-anchor-y', v.y);
-		anchor.setAttribute('data-oc-morph-anchor-do', v.do);
+		anchor.setAttribute('class', 'os-morph-anchor');
+		anchor.setAttribute('data-os-morph-anchor-x', v.x);
+		anchor.setAttribute('data-os-morph-anchor-y', v.y);
+		anchor.setAttribute('data-os-morph-anchor-do', v.do);
 		anchor.style.cursor = v.pointer;
+
 		_this.workspace.append(anchor);
 	});
 
@@ -103,16 +104,16 @@ Morph.parseAnchorSyntax = function(statement, width, height){
 
 Morph.prototype.updateAnchor = function(){
 	var obj = this.object;
-	var objW = parseInt(obj.getAttribute('data-oc-width'));
-	var objH = parseInt(obj.getAttribute('data-oc-height'));
-	var objX = Math.round(parseInt(obj.getAttribute('data-oc-x')) + objW / 2);
-	var objY = Math.round(parseInt(obj.getAttribute('data-oc-y')) + objH / 2);
-	var objZ = Math.round(parseInt(obj.getAttribute('data-oc-z')));
-	var objRotation = Math.round(parseInt(obj.getAttribute('data-oc-rotation')));
+	var objW = parseInt(obj.getAttribute('data-os-width'));
+	var objH = parseInt(obj.getAttribute('data-os-height'));
+	var objX = Math.round(parseInt(obj.getAttribute('data-os-x')) + objW / 2);
+	var objY = Math.round(parseInt(obj.getAttribute('data-os-y')) + objH / 2);
+	var objZ = Math.round(parseInt(obj.getAttribute('data-os-z')));
+	var objRotation = Math.round(parseInt(obj.getAttribute('data-os-rotation')));
 
 	this.anchors.forEach(function(v){
-		var anchorX = Morph.parseAnchorSyntax(obj.getAttribute("data-oc-morph-anchor-x"));
-		var anchorY = Morph.parseAnchorSyntax(obj.getAttribute("data-oc-morph-anchor-y"));
+		var anchorX = Morph.parseAnchorSyntax(obj.getAttribute("data-os-morph-anchor-x"));
+		var anchorY = Morph.parseAnchorSyntax(obj.getAttribute("data-os-morph-anchor-y"));
 
 		v.style.transformOrigin = objX + ' ' + objY + ' ' + objZ;
 		v.style.transform = "rotate(" + objRotation + "deg) translate(calc(" + anchorX + "), calc(" + anchorY + "))"

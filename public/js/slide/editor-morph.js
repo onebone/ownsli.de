@@ -94,51 +94,67 @@ function Morph(node, workspace){
 			.draggable({
 				origin: [initialScale.x, initialScale.y]
 			})
-			.on('start', function(event){
+			.on('dragstart', function(event){
 				initialScale = {
 					w: parseInt(node.getAttribute('data-os-width')),
 					h: parseInt(node.getAttribute('data-os-height'))
 				};
 			})
+			.on('dragend', function(event){
+				_this.updateAnchor();
+			})
 			.on('dragmove', function(event){
+				//Original XYWH of object
+				var ox = parseInt(node.getAttribute('data-os-x'));
+				var oy = parseInt(node.getAttribute('data-os-y'));
+				var ow = parseInt(node.getAttribute('data-os-width'));
+				var oh = parseInt(node.getAttribute('data-os-height'));
+
 				//Updated values
-				var nw = parseInt(node.getAttribute('data-os-width')) + event.dx;
-				var ny = parseInt(node.getAttribute('data-os-height')) + event.dy;
+				var nw = Math.max(0, ow + event.dx);
+				var nh = Math.max(0, oh + event.dy);
+
+				//for left anchors
+				var _nw = Math.max(0, ow - event.dx);
+
+				//for top anchors
+				var _nh = Math.max(0, oh - event.dy);
 
 				//Calculated values from initialScale to scale-preserved resizing
 				var ch;
+				var _ch; //ch for leftanchors
 
 				//if the resizing method is scale-preserved resizing,
 				if(v.do === 'left-up' || v.do === 'left-down' || v.do === 'right-up' || v.do === 'right-down'){
-					if(initialScale) ch = initialScale.h / initialScale.w * nw;
+					if(initialScale){
+						ch = Math.round(initialScale.h / initialScale.w * nw);
+						_ch = Math.round(initialScale.h / initialScale.w * (nw - 2 * event.dx));
+					}
 				}
 
-				//Original XY of object
-				var ox = parseInt(node.getAttribute('data-os-x'));
-				var oy = parseInt(node.getAttribute('data-os-x'));
 				switch(v.do){
 					case 'left-up':
 						if(!initialScale) break;
-						node.setAttribute('data-os-width', nw);
-						node.setAttribute('data-os-height', ch);
+						node.setAttribute('data-os-width', _nw);
+						node.setAttribute('data-os-height', _ch);
 
-						node.setAttribute('data-os-x', ox - nw);
-						node.setAttribute('data-os-y', oy - ch);
+						node.setAttribute('data-os-x', ox + event.dx);
+						node.setAttribute('data-os-y', oy + (oh - _ch));
 						break;
 
 					case 'left':
-						node.setAttribute('data-os-width', nw);
+						node.setAttribute('data-os-width', _nw);
 
-						node.setAttribute('data-os-x', ox - nw);
+						node.setAttribute('data-os-x', ox + event.dx);
 						break;
 
 					case 'left-down':
 						if(!initialScale) break;
-
-						node.setAttribute('data-os-width', nw);
+						ch = initialScale.h / initialScale.w * (_nw);
+						node.setAttribute('data-os-width', _nw);
 						node.setAttribute('data-os-height', ch);
 
-						node.setAttribute('data-os-x', ox - nw);
+						node.setAttribute('data-os-x', ox + event.dx);
 						break;
 
 					case 'down':
@@ -159,14 +175,13 @@ function Morph(node, workspace){
 						if(!initialScale) break;
 						node.setAttribute('data-os-width', nw);
 						node.setAttribute('data-os-height', ch);
-
-						data.setAttribute('data-os-y', oy - ch);
+						node.setAttribute('data-os-y', oy + (oh - ch));
 						break;
 
 					case 'up':
-						node.setAttribute('data-os-height', ch);
+						node.setAttribute('data-os-height', _nh);
 
-						node.setAttribute('data-os-y', oy - ch);
+						node.setAttribute('data-os-y', oy + event.dy);
 						break;
 
 					case 'rotation':
@@ -175,6 +190,7 @@ function Morph(node, workspace){
 				}
 
 				_this.updateNode();
+				//_this.updateAnchor();
 			});
 		_this.workspace.append(anchor);
 
@@ -182,7 +198,7 @@ function Morph(node, workspace){
 	});
 
 	node.addEventListener('os:update', function(){
-		_this.updateAnchor();
+		//_this.updateAnchor();
 	});
 
 	this.updateAnchor();

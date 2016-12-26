@@ -4,5 +4,5 @@ include({
 	interact: '/interactjs/dist/interact.min.js'
 }, function(err){
 	if(err) //TODO Error handle
-	workspace.initWorkspace();
+	workspace.initWorkspace(null, document.body);
 });

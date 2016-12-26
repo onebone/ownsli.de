@@ -55,11 +55,23 @@ var ANCHORS = [
 		pointer: 'ns-resize',
 		do: 'up'
 	}, {
-		//rotation
+		//rotationX
+		x: WIDTH + ' - ' + ANCHOR_SIZE_HALF + ' + ' + '20px',
+		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		pointer: 'url(/cursor/cursor-rotate.cur), all-scroll',
+		do: 'rotate-x'
+	}, {
+		//rotationY
 		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
 		y: '-' + ANCHOR_SIZE_HALF + ' - ' + '20px',
 		pointer: 'url(/cursor/cursor-rotate.cur), all-scroll',
-		do: 'rotate'
+		do: 'rotate-y'
+	}, {
+		//rotationY
+		x: '-' + ANCHOR_SIZE_HALF + ' - ' + '20px',
+		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		pointer: 'url(/cursor/cursor-rotate.cur), all-scroll',
+		do: 'rotate-z'
 	}
 ];
 
@@ -68,12 +80,10 @@ Object.freeze(ANCHORS);
 //Morph 제작
 function Morph(node, workspace){
 	this.object = node;
-	this.workspace = workspace.workspace;
+	this.workspace = workspace;
 	var _this = this;
-	['x', 'y', 'width', 'height', 'rotation'].forEach(function(v){
-		utils.bindPropertyToAttribute(_this.object, _this, v, function(prev, curr){
-			_this.onUpdate(prev, curr);
-		});
+	['os-x', 'os-y', 'os-z', 'os-width', 'os-height', 'os-rotation-x', 'os-rotation-y', 'os-rotation-z'].forEach(function(v){
+		utils.bindPropertyToAttribute(_this.object, _this, v);
 	});
 
 	this.anchors = ANCHORS.map(function(v){
@@ -85,8 +95,8 @@ function Morph(node, workspace){
 		anchor.style.cursor = v.pointer;
 
 		var initialScale = {
-			w: parseInt(node.getAttribute('data-os-width')),
-			h: parseInt(node.getAttribute('data-os-height'))
+			w: parseInt(_this['os-width']),
+			h: parseInt(_this['os-height'])
 		};
 
 		interact(anchor)
@@ -96,8 +106,8 @@ function Morph(node, workspace){
 			})
 			.on('dragstart', function(event){
 				initialScale = {
-					w: parseInt(node.getAttribute('data-os-width')),
-					h: parseInt(node.getAttribute('data-os-height'))
+					w: parseInt(_this['os-width']),
+					h: parseInt(_this['os-height'])
 				};
 			})
 			.on('dragend', function(event){
@@ -105,10 +115,10 @@ function Morph(node, workspace){
 			})
 			.on('dragmove', function(event){
 				//Original XYWH of object
-				var ox = parseInt(node.getAttribute('data-os-x'));
-				var oy = parseInt(node.getAttribute('data-os-y'));
-				var ow = parseInt(node.getAttribute('data-os-width'));
-				var oh = parseInt(node.getAttribute('data-os-height'));
+				var ox = parseInt(_this['os-x']);
+				var oy = parseInt(_this['os-y']);
+				var ow = parseInt(_this['os-width']);
+				var oh = parseInt(_this['os-height']);
 
 				//Updated values
 				var nw = Math.max(0, ow + event.dx);
@@ -135,83 +145,90 @@ function Morph(node, workspace){
 				switch(v.do){
 					case 'left-up':
 						if(!initialScale) break;
-						node.setAttribute('data-os-width', _nw);
-						node.setAttribute('data-os-height', _ch);
+						_this['os-width'] = _nw;
+						_this['os-height'] = _ch;
 
-						node.setAttribute('data-os-x', ox + event.dx);
-						node.setAttribute('data-os-y', oy + (oh - _ch));
+						_this['os-x'] = ox + event.dx;
+						_this['os-y'] = oy + (oh - _ch);
 						break;
 
 					case 'left':
-						node.setAttribute('data-os-width', _nw);
+						_this['os-width'] = _nw;
 
-						node.setAttribute('data-os-x', ox + event.dx);
+						_this['os-x'] = ox + event.dx;
 						break;
 
 					case 'left-down':
 						if(!initialScale) break;
 						ch = initialScale.h / initialScale.w * (_nw);
-						node.setAttribute('data-os-width', _nw);
-						node.setAttribute('data-os-height', ch);
+						_this['os-width'] = _nw;
+						_this['os-height'] = ch;
 
-						node.setAttribute('data-os-x', ox + event.dx);
+						_this['os-x'] = ox + event.dx;
 						break;
 
 					case 'down':
-						node.setAttribute('data-os-height', nh);
+						_this['os-height'] = nh;
 						break;
 
 					case 'right-down':
 						if(!initialScale) break;
-						node.setAttribute('data-os-width', nw);
-						node.setAttribute('data-os-height', ch);
+						_this['os-width'] = nw;
+						_this['os-height'] = ch;
 						break;
 
 					case 'right':
-						node.setAttribute('data-os-width', nw);
+						_this['os-width'] = nw;
 						break;
 
 					case 'right-up':
 						if(!initialScale) break;
-						node.setAttribute('data-os-width', nw);
-						node.setAttribute('data-os-height', ch);
-						node.setAttribute('data-os-y', oy + (oh - ch));
+						_this['os-width'] = nw;
+						_this['os-height'] = ch;
+						_this['os-y'] = oy + (oh - ch);
 						break;
 
 					case 'up':
-						node.setAttribute('data-os-height', _nh);
+						_this['os-height'] = _nh;
 
-						node.setAttribute('data-os-y', oy + event.dy);
+						_this['os-y'] = oy + event.dy;
 						break;
 
-					case 'rotation':
-						//TODO
+					case 'rotate-x':
+						_this['os-rotation-x'] = parseInt(_this['os-rotation-x']) + event.dy;
+						break;
+
+					case 'rotate-y':
+						_this['os-rotation-y'] = parseInt(_this['os-rotation-y']) + event.dx;
+						break;
+
+					case 'rotate-z':
+						_this['os-rotation-z'] = parseInt(_this['os-rotation-z']) - event.dy;
 						break;
 				}
 
 				_this.updateNode();
-				//_this.updateAnchor();
 			});
-		_this.workspace.append(anchor);
+		_this.workspace.addToWorkspace(anchor);
 
 		return anchor;
-	});
-
-	node.addEventListener('os:update', function(){
-		//_this.updateAnchor();
 	});
 
 	this.updateAnchor();
 }
 
 Morph.prototype.updateNode = function(){
+	var _this = this;
 	var obj = this.object;
-	var objW = parseInt(obj.getAttribute('data-os-width'));
-	var objH = parseInt(obj.getAttribute('data-os-height'));
-	var objX = Math.round(parseInt(obj.getAttribute('data-os-x')));
-	var objY = Math.round(parseInt(obj.getAttribute('data-os-y')));
-	var objZ = Math.round(parseInt(obj.getAttribute('data-os-z')));
-	var objRotation = Math.round(parseInt(obj.getAttribute('data-os-rotation')));
+	var objW = parseInt(_this['os-width']);
+	var objH = parseInt(_this['os-height']);
+	var objX = Math.round(parseInt(_this['os-x']));
+	var objY = Math.round(parseInt(_this['os-y']));
+	var objZ = Math.round(parseInt(_this['os-z']));
+	var objRotationX = Math.round(parseInt(_this['os-rotation-x']));
+	var objRotationY = Math.round(parseInt(_this['os-rotation-y']));
+	var objRotationZ = Math.round(parseInt(_this['os-rotation-z']));
+
 	obj.style.width = objW + 'px';
 	obj.style.height = objH + 'px';
 
@@ -219,28 +236,30 @@ Morph.prototype.updateNode = function(){
 	var centerY = objY + Math.round(objH / 2);
 
 	obj.style.transformOrigin = centerX + 'px ' + centerY + 'px';
-	obj.style.transform = "rotate(" + objRotation + "deg) translate3d(" + objX + "px, " + objY + "px, " + objZ + "px)";
+	obj.style.transform = "rotateX(" + objRotationX + "deg) rotateY(" + objRotationY + "deg) rotateZ(" + objRotationZ + "deg) translate3d(" + objX + "px, " + objY + "px, " + objZ + "px)";
 
 	var ev = new Event('os:update');
 	obj.dispatchEvent(ev);
 };
 
 Morph.prototype.updateAnchor = function(){
-	var obj = this.object;
-	var objW = parseInt(obj.getAttribute('data-os-width'));
-	var objH = parseInt(obj.getAttribute('data-os-height'));
-	var objX = Math.round(parseInt(obj.getAttribute('data-os-x')));
-	var objY = Math.round(parseInt(obj.getAttribute('data-os-y')));
-	var objZ = Math.round(parseInt(obj.getAttribute('data-os-z')));
-	var objRotation = Math.round(parseInt(obj.getAttribute('data-os-rotation')));
+	var _this = this;
+	var objW = parseInt(_this['os-width']);
+	var objH = parseInt(_this['os-height']);
+	var objX = Math.round(parseInt(_this['os-x']));
+	var objY = Math.round(parseInt(_this['os-y']));
+	var objZ = Math.round(parseInt(_this['os-z']));
+	var objRotationX = Math.round(parseInt(_this['os-rotation-x']));
+	var objRotationY = Math.round(parseInt(_this['os-rotation-y']));
+	var objRotationZ = Math.round(parseInt(_this['os-rotation-z']));
 
 	this.anchors.forEach(function(v){
 		var anchorX = Morph.parseAnchorSyntax(v.getAttribute("data-os-morph-anchor-x"), objW, objH);
 		var anchorY = Morph.parseAnchorSyntax(v.getAttribute("data-os-morph-anchor-y"), objW, objH);
 
 		v.style.transformOrigin = v.style.webkitTransformOrigin = v.style.mozTransformOrigin = v.style.msTransformOrigin =
-			objX + 'px ' + objY + 'px ' + objZ + 'px';
-		v.style.transform = "rotate(" + objRotation + "deg) translate3d(calc(" + anchorX + " + " + objX + "px), calc(" + anchorY + " + " + objY + "px), " + objZ + "px)";
+			(objX + objW / 2) + 'px ' + (objY + objH / 2) + 'px ' + objZ + 'px';
+		v.style.transform = "rotateX(" + objRotationX + "deg) rotateY(" + objRotationY + "deg) rotateZ(" + objRotationZ + "deg) translate3d(calc(" + anchorX + " + " + objX + "px), calc(" + anchorY + " + " + objY + "px), " + objZ + "px)";
 	});
 };
 

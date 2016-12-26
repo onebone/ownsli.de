@@ -15,12 +15,14 @@
 				interact: '/interactjs/dist/interact.min.js'
 			}, function(err){
 				if(err) return console.error(err);
-				testMorph = new morph($('div'), new workspace());
+				testMorph = new morph($('.os-editor-slide-root div'), new workspace(null, document.body));
 			});
 		</script>
 	</head>
 
 	<body>
-		<div style="background: blue; width: 300px; height: 200px" data-os-x="0" data-os-y="0" data-os-z="0" data-os-width="300" data-os-height="200" data-os-rotation="0"></div>
+		<div class="os-editor-slide-root" style="position: absolute;">
+			<div style="background: blue; width: 300px; height: 200px" data-os-x="0" data-os-y="0" data-os-z="0" data-os-width="300" data-os-height="200" data-os-rotation-x="0"  data-os-rotation-y="0"  data-os-rotation-z="0"></div>
+		</div>
 	</body>
 </html>

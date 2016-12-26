@@ -1,6 +1,6 @@
 //상수 선언
-var ANCHOR_SIZE_HALF = '5px';
-var WIDTH_HALF = 'width_half',
+var ANCHOR_SIZE_HALF = '3px';
+var WIDTH_HALF = 'width_half';
 var WIDTH = 'width_full';
 var HEIGHT_HALF = 'height_half';
 var HEIGHT = 'height_full';
@@ -8,57 +8,57 @@ var HEIGHT = 'height_full';
 var ANCHORS = [
 	{
 		//left-up
-		x: '-' + WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
-		y: '-' + HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		x: '-' + ANCHOR_SIZE_HALF,
+		y: '-' + ANCHOR_SIZE_HALF,
 		pointer: 'nwse-resize',
 		do: 'left-up-diagonal'
 	}, {
 		//left
-		x: '-' + WEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
-		y: '-' + ANCHOR_SIZE_HALF,
+		x: '-' + ANCHOR_SIZE_HALF,
+		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
 		pointer: 'ew-resize',
 		do: 'left-right'
 	}, {
 		//left-down
-		x: '-' + WEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
-		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		x: '-' + ANCHOR_SIZE_HALF,
+		y: HEIGHT + ' - ' + ANCHOR_SIZE_HALF,
 		pointer: 'nesw-resize',
 		do: 'left-down-diagonal'
 	}, {
 		//down
-		x: '-' + ANCHOR_SIZE_HALF,
-		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		y: HEIGHT + ' - ' + ANCHOR_SIZE_HALF,
 		pointer: 'ns-resize',
 		do: 'up-down'
 	}, {
 		//down-right
-		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
-		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		x: WIDTH + ' - ' + ANCHOR_SIZE_HALF,
+		y: HEIGHT + ' - ' + ANCHOR_SIZE_HALF,
 		pointer: 'nwse-resize',
 		do: 'left-up-diagonal'
 	}, {
 		//right
-		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
-		y: '-' + ANCHOR_SIZE_HALF,
+		x: WIDTH + ' - ' + ANCHOR_SIZE_HALF,
+		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
 		pointer: 'ew-resize',
 		do: 'left-right'
 	}, {
 		//right-up
-		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
-		y: '-' + HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		x: WIDTH + ' - ' + ANCHOR_SIZE_HALF,
+		y: '-' + ANCHOR_SIZE_HALF,
 		pointer: 'nesw-resize',
 		do: 'left-down-diagonal'
 	}, {
 		//up
-		x: '-' + ANCHOR_SIZE_HALF,
-		y: '-' + HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		y: '-' + ANCHOR_SIZE_HALF,
 		pointer: 'ns-resize',
 		do: 'up-down'
 	}, {
 		//rotation
-		x: '-' + ANCHOR_SIZE_HALF,
-		y: '-' + HEIGHT_HALF + ' - ' + '20px',
-		pointer: 'url(cursor/cursor-rotate.cur), all-scroll',
+		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
+		y: '-' + ANCHOR_SIZE_HALF + ' - ' + '20px',
+		pointer: 'url(/cursor/cursor-rotate.cur), all-scroll',
 		do: 'rotate'
 	}
 ];
@@ -68,7 +68,7 @@ Object.freeze(ANCHORS);
 //Morph 제작
 function Morph(node, workspace){
 	this.object = node;
-	this.workspace = workspace;
+	this.workspace = workspace.workspace;
 	var _this = this;
 	['x', 'y', 'width', 'height', 'rotation'].forEach(function(v){
 		utils.bindPropertyToAttribute(this.object, this, v, function(prev, curr){
@@ -85,6 +85,8 @@ function Morph(node, workspace){
 		anchor.style.cursor = v.pointer;
 
 		_this.workspace.append(anchor);
+
+		return anchor;
 	});
 
 	node.addEventListener('os:update', function(){
@@ -106,17 +108,18 @@ Morph.prototype.updateAnchor = function(){
 	var obj = this.object;
 	var objW = parseInt(obj.getAttribute('data-os-width'));
 	var objH = parseInt(obj.getAttribute('data-os-height'));
-	var objX = Math.round(parseInt(obj.getAttribute('data-os-x')) + objW / 2);
-	var objY = Math.round(parseInt(obj.getAttribute('data-os-y')) + objH / 2);
+	var objX = Math.round(parseInt(obj.getAttribute('data-os-x')));
+	var objY = Math.round(parseInt(obj.getAttribute('data-os-y')));
 	var objZ = Math.round(parseInt(obj.getAttribute('data-os-z')));
 	var objRotation = Math.round(parseInt(obj.getAttribute('data-os-rotation')));
 
 	this.anchors.forEach(function(v){
-		var anchorX = Morph.parseAnchorSyntax(obj.getAttribute("data-os-morph-anchor-x"));
-		var anchorY = Morph.parseAnchorSyntax(obj.getAttribute("data-os-morph-anchor-y"));
+		var anchorX = Morph.parseAnchorSyntax(v.getAttribute("data-os-morph-anchor-x"), objW, objH);
+		var anchorY = Morph.parseAnchorSyntax(v.getAttribute("data-os-morph-anchor-y"), objW, objH);
 
-		v.style.transformOrigin = objX + ' ' + objY + ' ' + objZ;
-		v.style.transform = "rotate(" + objRotation + "deg) translate(calc(" + anchorX + "), calc(" + anchorY + "))"
+		v.style.transformOrigin = v.style.webkitTransformOrigin = v.style.mozTransformOrigin = v.style.msTransformOrigin =
+			objX + 'px ' + objY + 'px ' + objZ + 'px';
+		v.style.transform = "rotate(" + objRotation + "deg) translate(calc(" + anchorX + " + " + objX + "px), calc(" + anchorY + " + " + objY + "px))"
 	});
 };
 

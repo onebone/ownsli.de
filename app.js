@@ -1,6 +1,7 @@
 require('./init');
 
 const bodyParser = require('body-parser');
+const chalk = require('chalk');
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const favicon = require('serve-favicon');
@@ -36,17 +37,16 @@ app.use(requestLanguage({
 	languages: config.langs
 }));
 
-/*app.use((req, res, next) => {
-	res.locals.url = req.url;
-});
-
 app.use(httpErrors);
 app.use(preventInjection);
 app.use(resolveLanguage);
-*/ // //FIXME This code interrupts routing
 
 app.use('/', require('./routes/index'));
 app.use('/login', require('./routes/login'));
+if(devmode){
+	console.log(chalk.yellow('Warning: this app is running on development!'));
+	app.use('/test', express.static(path.join(__dirname, 'test')));
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

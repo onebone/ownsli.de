@@ -11,49 +11,49 @@ var ANCHORS = [
 		x: '-' + ANCHOR_SIZE_HALF,
 		y: '-' + ANCHOR_SIZE_HALF,
 		pointer: 'nwse-resize',
-		do: 'left-up-diagonal'
+		do: 'left-up'
 	}, {
 		//left
 		x: '-' + ANCHOR_SIZE_HALF,
 		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
 		pointer: 'ew-resize',
-		do: 'left-right'
+		do: 'left'
 	}, {
 		//left-down
 		x: '-' + ANCHOR_SIZE_HALF,
 		y: HEIGHT + ' - ' + ANCHOR_SIZE_HALF,
 		pointer: 'nesw-resize',
-		do: 'left-down-diagonal'
+		do: 'left-down'
 	}, {
 		//down
 		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
 		y: HEIGHT + ' - ' + ANCHOR_SIZE_HALF,
 		pointer: 'ns-resize',
-		do: 'up-down'
+		do: 'down'
 	}, {
 		//down-right
 		x: WIDTH + ' - ' + ANCHOR_SIZE_HALF,
 		y: HEIGHT + ' - ' + ANCHOR_SIZE_HALF,
 		pointer: 'nwse-resize',
-		do: 'left-up-diagonal'
+		do: 'right-down'
 	}, {
 		//right
 		x: WIDTH + ' - ' + ANCHOR_SIZE_HALF,
 		y: HEIGHT_HALF + ' - ' + ANCHOR_SIZE_HALF,
 		pointer: 'ew-resize',
-		do: 'left-right'
+		do: 'right'
 	}, {
 		//right-up
 		x: WIDTH + ' - ' + ANCHOR_SIZE_HALF,
 		y: '-' + ANCHOR_SIZE_HALF,
 		pointer: 'nesw-resize',
-		do: 'left-down-diagonal'
+		do: 'right-up'
 	}, {
 		//up
 		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
 		y: '-' + ANCHOR_SIZE_HALF,
 		pointer: 'ns-resize',
-		do: 'up-down'
+		do: 'up'
 	}, {
 		//rotation
 		x: WIDTH_HALF + ' - ' + ANCHOR_SIZE_HALF,
@@ -71,7 +71,7 @@ function Morph(node, workspace){
 	this.workspace = workspace.workspace;
 	var _this = this;
 	['x', 'y', 'width', 'height', 'rotation'].forEach(function(v){
-		utils.bindPropertyToAttribute(this.object, this, v, function(prev, curr){
+		utils.bindPropertyToAttribute(_this.object, _this, v, function(prev, curr){
 			_this.onUpdate(prev, curr);
 		});
 	});
@@ -84,6 +84,98 @@ function Morph(node, workspace){
 		anchor.setAttribute('data-os-morph-anchor-do', v.do);
 		anchor.style.cursor = v.pointer;
 
+		var initialScale = {
+			w: parseInt(node.getAttribute('data-os-width')),
+			h: parseInt(node.getAttribute('data-os-height'))
+		};
+
+		interact(anchor)
+			.origin('self')
+			.draggable({
+				origin: [initialScale.x, initialScale.y]
+			})
+			.on('start', function(event){
+				initialScale = {
+					w: parseInt(node.getAttribute('data-os-width')),
+					h: parseInt(node.getAttribute('data-os-height'))
+				};
+			})
+			.on('dragmove', function(event){
+				//Updated values
+				var nw = parseInt(node.getAttribute('data-os-width')) + event.dx;
+				var ny = parseInt(node.getAttribute('data-os-height')) + event.dy;
+
+				//Calculated values from initialScale to scale-preserved resizing
+				var ch;
+
+				//if the resizing method is scale-preserved resizing,
+				if(v.do === 'left-up' || v.do === 'left-down' || v.do === 'right-up' || v.do === 'right-down'){
+					if(initialScale) ch = initialScale.h / initialScale.w * nw;
+				}
+
+				//Original XY of object
+				var ox = parseInt(node.getAttribute('data-os-x'));
+				var oy = parseInt(node.getAttribute('data-os-x'));
+				switch(v.do){
+					case 'left-up':
+						if(!initialScale) break;
+						node.setAttribute('data-os-width', nw);
+						node.setAttribute('data-os-height', ch);
+
+						node.setAttribute('data-os-x', ox - nw);
+						node.setAttribute('data-os-y', oy - ch);
+						break;
+
+					case 'left':
+						node.setAttribute('data-os-width', nw);
+
+						node.setAttribute('data-os-x', ox - nw);
+						break;
+
+					case 'left-down':
+						if(!initialScale) break;
+
+						node.setAttribute('data-os-width', nw);
+						node.setAttribute('data-os-height', ch);
+
+						node.setAttribute('data-os-x', ox - nw);
+						break;
+
+					case 'down':
+						node.setAttribute('data-os-height', nh);
+						break;
+
+					case 'right-down':
+						if(!initialScale) break;
+						node.setAttribute('data-os-width', nw);
+						node.setAttribute('data-os-height', ch);
+						break;
+
+					case 'right':
+						node.setAttribute('data-os-width', nw);
+						break;
+
+					case 'right-up':
+						if(!initialScale) break;
+						node.setAttribute('data-os-width', nw);
+						node.setAttribute('data-os-height', ch);
+
+						data.setAttribute('data-os-y', oy - ch);
+						break;
+
+					case 'up':
+						node.setAttribute('data-os-height', ch);
+
+						node.setAttribute('data-os-y', oy - ch);
+						break;
+
+					case 'rotation':
+						//TODO
+						break;
+				}
+
+				_this.updateNode();
+			});
 		_this.workspace.append(anchor);
 
 		return anchor;
@@ -96,12 +188,25 @@ function Morph(node, workspace){
 	this.updateAnchor();
 }
 
-Morph.parseAnchorSyntax = function(statement, width, height){
-	return statement
-		.split(WIDTH).join(width + 'px')
-		.split(WIDTH_HALF).join(Math.round(width / 2) + 'px')
-		.split(HEIGHT).join(height + 'px')
-		.split(HEIGHT_HALF).join(Math.round(height / 2) + 'px');
+Morph.prototype.updateNode = function(){
+	var obj = this.object;
+	var objW = parseInt(obj.getAttribute('data-os-width'));
+	var objH = parseInt(obj.getAttribute('data-os-height'));
+	var objX = Math.round(parseInt(obj.getAttribute('data-os-x')));
+	var objY = Math.round(parseInt(obj.getAttribute('data-os-y')));
+	var objZ = Math.round(parseInt(obj.getAttribute('data-os-z')));
+	var objRotation = Math.round(parseInt(obj.getAttribute('data-os-rotation')));
+	obj.style.width = objW + 'px';
+	obj.style.height = objH + 'px';
+
+	var centerX = objX + Math.round(objW / 2);
+	var centerY = objY + Math.round(objH / 2);
+
+	obj.style.transformOrigin = centerX + 'px ' + centerY + 'px';
+	obj.style.transform = "rotate(" + objRotation + "deg) translate3d(" + objX + "px, " + objY + "px, " + objZ + "px)";
+
+	var ev = new Event('os:update');
+	obj.dispatchEvent(ev);
 };
 
 Morph.prototype.updateAnchor = function(){
@@ -119,8 +224,16 @@ Morph.prototype.updateAnchor = function(){
 
 		v.style.transformOrigin = v.style.webkitTransformOrigin = v.style.mozTransformOrigin = v.style.msTransformOrigin =
 			objX + 'px ' + objY + 'px ' + objZ + 'px';
-		v.style.transform = "rotate(" + objRotation + "deg) translate(calc(" + anchorX + " + " + objX + "px), calc(" + anchorY + " + " + objY + "px))"
+		v.style.transform = "rotate(" + objRotation + "deg) translate3d(calc(" + anchorX + " + " + objX + "px), calc(" + anchorY + " + " + objY + "px), " + objZ + "px)";
 	});
+};
+
+Morph.parseAnchorSyntax = function(statement, width, height){
+	return statement
+	.split(WIDTH).join(width + 'px')
+	.split(WIDTH_HALF).join(Math.round(width / 2) + 'px')
+	.split(HEIGHT).join(height + 'px')
+	.split(HEIGHT_HALF).join(Math.round(height / 2) + 'px');
 };
 
 

@@ -7,18 +7,20 @@
 		<link rel="stylesheet" href="/css/slide/editor.css">
 		<script src="/js/common/include.js"></script>
 		<script>
+			var testMorph;
 			include({
 				utils: '/js/common/utils.js',
 				morph: '/js/slide/editor-morph.js',
-				workspace: '/js/slide/editor-workspace.js'
+				workspace: '/js/slide/editor-workspace.js',
+				interact: '/interactjs/dist/interact.min.js'
 			}, function(err){
 				if(err) return console.error(err);
-				var testMorph = new morph($('div'), new workspace());
+				testMorph = new morph($('div'), new workspace());
 			});
 		</script>
 	</head>
 
 	<body>
-		<div style="background: blue; width: 300px; height: 200px" data-os-x="8" data-os-y="8" data-os-z="0" data-os-width="300" data-os-height="200" data-os-rotation="0"></div>
+		<div style="background: blue; width: 300px; height: 200px" data-os-x="0" data-os-y="0" data-os-z="0" data-os-width="300" data-os-height="200" data-os-rotation="0"></div>
 	</body>
 </html>

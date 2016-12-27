@@ -7,11 +7,13 @@ const Utils = require('./utils');
 class Document{
 	/**
 	 * @param id string         | Id of document
+	 * @param owner string      | User Id of owner
 	 * @param name string       | Name of document
 	 * @param slides Slide[]    | Key of the array is page
 	 */
-	constructor(id, name, slides = []){
+	constructor(id, owner, name, slides = []){
 		this._id = id;
+		this._owner = owner;
 		this._name = name;
 		this._slides = slides;
 	}
@@ -21,6 +23,10 @@ class Document{
 	 */
 	getId(){
 		return this._id;
+	}
+
+	getOwner(){
+		return this._owner;
 	}
 
 	/**
@@ -55,6 +61,7 @@ class Document{
 	toArray(){
 		let data = {
 			id: this._id,
+			owner: this._owner,
 			name: this._name,
 			slides: []
 		};
@@ -170,7 +177,7 @@ class DocumentManager{
 				if(err) return reject(err);
 				if(rows.length < 1) return resolve(null);
 
-				resolve(new Document(rows[0].id, rows[0].name, rows[0].slides));
+				resolve(new Document(rows[0].id, rows[0].owner, rows[0].name, rows[0].slides));
 			});
 		});
 	}

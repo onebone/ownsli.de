@@ -11,7 +11,7 @@ describe('Group', () => {
 		Sync.resetGroups();
 
 		const now = Date.now();
-		Sync.createGroup(new Document('testId', 'name', []), new Session('test', 'thisisatoken', now), new Session('test2', 'thisisatoken2', now));
+		Sync.createGroup(new Document('testId', 'test', 'name', []), new Session('test', 'thisisatoken', now), new Session('test2', 'thisisatoken2', now));
 
 		const sess1 = new Session('test', 'thisisatoken', now), sess2 =  new Session('test2', 'thisisatoken2', now);
 		sess1._group = sess2._group = 'testId';
@@ -27,7 +27,7 @@ describe('Group', () => {
 	it('Join', (done) => {
 		Sync.resetGroups();
 
-		Sync.createGroup(new Document('testId', 'name', []));
+		Sync.createGroup(new Document('testId', 'test', 'name', []));
 
 		const now = Date.now();
 		const session = new Session('test', 'thisisatoken', now);
@@ -47,7 +47,7 @@ describe('Group', () => {
 	it('Leave', (done) => {
 		Sync.resetGroups();
 
-		Sync.createGroup(new Document('testId', 'name', []));
+		Sync.createGroup(new Document('testId', 'test', 'name', []));
 
 		const now = Date.now();
 		const session = new Session('test', 'thisisatoken', now);
@@ -73,8 +73,8 @@ describe('Group', () => {
 			sessions[i] = new Session('test'+i, 'thisisatoken'+i, now);
 		}
 
-		Sync.createGroup(new Document('testId', 'name', []), sessions[0], sessions[1]);
-		Sync.createGroup(new Document('testId2', 'name', []), sessions[2], sessions[3]);
+		Sync.createGroup(new Document('testId', 'test', 'name', []), sessions[0], sessions[1]);
+		Sync.createGroup(new Document('testId2', 'test', 'name', []), sessions[2], sessions[3]);
 
 		Sync.removeGroup('testId2');
 

@@ -9,5 +9,11 @@
 	"error.login.2": "Error occurred while processing",
 	"error.login.3": "Your user id is already logged in from other device",
 	"error.login.4": "You are already logged in",
-	"error.login.invalid": "Invalid response from server"
+	"error.login.invalid": "Invalid response from server",
+
+	"slide.list.title": "슬라이드 목록",
+	"slide.list.search": "검색",
+	"slide.list.name": "파일명",
+	"slide.list.date": "수정된 시각",
+	"slide.list.author": "제작자"
 }

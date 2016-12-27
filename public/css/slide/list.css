@@ -1,0 +1,103 @@
+nav {
+	width: 100%;
+	background: #ff5722;
+}
+
+main {
+	max-width: 768px;
+	margin: 0 auto;
+}
+
+.nav-wrapper {
+	max-width: 768px;
+	margin: 0 auto;
+}
+
+/* WTF Vendor Prefix */
+.nav-wrapper input::placeholder {
+	color: #fff;
+	transition: color 500ms;
+}
+
+.nav-wrapper input:placeholder-shown {
+	color: #fff;
+	transition: color 500ms;
+}
+
+.nav-wrapper input::-webkit-input-placeholder {
+	color: #fff;
+	transition: color 500ms;
+}
+
+.nav-wrapper input::-moz-placeholder {
+	color: #fff;
+	transition: color 500ms;
+}
+
+.nav-wrapper input:-moz-placeholder {
+	color: #fff;
+	transition: color 500ms;
+}
+
+.nav-wrapper input:-ms-input-placeholder {
+	color: #fff;
+	transition: color 500ms;
+}
+
+.nav-wrapper input:focus::placeholder {
+	color: #333;
+}
+
+.nav-wrapper input:focus:placeholder-shown {
+	color: #333;
+}
+
+.nav-wrapper input:focus::-webkit-input-placeholder {
+	color: #333;
+}
+
+.nav-wrapper input:focus::-moz-placeholder {
+	color: #333;
+}
+
+.nav-wrapper input:focus:-moz-placeholder {
+	color: #333;
+}
+
+.nav-wrapper input:focus:-ms-input-placeholder {
+	color: #333;
+}
+
+.slide-listing li{
+	margin-bottom: 0px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.slide-listing li.slide-listing-content:hover {
+	box-shadow: 0 0 50px #000;
+	transition: box-shadow 100ms;
+}
+
+.slide-listing li:not(:last-child) {
+	border-bottom: 1px dashed #ccc;
+}
+
+.slide-listing li.slide-listing-header {
+	padding-bottom: 15px;
+}
+
+.slide-listing-content * {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.slide-listing-header a {
+	color: #888;
+	transition: color 500ms;
+}
+
+.slide-listing-header a:hover {
+	color: #00c0ff;
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	</head>
+		<%- include('../common/header', {
+			title: translator('slide.list.title')
+		}) %>
+
+		<link rel="stylesheet" href="/css/slide/list.css">
+	<head>
+
+	<body>
+		<nav>
+			<div class="nav-wrapper">
+				<a href="#!" class="brand-logo">
+					<i class="mdi mdi-file-presentation-box"></i> <%= translator('title') %>
+				</a>
+				<ul class="right hide-on-med-and-down" style="height: 100%; width: 40%">
+					<form>
+						<div class="input-field">
+							<input id="search" type="search" placeholder="<%= translator('slide.list.search') %>">
+							<label for="search"><i class="mdi mdi-magnify"></i></label>
+							<i class="material-icons mdi mdi-close"></i>
+						</div>
+					</form>
+				</ul>
+			</div>
+		</nav>
+
+		<main>
+			<ul class="slide-listing">
+				<li class="slide-listing-header row">
+					<a class="col s6" data-sort="name" href="#!">
+						<i class="mdi mdi-chevron-down"></i> <%= translator('slide.list.name') %>
+					</a>
+
+					<a class="col s3" data-sort="date" href="#!">
+						<i class="mdi"></i> <%= translator('slide.list.date') %>
+					</a>
+
+					<a class="col s3" data-sort="author" href="#!">
+						<i class="mdi"></i> <%= translator('slide.list.author') %>
+					</a>
+				</li>
+			</ul>
+		</main>
+
+		<script>
+			//FIXME Dummy data for testing
+			const $ = (...args) => document.querySelector(...args);
+
+			const PRESENTATION_DATA = [
+				{
+					name: "Khinenw's Template Slide",
+					date: new Date(),
+					author: 'Khinenw',
+					link: '/slide/view/khinenws-template-slide'
+				},
+
+				{
+					name: "Khinenw's Template Slide with suuuuuuuuuuuuuuuuuuuuuuuuuper long title",
+					date: new Date('2003-01-14 00:00:00'),
+					author: 'Khinenw2',
+					link: '/slide/view/khinenws-template-slide-with-suu'
+				}
+			];
+		</script>
+
+		<script src="/js/common/include.js"></script>
+		<script src="/js/slide/listing-main.js"></script>
+	</body>
+</html>

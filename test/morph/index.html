@@ -8,6 +8,7 @@
 		<script src="/js/common/include.js"></script>
 		<script>
 			var testMorph;
+			var workspace;
 			include({
 				utils: '/js/common/utils.js',
 				morph: '/js/slide/editor-morph.js',
@@ -15,8 +16,23 @@
 				interact: '/interactjs/dist/interact.min.js'
 			}, function(err){
 				if(err) return console.error(err);
-				testMorph = new morph($('.os-editor-slide-root div'), new workspace(null, document.body));
+				workspace = new workspace(null, document.body);
+				testMorph = new morph($('.os-editor-slide-root div'), workspace);
 			});
+
+			var destroyMode = true;
+			var toggleDestroy = function(button){
+				if(destroyMode){
+					testMorph.destroy();
+					button.innerHTML = "Start Morphing!";
+					destroyMode = false;
+					return;
+				}
+
+				testMorph = new morph($('.os-editor-slide-root div'), workspace);
+				button.innerHTML = "Destroy!";
+				destroyMode = true;
+			};
 		</script>
 	</head>
 
@@ -24,5 +40,8 @@
 		<div class="os-editor-slide-root" style="position: absolute;">
 			<div style="background: blue; width: 300px; height: 200px" data-os-x="0" data-os-y="0" data-os-z="0" data-os-width="300" data-os-height="200" data-os-rotation-x="0"  data-os-rotation-y="0"  data-os-rotation-z="0"></div>
 		</div>
+		<button style="position: fixed; top: 3rem; right: 3rem" type="button" onclick="toggleDestroy(this)">
+			Destroy!
+		</button>
 	</body>
 </html>

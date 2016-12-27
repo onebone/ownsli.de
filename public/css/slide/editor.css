@@ -12,8 +12,8 @@ body, html {
 	position: absolute;
 }
 
-.os-editor-workspace {
-	position: fixed;
+.os-editor-slide-root {
+	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100vw;

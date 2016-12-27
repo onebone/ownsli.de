@@ -4,14 +4,16 @@ const {Vector3} = require('../src/math');
 const Utils = require('../src/utils');
 
 describe('Document', () => {
+	let id;
 	it('Creation', (done) => {
-		DocumentManager.addDocument('test').then(() => {
+		DocumentManager.addDocument('test', 'test').then((created) => {
+			id = created;
 			done();
-		});
+		}).catch(done);
 	});
 
 	it('Update', (done) => {
-		DocumentManager.getDocument('test').then((document) => {
+		DocumentManager.getDocument(id).then((document) => {
 			if(document === null) throw new Error('document does not exist');
 			let len = Utils.rand(1, 5);
 			document._slides = [];
@@ -20,6 +22,22 @@ describe('Document', () => {
 			}
 
 			DocumentManager.saveDocument(document).then(() => done());
-		})
+		}).catch(done);
+	});
+
+	it('Sort', (done) => {
+		DocumentManager.getDocuments({}, DocumentManager.SORT_TIME, 1, 5).then((documents) => {
+			let last = Date.now();
+
+			documents.forEach((document) => {
+				if(last < document._lastSave){
+					done(new Error('invalid sort'));
+					return;
+				}
+				last = document._lastSave;
+			});
+
+			done();
+		});
 	});
 });

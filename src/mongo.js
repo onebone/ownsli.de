@@ -20,7 +20,7 @@ class MongoConnection{
 	static query(dbname, query, one = false){
 		if(typeof dbname !== 'string') return false;
 
-		if(one)
+		if(!one)
 			return db.collection(dbname).find(query);
 		else
 			return db.collection(dbname).findOne(query);

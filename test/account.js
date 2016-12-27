@@ -1,17 +1,23 @@
 require('../init');
-const {AccountManager} = require('../src/account');
+const {AccountManager, AccountAlreadyExistError} = require('../src/account');
 
 describe('Account', () => {
 	it('Creation', (done) => {
 		AccountManager.createAccount('test', 'password').then(() => {
 			done();
-		}).catch(err => {throw err});
+		}).catch((err) => {
+			if(err instanceof AccountAlreadyExistError){
+				return done();
+			}
+
+			done(err);
+		});
 	});
 
 	it('Compare', (done) => {
 		AccountManager.comparePassword('test', 'password').then((res) => {
 			if(res) done();
-			else throw new Error('password does not match');
-		}).catch(err => {throw err});
+			else done(new Error('password does not match'));
+		}).catch(done);
 	});
 });

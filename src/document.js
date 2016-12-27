@@ -10,12 +10,14 @@ class Document{
 	 * @param owner string      | User Id of owner
 	 * @param name string       | Name of document
 	 * @param slides Slide[]    | Key of the array is page
+	 * @param lastSave int      | Last saved
 	 */
-	constructor(id, owner, name, slides = []){
+	constructor(id, owner, name, slides = [], lastSave = Date.now()){
 		this._id = id;
 		this._owner = owner;
 		this._name = name;
 		this._slides = slides;
+		this._lastSave = lastSave;
 	}
 
 	/**
@@ -63,7 +65,8 @@ class Document{
 			id: this._id,
 			owner: this._owner,
 			name: this._name,
-			slides: []
+			slides: [],
+			lastSave: this._lastSave,
 		};
 
 		this._slides.forEach((slide) => {
@@ -155,29 +158,35 @@ class DocumentManager{
 	/**
 	 * Creates one document
 	 *
+	 * @param owner string
 	 * @param name string
 	 * @return Promise
 	 */
-	static addDocument(name){
-		return MongoConnection.insert('document', {
-			id: Utils.createToken(32), // TODO Check if same id exist
-			name: name,
-			slides: []
+	static addDocument(owner, name){
+		return new Promise((resolve, reject) =>{
+			const id = Utils.createToken(32); // TODO Check if same id exist
+			MongoConnection.insert('document', {
+				id: id,
+				name: name,
+				owner: owner,
+				slides: [],
+				lastSave: Date.now()
+			}).catch(err => reject(err)).then(() => resolve(id));
 		});
 	}
 
 	/**
-	 * @param name string
+	 * @param id string
 	 */
-	static getDocument(name){
+	static getDocument(id){
 		return new Promise((resolve, reject) => {
 			MongoConnection.query('document', {
-				name: name
-			}, true).toArray((err, rows) => {
+				id: id
+			}).toArray((err, rows) => {
 				if(err) return reject(err);
 				if(rows.length < 1) return resolve(null);
 
-				resolve(new Document(rows[0].id, rows[0].owner, rows[0].name, rows[0].slides));
+				resolve(new Document(rows[0].id, rows[0].owner, rows[0].name, rows[0].slides, rows[0].lastSave));
 			});
 		});
 	}
@@ -186,10 +195,52 @@ class DocumentManager{
 	 * @param document Document
 	 */
 	static saveDocument(document){
+		document._lastSave = Date.now();
 		return MongoConnection.replace('document', {
 			id: document.getId()
 		}, document.toArray());
 	}
+
+	/**
+	 * @param query
+	 * @param {int} mode
+	 * @param {int} page
+	 * @param {int} count
+	 *
+	 * @return Promise
+	 */
+	static getDocuments(query, mode = DocumentManager.SORT_TIME, page = 1, count = 15){
+		return new Promise((resolve, reject) => {
+			try{
+				MongoConnection.query('document', query, false).sort(
+					mode === DocumentManager.SORT_NAME ? {name: -1}
+					: mode === DocumentManager.SORT_TIME ? {lastSave: -1}
+					: mode === DocumentManager.SORT_OWNER ? {owner: -1}
+					: mode === DocumentManager.SORT_NAME_DESC ? {name: 1}
+					: mode === DocumentManager.SORT_TIME_DESC ? {lastSave: 1}
+					: mode === DocumentManager.SORT_OWNER_DESC ? {owner: 1}
+					: {name: -1}
+				).skip((page - 1) * count).limit(count).toArray((err, documents) => {
+					if(err) return reject(err);
+					let data = [];
+					documents.forEach((document) => {
+						data.push(new Document(document.id, document.owner, document.name, document.slides, document.lastSave));
+					});
+
+					resolve(data);
+				});
+			}catch(e){
+				reject(e);
+			}
+		});
+	}
 }
+
+DocumentManager.SORT_NAME = 1;
+DocumentManager.SORT_TIME = 2;
+DocumentManager.SORT_OWNER = 3;
+DocumentManager.SORT_NAME_DESC = 9;
+DocumentManager.SORT_TIME_DESC = 10;
+DocumentManager.SORT_OWNER_DESC = 12;
 
 module.exports = {DocumentManager, Document, Slide, Shape};

@@ -44,7 +44,7 @@ class AccountManager{
 			if(typeof userId !== 'string') return reject(new InvalidDataTypeError());
 			MongoConnection.query('account', {
 				userId: userId
-			}, true).toArray((err, docs) =>{
+			}).toArray((err, docs) =>{
 				if(err) return reject(err);
 				if(docs.length < 1) return reject(new NoAccountError());
 

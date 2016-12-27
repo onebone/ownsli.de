@@ -12,14 +12,22 @@ class AccountManager{
 				return reject(new InvalidDataTypeError());
 			}
 
-			Utils.encrypt(password).then((hash) => {
-				MongoConnection.insert('account', {
-					userId: userId,
-					password: hash,
-					registerTime: Date.now(),
-					lastLogin: Date.now()
-				}).then(() => resolve()).catch(() => reject());
-			}).catch((err) => reject(err));
+			AccountManager.getAccount(userId).then(() => {
+				return reject(new AccountAlreadyExistError());
+			}).catch((err) => {
+				if(err instanceof NoAccountError){
+					Utils.encrypt(password).then((hash) => {
+						MongoConnection.insert('account', {
+							userId: userId,
+							password: hash,
+							registerTime: Date.now(),
+							lastLogin: Date.now()
+						}).then(() => resolve()).catch((err) => reject(err));
+					}).catch((err) => reject(err));
+				}else{
+					reject(err);
+				}
+			});
 		});
 	}
 
@@ -71,6 +79,12 @@ class Account{
 	}
 }
 
+class AccountAlreadyExistError extends Error{
+	constructor(){
+		super('account already exists');
+	}
+}
+
 class InvalidDataTypeError extends Error{
 	constructor(){
 		super('invalid data type');
@@ -96,5 +110,5 @@ class IncorrectPasswordError extends Error{
 }
 
 module.exports = {
-	Account, AccountManager, InvalidDataTypeError, NoAccountError, HashCompareError, IncorrectPasswordError
+	Account, AccountManager, AccountAlreadyExistError, InvalidDataTypeError, NoAccountError, HashCompareError, IncorrectPasswordError
 };

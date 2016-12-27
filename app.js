@@ -51,6 +51,7 @@ app.use(resolveLanguage);
 app.use('/', require('./routes/index'));
 app.use('/login', require('./routes/login'));
 app.use('/slide', require('./routes/slide'));
+app.use('/document', require('./routes/document'));
 
 if(devmode){
 	console.log(chalk.yellow('Warning: this app is running on development mode!'));

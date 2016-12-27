@@ -210,6 +210,9 @@ class DocumentManager{
 	 * @return Promise
 	 */
 	static getDocuments(query, mode = DocumentManager.SORT_TIME, page = 1, count = 15){
+		page = Math.max(1, page);
+		count = Math.max(1, count);
+
 		return new Promise((resolve, reject) => {
 			try{
 				MongoConnection.query('document', query, false).sort(

@@ -54,12 +54,9 @@ router.post('/', (req, res, next) => {
 
 	AccountManager.comparePassword(userId, password).then((result) => {
 		if(result){
-			if(SessionManager.getSessionByUserId(userId) !== null){
-				return res.send(JSON.stringify({
-					status: true,
-					error: true,
-					errCode: ERROR_OTHER_ALREADY_LOGGED_IN
-				}));
+			let sess;
+			if((sess = SessionManager.getSessionByUserId(userId)) !== null){
+				SessionManager.removeSession(sess.getToken());
 			}
 			const session = SessionManager.addSession(userId);
 

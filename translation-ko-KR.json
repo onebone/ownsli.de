@@ -1,0 +1,13 @@
+{
+	"title": "ownsli.de",
+	"login.title": "Login",
+	"login.desc": "Welcome to {{title}}!",
+	"login.id": "Username",
+	"login.password": "Password",
+	"error.login.0": "Invalid form",
+	"error.login.1": "Incorrect user id or password",
+	"error.login.2": "Error occurred while processing",
+	"error.login.3": "Your user id is already logged in from other device",
+	"error.login.4": "You are already logged in",
+	"error.login.invalid": "Invalid response from server"
+}

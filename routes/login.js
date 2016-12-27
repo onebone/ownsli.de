@@ -31,7 +31,6 @@ router.get('/', function(req, res, next) {
 router.post('/', (req, res, next) => {
 	const userId = req.body.userId;
 	const password = req.body.password;
-
 	if(!userId || !password
 		|| typeof userId !== 'string' || typeof password !== 'string'){
 		return res.send(JSON.stringify({

@@ -9,7 +9,7 @@
 	<meta property="og:site_name" content="<%= translator('title') %>">
 	<meta property="og:type" content="game">
 	<meta property="og:url" content="<%= url %>">
-	<meta property="og:image" content="<%= config.url + config.url %>">
+	<meta property="og:image" content="<%= config.url + config.imageUrl %>">
 <% } %>
 
 <link rel="stylesheet" type="text/css" href="/materialize/dist/css/materialize.min.css">
@@ -24,21 +24,6 @@
 <meta name="apple-mobile-web-app-title" content="<%= translator('title') %>">
 <meta name="application-name" content="<%= translator('title') %>">
 <meta name="theme-color" content="#ff5722">
-<style>
-	nav {
-		background: <%= global.theme['background-0'] %>;
-		color: <%= global.theme['foreground-0'] %>;
-	}
-	.nav-wrapper {
-		max-width: 942px;
-		margin: 0 auto;
-	}
-	@media (min-width: 1050px) {
-		.main-section {
-			background: <%= global.theme['background-2'] %>;
-		}
-	}
-</style>
 
 <script src="/jquery/dist/jquery.min.js"></script>
 <script src="/materialize/dist/js/materialize.min.js"></script>

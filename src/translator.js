@@ -27,22 +27,24 @@ const COLOR_MAPPING = {
 const cache = {};
 
 const translate = (lang, key, options) => {
-	let translation;
-	if(cache[lang]) translation = cahce[lang];
-	else translation = cache[lang] = require(`../translation-${lang}.json`);
-	
+	let translations;
+	if(cache[lang]) translations = cache[lang];
+	else translations = cache[lang] = require(`../translation-${lang}.json`);
+
 	options = options || {};
+
+	var translation = translations[key];
+	if(typeof translation !== 'string') translation = key;
 
 	Object.keys(options).forEach((k) => {
 		translation = translation.split(`%${k}%`).join(options[k]);
 	});
 
-	translation = translation.replace(/\}(\})?([^{}]+?)\{(?!\{)/g, (match, p1, p2) => {
-		if(p1 === '{') return match; //Escape
-		return translate(p2, options);
+	translation = translation.replace(/\{\{([^{}]+?)\}\}(?!})/g, (match, p1) => {
+		return translate(p1, options);
 	});
 
-	translation = translation.replace(/\}\}/g, '}').replace(/\{\{/g, '{');
+	translation = translation.replace(/\}\}\}/g, '}}').replace(/\{\{\{/g, '{');
 
 	translation = translation.replace(/\$(\$)?([0-9a-eA-H])([^]+?)\$(?!\$)/g, (match, p1, p2, p3) => {
 		if(p1 === '$') return match;
@@ -67,7 +69,7 @@ translator.deflang = (key, ...args) => {
 
 translator.generate = (request) => {
 	return (...args) => {
-		translator(request, ...args);
+		return translator(request, ...args);
 	};
 };
 

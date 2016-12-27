@@ -1,72 +1,75 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+	<head>
+		<%- include('../common/header', {
+			title: translator('login.title')
+		}) %>
+		<title><%= translator('login.title') %></title>
+		<link rel='stylesheet' href='/stylesheets/style.css' />
 
-    <script>
-	    var ERROR_INVALID_FORM = 0;
-	    var ERROR_INVALID_DATA = 1;
-	    var ERROR_SERVER_SIDE = 2;
-	    var ERROR_OTHER_ALREADY_LOGGED_IN = 3;
-	    var ERROR_ALREADY_LOGGED_IN = 4;
+		<script>
+			var ERROR_INVALID_FORM = 0;
+			var ERROR_INVALID_DATA = 1;
+			var ERROR_SERVER_SIDE = 2;
+			var ERROR_OTHER_ALREADY_LOGGED_IN = 3;
+			var ERROR_ALREADY_LOGGED_IN = 4;
 
-        var elements = {};
+			var elements = {};
 
-        window.onload = function(){
-        	elements.info = document.getElementById('info');
-        	elements.userId = document.getElementById('userId');
-        	elements.password = document.getElementById('password');
+			window.onload = function(){
+				elements.info = document.getElementById('info');
+				elements.userId = document.getElementById('userId');
+				elements.password = document.getElementById('password');
 
-            document.getElementById('sbBtn').onclick = function(){
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', '/login', true);
-	            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-	            xhr.onreadystatechange = function(){
-		            if(xhr.readyState === XMLHttpRequest.DONE){
-		            	var data = JSON.parse(xhr.responseText);
-		            	if(data){
-		            		if(data.status){
-                                if(data.error){
-                                	switch(data.errCode){
-                                        case ERROR_INVALID_FORM:
-                                        	elements.info.innerHTML = 'Invalid form';
-                                        	break;
-                                        case ERROR_INVALID_DATA:
-                                        	elements.info.innerHTML = 'Incorrect user id or password';
-                                        	break;
-                                        case ERROR_SERVER_SIDE:
-                                        	elements.info.innerHTML = 'Error occurred while processing';
-                                        	break;
-                                        case ERROR_OTHER_ALREADY_LOGGED_IN:
-                                        	elements.info.innerHTML = 'Your user id is already logged in from other device';
-                                        	break;
-                                        case ERROR_ALREADY_LOGGED_IN:
-                                        	elements.info.innerHTML = 'You are already logged in';
-                                        	break;
-                                    }
-                                }else{
-                                	elements.info.innerHTML = 'You are logged in';
-                                }
-                            }
-                        }else{
-                            elements.info.innerHTML = 'Invalid response from server';
-                        }
-		            }
-	            };
-	            xhr.send('userId=' + elements.userId.value + '&password=' + elements.password.value);
-            };
-        };
-    </script>
-</head>
-<body>
-<h1><%= title %></h1>
-<p>Welcome to <%= title %></p>
-<div>
-    <input id="userId" name="userId" type="text" placeholder="ID"/>
-    <input id="password" name="password" type="password" placeholder="Password"/>
-    <button id="sbBtn" >Login</button>
-</div>
-<p style="color: red;" id="info"></p>
-</body>
+				document.getElementById('sbBtn').onclick = function(){
+					var xhr = new XMLHttpRequest();
+					xhr.open('POST', '/login', true);
+		            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		            xhr.onreadystatechange = function(){
+			            if(xhr.readyState === XMLHttpRequest.DONE){
+			            	var data = JSON.parse(xhr.responseText);
+			            	if(data){
+			            		if(data.status){
+									if(data.error){
+										switch(data.errCode){
+											case ERROR_INVALID_FORM:
+												elements.info.innerHTML = '<%= translator("error.login.0") %>';
+												break;
+											case ERROR_INVALID_DATA:
+												elements.info.innerHTML = '<%= translator("error.login.1") %>';
+												break;
+											case ERROR_SERVER_SIDE:
+												elements.info.innerHTML = '<%= translator("error.login.2") %>';
+												break;
+											case ERROR_OTHER_ALREADY_LOGGED_IN:
+												elements.info.innerHTML = '<%= translator("error.login.3") %>';
+												break;
+											case ERROR_ALREADY_LOGGED_IN:
+												elements.info.innerHTML = '<%= translator("error.login.4") %>';
+												break;
+										}
+									}else{
+										elements.info.innerHTML = 'You are logged in';
+									}
+								}
+							}else{
+								elements.info.innerHTML = '<%= translator("error.login.invalid") %>';
+							}
+			            }
+		            };
+		            xhr.send('userId=' + elements.userId.value + '&password=' + elements.password.value);
+				};
+			};
+		</script>
+	</head>
+	<body>
+		<h1><%= title %></h1>
+		<p>Welcome to <%= translator('title') %></p>
+		<form onsubmit="return false">
+			<input id="userId" name="userId" type="text" placeholder="<%= translator('login.id') %>"/>
+			<input id="password" name="password" type="password" placeholder="<%= translator('login.password') %>"/>
+			<button id="sbBtn"><%= translator('login.title') %></button>
+		</form>
+		<p style="color: red;" id="info"></p>
+	</body>
 </html>

@@ -39,6 +39,11 @@ app.use(requestLanguage({
 	languages: config.langs
 }));
 
+app.use((req, res, next) => {
+	res.locals.url = req.url;
+	next();
+});
+
 app.use(httpErrors);
 app.use(preventInjection);
 app.use(resolveLanguage);

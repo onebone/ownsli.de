@@ -5,5 +5,7 @@
 		"database": "ownslide"
 	},
 	"lang": "ko",
-	"langs": ["ko-KR"]
+	"langs": ["ko-KR"],
+	"url": "https://ownsli.de/",
+	"imageUrl": "img/logo.svg"
 }

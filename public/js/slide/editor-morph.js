@@ -89,7 +89,7 @@ function Morph(node, workspace){
 
 	var lastNode = {x: parseInt(this['os-x']), y: parseInt(this['os-y'])};
 
-	interact(node)
+	this.interactableObject = interact(node)
 		.origin('self')
 		.draggable({})
 		.on('dragmove', function(event){
@@ -298,6 +298,14 @@ Morph.prototype.updateAnchor = function(){
 			(objX + objW / 2) + 'px ' + (objY + objH / 2) + 'px ' + objZ + 'px';
 		v.style.transform = "rotateX(" + objRotationX + "deg) rotateY(" + objRotationY + "deg) rotateZ(" + objRotationZ + "deg) translate3d(calc(" + anchorX + " + " + objX + "px), calc(" + anchorY + " + " + objY + "px), " + objZ + "px)";
 	});
+};
+
+Morph.prototype.destroy = function(){
+	this.anchors.forEach(function(v){
+		v.remove();
+	});
+
+	this.interactableObject.unset();
 };
 
 Morph.parseAnchorSyntax = function(statement, width, height){

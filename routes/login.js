@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const {AccountManager, NoAccountError} = require('../src/account');
+const {AccountManager, NoAccountError, AccountAlreadyExistError} = require('../src/account');
 const {SessionManager} = require('../src/session');
 
 // login error
@@ -15,14 +15,13 @@ const ERROR_INVALID_DATA = 1;
 // Server processing error
 // Cannot compare password or create account due to error
 const ERROR_SERVER_SIDE = 2;
-// Other user is already logged in
-// Session already exists with same userId
-const ERROR_OTHER_ALREADY_LOGGED_IN = 3;
+// Account already exists
+// Account with same user Id already exists
+const ERROR_ACCOUNT_ALREADY_EXIST = 3;
 // Already logged in
 const ERROR_ALREADY_LOGGED_IN = 4;
 
 router.get('/', function(req, res, next) {
-	console.log('hello');
 	res.render('login/index', { // TODO: Improve front end
 		title: 'Login'
 	});
@@ -54,12 +53,9 @@ router.post('/', (req, res, next) => {
 
 	AccountManager.comparePassword(userId, password).then((result) => {
 		if(result){
-			if(SessionManager.getSessionByUserId(userId) !== null){
-				return res.send(JSON.stringify({
-					status: true,
-					error: true,
-					errCode: ERROR_OTHER_ALREADY_LOGGED_IN
-				}));
+			let sess;
+			if((sess = SessionManager.getSessionByUserId(userId)) !== null){
+				SessionManager.removeSession(sess.getToken());
 			}
 			const session = SessionManager.addSession(userId);
 
@@ -85,8 +81,6 @@ router.post('/', (req, res, next) => {
 			}));
 		}
 
-		console.log(err);
-
 		res.send(JSON.stringify({
 			status: true,
 			error: true,
@@ -95,19 +89,41 @@ router.post('/', (req, res, next) => {
 	});
 });
 
+router.post('/create', (req, res, next) => {
+	const userId = req.body.userId;
+	const password = req.body.password;
 
-// test //
-router.get('/create', (req, res, next) => {
-	const userId = req.query.userId;
-	const password = req.query.password;
-
-	if(!userId || !password){
-		res.send('not set');
+	if(!userId || !password
+	|| typeof userId !== 'string' || typeof password !== 'string'){
+		res.send(JSON.stringify({
+			status: true,
+			error: true,
+			errCode: ERROR_INVALID_FORM
+		}));
 		return;
 	}
 
-	AccountManager.createAccount(userId, password).then(() => res.send('success')).catch((err) => res.send('err ' + err));
+	AccountManager.createAccount(userId, password).then(() =>
+		res.send(
+		JSON.stringify({
+			status: true,
+			error: false,
+		}))
+	).catch((err) => {
+		if(err instanceof AccountAlreadyExistError){
+			res.send(JSON.stringify({
+				status: true,
+				error: true,
+				errCode: ERROR_ACCOUNT_ALREADY_EXIST
+			}));
+		}else{
+			res.send(JSON.stringify({
+				status: true,
+				error: true,
+				errCode: ERROR_SERVER_SIDE
+			}))
+		}
+	});
 });
-// test end //
 
 module.exports = router;

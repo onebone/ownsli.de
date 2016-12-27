@@ -1,7 +1,7 @@
 'use strict';
 
 const {Document} = require('./document');
-const {SessionManager} = require('./session');
+const {SessionManager, Session} = require('./session');
 
 let io = null;
 let groups = {};
@@ -29,26 +29,16 @@ class Sync{
 
 	/**
 	 * Create group which document will be synchronized
-	 * @param document Document|string  | Document which will be synced
-	 * @param session optional Session  | Sessions which will be initialized
+	 * @param document Document  | Document which will be synced
+	 * @param sessions optional Session  | Sessions which will be initialized
 	 * @return boolean
 	 */
-	static createGroup(document, ...session){
-		if(document instanceof Document){
-			document = document.getId();
-		}
-
-		if(typeof document !== 'string'){
+	static createGroup(document, ...sessions){
+		if(!document instanceof Document){
 			return false;
 		}
 
-		session.forEach((sess) => {
-			if(!sess) return;
-			// TODO check if session already has group
-			sess.__setGroup(document);
-		});
-
-		groups[document] = session;
+		groups[document.getId()] = new Group(document, ...sessions);
 		return true;
 	}
 
@@ -67,10 +57,7 @@ class Sync{
 		}
 
 		if(groups[document]){
-			session.forEach((sess) => {
-				sess.__setGroup(document);
-				groups[document].push(sess);
-			});
+			groups[document].addSession(...session);
 			return true;
 		}
 		return false;
@@ -84,13 +71,8 @@ class Sync{
 	static leaveSession(...sessions){
 		sessions.forEach((session) => {
 			const document = session.getGroup();
-			groups[document].forEach((sess, index) => {
-				if(!sess) return;
 
-				if(sess.getUserId() === session.getUserId()){
-					groups[document].splice(index, 1);
-				}
-			});
+			groups[document].removeSession(session);
 		});
 	}
 
@@ -108,11 +90,7 @@ class Sync{
 		}
 
 		if(groups[document]){
-			groups[document].forEach((sess) => {
-				if(!sess) return;
-
-				sess.__setGroup(null);
-			});
+			groups[document].removeAll();
 
 			delete groups[document];
 			return true;
@@ -120,12 +98,95 @@ class Sync{
 		return false;
 	}
 
+	/**
+	 * @param {string|Document} document
+	 * @return {Group|null}
+	 */
+	static getGroup(document){
+		if(document instanceof Document){
+			document = document.getId();
+		}
+
+		if(typeof document !== 'string'){
+			return null;
+		}
+
+		return groups[document] || null;
+	}
+
 	static getGroups(){
-		return groups;
+		let ret = {};
+		for(const document in groups){
+			if(groups.hasOwnProperty(document)){
+				const group = groups[document];
+				ret[document] = group.getSessions();
+			}
+		}
+		return ret;
 	}
 
 	static resetGroups(){
+		for(const document in groups){
+			if(groups.hasOwnProperty(document)){
+				const group = groups[document];
+				group.removeAll();
+			}
+		}
 		groups = {};
+	}
+}
+
+class Group{
+	/**
+	 * @param document Document
+	 * @param sessions Session
+	 */
+	constructor(document, ...sessions){
+		this._document = document;
+		this._sessions = sessions;
+
+		this._sessions.forEach((session) => {
+			if(session.getGroup() !== null){
+				Sync.getGroup(session.getGroup()).removeSession(session);
+			}
+
+			session.__setGroup(document.getId());
+		});
+	}
+
+	getSessions(){
+		return this._sessions;
+	}
+
+	/**
+	 * @param {Session} sessions
+	 */
+	addSession(...sessions){
+		const _this = this;
+		sessions.forEach((session) => {
+			_this._sessions.push(session);
+			session.__setGroup(_this._document.getId());
+		});
+	}
+
+	/**
+	 * @param {Session} sessions
+	 */
+	removeSession(...sessions){
+		const _this = this;
+		sessions.forEach((session) => {
+			_this._sessions.forEach((sess, index) =>{
+				if(!sess) return;
+
+				if(sess.getUserId() === session.getUserId()){
+					_this._sessions.splice(index, 1);
+				}
+			});
+		});
+	}
+
+	removeAll(){
+		this.removeSession(...this._sessions);
 	}
 }
 

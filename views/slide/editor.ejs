@@ -1,8 +1,14 @@
 <!DOCTYPE html>
+<%
+	//TODO test code, removal required
+	const slideTitle = 'TEST';
+%>
 <html>
 	</head>
 		<%- include('../common/header', {
-			title: translator('slide.editor.title')
+			title: translator('slide.editor.title', {
+				title: slideTitle
+			})
 		}) %>
 
 		<link rel="stylesheet" href="/css/slide/editor.css">

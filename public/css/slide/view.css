@@ -1,0 +1,43 @@
+body {
+	background: #444;
+}
+
+nav {
+	width: 100%;
+	background: #ff5722;
+}
+
+main {
+	max-width: 768px;
+	margin: 0 auto;
+}
+
+.nav-wrapper {
+	max-width: 768px;
+	margin: 0 auto;
+}
+
+#slide-view-title {
+	color: #fff;
+	font-weight: 600;
+}
+
+#slide-view-metadata {
+	text-align: right;
+}
+
+#slide-view-metadata span {
+	display: inline;
+	color: #fff;
+	margin: 3px;
+}
+
+#slide-view iframe{
+	width: 100%;
+	/* TODO resize height with javascript */
+	height: 500px;
+	border-top: 5px solid #ff5722;
+	border-bottom: 5px solid #ff5722;
+	border-left: none;
+	border-right: none;
+}

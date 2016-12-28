@@ -1,11 +1,24 @@
 <!DOCTYPE html>
+<%
+	//TODO test code, removal required
+	const slideTitle = 'TEST';
+	const slideID = 'abc';
+	const slideOwner = 'Khinenw';
+	const slideLastEdit = new Date;
+%>
+
+<%
+	const pad2 = (str) => String(str).length === 1 ? '0' + str : str;
+%>
 <html>
 	</head>
 		<%- include('../common/header', {
-			title: translator('slide.view.title')
+			title: translator('slide.view.title', {
+				title: slideTitle
+			})
 		}) %>
 
-		<link rel="stylesheet" href="/css/slide/list.css">
+		<link rel="stylesheet" href="/css/slide/view.css">
 	<head>
 
 	<body>
@@ -18,22 +31,22 @@
 		</nav>
 
 		<main>
+			<h2 id="slide-view-title"><%= slideTitle %></h2>
+			<div id="slide-view-metadata" class="row">
+				<span id="slide-view-metadata-lastedit">
+						<%= `${pad2(slideLastEdit.getFullYear())}-${pad2(slideLastEdit.getMonth() + 1)}-${pad2(slideLastEdit.getDate())}` %>
+						&nbsp;
+						<%= `${pad2(slideLastEdit.getHours())}:${pad2(slideLastEdit.getMinutes())}:${pad2(slideLastEdit.getSeconds())}` %>
+				</span>
+
+				<span id="slide-view-metadata-owner">
+					<%= slideOwner %>
+				</span>
+			</div>
+
 			<section id="slide-view">
-				<iframe src="/slide/"
+				<iframe src="/slide/present/<%= slideID %>"></iframe>
 			</section>
-			<li class="slide-listing-header row">
-				<a class="col s6" data-sort="name" href="#!">
-					<i class="mdi mdi-chevron-down"></i> <%= translator('slide.list.name') %>
-				</a>
-
-				<a class="col s3" data-sort="date" href="#!">
-					<i class="mdi"></i> <%= translator('slide.list.date') %>
-				</a>
-
-				<a class="col s3" data-sort="author" href="#!">
-					<i class="mdi"></i> <%= translator('slide.list.author') %>
-				</a>
-			</li>
 		</main>
 	</body>
 </html>

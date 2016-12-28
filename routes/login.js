@@ -81,6 +81,8 @@ router.post('/', (req, res, next) => {
 			}));
 		}
 
+		console.log(err);
+
 		res.send(JSON.stringify({
 			status: true,
 			error: true,

@@ -125,10 +125,56 @@ body, html {
 	overflow: auto;
 }
 
+#os-editor-layout-dialog {
+	background: #111;
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	top: 100vh;
+	left: 0;
+	animation-fill-mode: forwards;
+	animation-timing-function: ease-in-out;
+	animation-duration: 600ms;
+	z-index: 9;
+}
+
+#os-editor-layout-close {
+	top: 1rem;
+	right: 1rem;
+	position: absolute;
+	font-size: 40px;
+	color: #808080;
+	transition: color 500ms;
+}
+
+#os-editor-layout-close:hover {
+	color: #ff5722;
+}
+
 .material-tooltip .backdrop {
 	background: #000;
 }
 
 .dropdown-content li>a {
 	color: #808080;
+}
+
+@keyframes up {
+	from {
+		top: 100vh;
+	}
+
+	to {
+		top: 0;
+	}
+}
+
+@keyframes down {
+	from {
+		top: 0;
+	}
+
+	to {
+		top: 100vh;
+	}
 }

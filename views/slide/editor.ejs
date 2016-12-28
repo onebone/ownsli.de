@@ -2,14 +2,14 @@
 <html>
 	</head>
 		<%- include('../common/header', {
-			title: translator('slide.list.title')
+			title: translator('slide.editor.title')
 		}) %>
 
 		<link rel="stylesheet" href="/css/slide/editor.css">
 	<head>
 
 	<body>
-		<div id="os-editor-menubar">
+		<header id="os-editor-menubar">
 			<!-- File menu -->
 			<span id="os-editor-logo" class="os-editor-menu">
 				<img class="os-logo" src="/img/logo.svg">
@@ -129,15 +129,24 @@
 				<i class="mdi mdi-check"></i>
 				<%= translator('slide.editor.finish') %>
 			</a>
-		</div>
+		</header>
 
-		<div id="os-editor-slidelist">
-		</div>
+		<aside id="os-editor-slidelist">
+		</aside>
 
 		<main id="os-editor-workspace">
 			<div id="os-editor-slides">
 			</div>
 		</main>
+
+		<section id="os-editor-layout-dialog">
+			<a id="os-editor-layout-close" href="#!">
+				<i class="mdi mdi-close"></i>
+			</a>
+
+			<div id="os-editor-layout">
+			</div>
+		</section>
 
 		<script src="/js/common/include.js"></script>
 		<script src="/js/slide/editor-main.js"></script>

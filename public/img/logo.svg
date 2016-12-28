@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<svg width="512" height="512" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<clipPath id="clip0">
+			<use xlink:href="#shape0"/>
+		</clipPath>
+
+		<clipPath id="clip1">
+			<use xlink:href="#shape1"/>
+		</clipPath>
+
+		<clipPath id="clip2">
+			<use xlink:href="#shape2"/>
+		</clipPath>
+	</defs>
+	<path id="shape0" clip-path="url(#clip0)" d="M0 0 H512 V512 H0 z" fill="transparent" stroke-width="30px" stroke="#fff"/>
+	<path id="shape1" clip-path="url(#clip1)" d="M341 512 L0 341 L171 0 L512 171 Z" fill="transparent" stroke-width="30px" stroke="#fff"/>
+	<path id="shape2" clip-path="url(#clip2)" d="M227 455 L57 228 L284 57 L455 285 Z" fill="transparent" stroke-width="30px" stroke="#fff"/>
+</svg>

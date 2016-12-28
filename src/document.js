@@ -268,7 +268,7 @@ class DocumentManager{
 
 DocumentManager.SORT_NAME = 1;
 DocumentManager.SORT_TIME = 2;
-DocumentManager.SORT_OWNER = 3;
+DocumentManager.SORT_OWNER = 4;
 DocumentManager.SORT_NAME_DESC = 9;
 DocumentManager.SORT_TIME_DESC = 10;
 DocumentManager.SORT_OWNER_DESC = 12;

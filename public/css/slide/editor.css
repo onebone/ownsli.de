@@ -3,6 +3,58 @@ body, html {
 	padding: 0;
 }
 
+ * {
+	scrollbar-arrow-color: #ff5722;
+	scrollbar-base-color: #606060;
+	scrollbar-track-color: #606060;
+	scrollbar-face-color: #ff5722;
+	scrollbar-highlight-color: #606060;
+	scrollbar-3dlight-color: #606060;
+	scrollbar-darkshadow-color: #606060;
+	scrollbar-shadow-color: #ff5722;
+}
+
+*::-webkit-scrollbar {
+	width: 17px;
+	height: 17px;
+}
+
+*::-webkit-scrollbar-button {
+	height: 0;
+}
+
+*::-webkit-scrollbar-thumb {
+	background: #ff5722;
+	border: none;
+	border-radius: 0;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+	background: #f4511e;
+}
+
+*::-webkit-scrollbar-thumb:active {
+	background: #000000;
+}
+
+*::-webkit-scrollbar-track {
+	background: #606060;
+	border: none;
+	border-radius: 0;
+}
+
+*::-webkit-scrollbar-track:hover {
+	background: #606060;
+}
+
+*::-webkit-scrollbar-track:active {
+	background: #303030;
+}
+
+*::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
 .os-morph-anchor {
 	background: #00bcd4;
 	border: 2px solid #222;
@@ -12,10 +64,71 @@ body, html {
 	position: absolute;
 }
 
-.os-editor-slide-root {
+.os-editor-menu {
+	color: #fff;
+	display: inline-block;
+	text-align: center;
+	line-height: 30px;
+	height: 50px;
+	padding: 10px;
+	z-index: 6;
+}
+
+#os-editor-menubar {
+	background: #222;
+	display: flex;
+	height: 50px;
+}
+
+#os-editor-logo {
+	background: #ff5722;
+	color: #fff;
+	font-size: 20px;
+	width: 50px;
+}
+
+#os-editor-menu-clock {
 	position: absolute;
+	width: 100%;
 	top: 0;
 	left: 0;
-	width: 100vw;
-	height: 100vh;
+	z-index: 5;
+}
+
+#os-editor-menu-present {
+	background: #f4511e;
+	margin-left: auto;
+}
+
+#os-editor-menu-finish {
+	background: #e64a19;
+}
+
+#os-editor-slidelist {
+	position: fixed;
+	background: #333;
+	width: 200px;
+	top: 50px;
+	left: 0;
+	bottom: 0;
+	overflow-x: auto;
+	overflow-y: scroll;
+}
+
+#os-editor-workspace {
+	position: fixed;
+	top: 50px;
+	left: 200px;
+	right: 0;
+	bottom: 0;
+	background: #444;
+	overflow: auto;
+}
+
+.material-tooltip .backdrop {
+	background: #000;
+}
+
+.dropdown-content li>a {
+	color: #808080;
 }

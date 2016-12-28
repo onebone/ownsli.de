@@ -5,7 +5,8 @@ router.get('/', (req, res, next) => {
 	res.render('slide/list');
 });
 
-router.get('/edit', (req, res, next) => {
+router.get('/edit/:id', (req, res, next) => {
+	//TODO Send presentation data
 	res.render('slide/editor');
 });
 

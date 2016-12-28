@@ -117,6 +117,8 @@ router.post('/create', (req, res, next) => {
 				errCode: ERROR_ACCOUNT_ALREADY_EXIST
 			}));
 		}else{
+			console.error(err);
+
 			res.send(JSON.stringify({
 				status: true,
 				error: true,

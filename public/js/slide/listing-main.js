@@ -8,5 +8,5 @@ include({
 		return alert('Oops! An error occured while loading scripts...\nPlease press F5 to refresh!');
 	}
 
-	sort(new view(PRESENTATION_DATA, $('.slide-listing')));
+	sort(new view($('.slide-listing')));
 });

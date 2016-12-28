@@ -245,10 +245,10 @@ class DocumentManager{
 				MongoConnection.query('document', query, false).sort(
 					mode === DocumentManager.SORT_NAME ? {name: -1}
 					: mode === DocumentManager.SORT_TIME ? {lastSave: -1}
-					: mode === DocumentManager.SORT_OWNER ? {owner: -1}
+					: mode === DocumentManager.SORT_OWNER ? {owner: 1}
 					: mode === DocumentManager.SORT_NAME_DESC ? {name: 1}
 					: mode === DocumentManager.SORT_TIME_DESC ? {lastSave: 1}
-					: mode === DocumentManager.SORT_OWNER_DESC ? {owner: 1}
+					: mode === DocumentManager.SORT_OWNER_DESC ? {owner: -1}
 					: {name: -1}
 				).skip((page - 1) * count).limit(count).toArray((err, documents) => {
 					if(err) return reject(err);

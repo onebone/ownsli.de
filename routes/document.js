@@ -17,7 +17,10 @@ router.get('/get', (req, res) => {
 	const page = parseInt(req.query.page || '1');
 	const count = parseInt(req.query.count || '15');
 
-	DocumentManager.getDocuments({owner: owner}, mode, page, count).then((documents) => {
+	DocumentManager.getDocuments({
+		$or: [{owner: owner},
+			{invitation: {$in: [owner]}}]
+	}, mode, page, count).then((documents) => {
 		let arr = [];
 		documents.forEach((document) => {
 			arr.push({
@@ -25,7 +28,7 @@ router.get('/get', (req, res) => {
 				owner: document._owner,
 				name: document._name,
 				slideCount: document._slides.length,
-				lastSave: documents._lastSave
+				lastSave: document._lastSave
 			});
 		});
 

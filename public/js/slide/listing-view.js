@@ -1,12 +1,16 @@
-function ListPresentation(slideData, target){
-	this.slideData = slideData;
+function ListPresentation(target){
+	this.slideData = [];
 	this.target = target;
 }
 
-ListPresentation.prototype.listPresentation = function(){
+ListPresentation.prototype.removeAll = function(){
 	this.target.querySelectorAll('.slide-listing-content').forEach(function(v){
 		v.remove();
 	});
+};
+
+ListPresentation.prototype.listPresentation = function(){
+	this.removeAll();
 
 	var _this = this;
 

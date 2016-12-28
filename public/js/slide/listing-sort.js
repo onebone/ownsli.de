@@ -20,14 +20,41 @@ var SORT_FUNCTION = {
 	4: function(v1, v2){
 		return v1.author.localeCompare(v2.author);
 	}
-}
+};
 
 var SORT_MODE_REVERSED = 8;
 
 var removeReverse = function(sortCode){
 	if(sortCode >= 8) return sortCode - 8;
 	return sortCode;
-}
+};
+
+var listDocuments = function(view, mode){
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', '/document/get?mode=' + mode, true);
+
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200){
+			var data = JSON.parse(xhr.responseText);
+			if(!data) return; // TODO Show error
+			view.slideData = [];
+			data.forEach((document) => {
+				view.slideData.push({
+					name: document.name,
+					date: new Date(document.lastSave),
+					author: document.owner,
+					link: '/document/d/' + document.id
+				});
+			});
+
+			view.listPresentation();
+		}
+	};
+
+	view.removeAll();
+	xhr.send(null);
+};
+
 module.exports = function(view){
 	var SORT_MODE = 1;
 	var header = view.target.querySelector('.slide-listing-header');
@@ -43,19 +70,14 @@ module.exports = function(view){
 				SORT_MODE = (SORT_MODE & SORT_MODE_REVERSED) ? SORT_MODES[v] : SORT_MODES[v] | SORT_MODE_REVERSED;
 			}else SORT_MODE = SORT_MODES[v];
 
-			var _sort = removeReverse(SORT_MODE);
-			view.slideData = view.slideData.sort(SORT_FUNCTION[_sort]);
-
 			if(SORT_MODE >= 8){
-				view.slideData = view.slideData.reverse();
 				button.querySelector('i').classList.add('mdi-chevron-up');
 			}else button.querySelector('i').classList.add('mdi-chevron-down');
 
-			view.listPresentation();
-
+			listDocuments(view, SORT_MODE);
 			return false;
 		});
 	});
 
-	view.listPresentation();
+	listDocuments(view, 1);
 };

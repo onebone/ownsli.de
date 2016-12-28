@@ -6,17 +6,19 @@ const Utils = require('./utils');
 // Document is wrapper of a presentation
 class Document{
 	/**
-	 * @param id string         | Id of document
-	 * @param owner string      | User Id of owner
-	 * @param name string       | Name of document
-	 * @param slides Slide[]    | Key of the array is page
-	 * @param lastSave int      | Last saved
+	 * @param id string             | Id of document
+	 * @param owner string          | User Id of owner
+	 * @param name string           | Name of document
+	 * @param slides Slide[]        | Key of the array is page
+	 * @param invitation string[]   | Invited user id
+	 * @param lastSave int          | Last saved
 	 */
-	constructor(id, owner, name, slides = [], lastSave = Date.now()){
+	constructor(id, owner, name, slides = [], invitation = [], lastSave = Date.now()){
 		this._id = id;
 		this._owner = owner;
 		this._name = name;
 		this._slides = slides;
+		this._invitation = invitation;
 		this._lastSave = lastSave;
 	}
 
@@ -60,13 +62,38 @@ class Document{
 		return this._slides.length;
 	}
 
+	/**
+	 * @param {string} userId
+	 */
+	addInvitation(userId){
+		this._invitation.push(userId);
+	}
+
+	/**
+	 * @param {string} userId
+	 */
+	removeInvitation(userId){
+		let index;
+		if((index = this._invitation.indexOf(userId)) !== -1){
+			this._invitation.splice(index, 1);
+
+			return true;
+		}
+		return false;
+	}
+
+	getInvitations(){
+		return this._invitation;
+	}
+
 	toArray(){
 		let data = {
 			id: this._id,
 			owner: this._owner,
 			name: this._name,
 			slides: [],
-			lastSave: this._lastSave,
+			invitation: this._invitation,
+			lastSave: this._lastSave
 		};
 
 		this._slides.forEach((slide) => {
@@ -186,7 +213,7 @@ class DocumentManager{
 				if(err) return reject(err);
 				if(rows.length < 1) return resolve(null);
 
-				resolve(new Document(rows[0].id, rows[0].owner, rows[0].name, rows[0].slides, rows[0].lastSave));
+				resolve(new Document(rows[0].id, rows[0].owner, rows[0].name, rows[0].slides, rows[0].invitation, rows[0].lastSave));
 			});
 		});
 	}
@@ -227,7 +254,7 @@ class DocumentManager{
 					if(err) return reject(err);
 					let data = [];
 					documents.forEach((document) => {
-						data.push(new Document(document.id, document.owner, document.name, document.slides, document.lastSave));
+						data.push(new Document(document.id, document.owner, document.name, document.slides, document.invitation, document.lastSave));
 					});
 
 					resolve(data);

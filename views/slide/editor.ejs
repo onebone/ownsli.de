@@ -1,9 +1,64 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-	<head>
-	    <%- include ../common/header.ejs %>
 	</head>
-	<body>
+		<%- include('../common/header', {
+			title: translator('slide.list.title')
+		}) %>
 
+		<link rel="stylesheet" href="/css/slide/list.css">
+	<head>
+
+	<body>
+		<div id="os-editor-menubar">
+			<!-- File menu -->
+			<a id="os-editor-menu-file" href="#!" class="os-editor-menu dropdown-button">
+				<%= translator('slide.editor.file') %>
+			</a>
+
+			<ul id="file-dropdown" class="dropdown-content">
+				<li><a href="#!"><%= translator('slide.editor.file.share') %></a></li>
+				<li><a href="#!"><%= translator('slide.editor.file.save') %></a></li>
+				<li><a href="#!"><%= translator('slide.editor.file.saveas') %></a></li>
+			</ul>
+
+			<!-- Edit menu -->
+			<a id="os-editor-menu-undo" href="#!" class="os-editor-menu">
+				<%= translator('slide.editor.undo') %>
+			</a>
+
+			<a id="os-editor-menu-redo" href="#!" class="os-editor-menu">
+				<%= translator('slide.editor.redo') %>
+			</a>
+
+			<!-- Shape Insert menu -->
+			<a id="os-editor-menu-insert" href="#!" class="os-editor-menu dropdown-button">
+				<%= translator('slide.editor.insert') %>
+			</a>
+
+			<ul id="insert-dropdown" class="dropdown-content">
+				<li><a href="#!"><%= translator('slide.editor.insert.richtext') %></a></li>
+				<li><a href="#!"><%= translator('slide.editor.insert.image') %></a></li>
+				<li><a href="#!"><%= translator('slide.editor.insert.video') %></a></li>
+				<li><a href="#!"><%= translator('slide.editor.insert.url') %></a></li>
+				<li><a href="#!"><%= translator('slide.editor.insert.html') %></a></li>
+			</ul>
+
+			<!-- Edit menu -->
+			<a id="os-editor-menu-present" href="#!" class="os-editor-menu">
+				<%= translator('slide.editor.present') %>
+			</a>
+
+			<a id="os-editor-menu-finish" href="#!" class="os-editor-menu">
+				<%= translator('slide.editor.finish') %>
+			</a>
+		</div>
+
+		<div id="os-editor-slidelist">
+		</div>
+
+		<div id="os-editor-workspace">
+			<main id="os-editor-slide">
+			</main>
+		</div>
 	</body>
 </html>

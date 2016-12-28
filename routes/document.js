@@ -25,7 +25,7 @@ router.get('/get', (req, res) => {
 			});
 		});
 
-		res.send(JSON.stringify(arr));
+		res.json(arr);
 	}).catch((err) => res.send('null'));
 });
 

@@ -1,4 +1,5 @@
 'use strict';
+//TODO update jsdoc, api
 
 const MongoConnection = require('./mongo');
 const Utils = require('./utils');
@@ -141,9 +142,9 @@ class Slide{
 // Shape is an object which is placed on slide
 class Shape{
 	/**
-	 * @param vec Vector2   | Position of shape where an object will be placed
-	 * @param type int      | Type of shape
-	 * @param meta array    | Other data needed to render shape
+	 * @param vec Vector2	| Position of shape where an object will be placed
+	 * @param type int		| Type of shape
+	 * @param meta object	| Other data needed to render shape
 	 */
 	constructor(vec, type, meta){
 		this._vec = vec;
@@ -166,7 +167,7 @@ class Shape{
 	}
 
 	/**
-	 * @return array
+	 * @return object
 	 */
 	getMetadata(){
 		return this._meta;

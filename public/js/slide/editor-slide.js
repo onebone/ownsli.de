@@ -55,7 +55,7 @@ Slide.prototype.setSlidePreview = function(node){
 };
 
 Slide.prototype.setSlideLayout = function (node){
-	var this = _this;
+	var _this = this;
 	this.layoutNode = node;
 	this.layoutNode.addEventListener('click', function(){
 		var layoutMorph = new morph(node, this.workspace, false, function(){

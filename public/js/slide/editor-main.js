@@ -1,7 +1,7 @@
 window.socket = io();
 window.documentId = location.href.match(/[^#?]+\/slide\/edit\/([a-zA-Z0-9]+)/)[1];
 
-io.once('send data', function(event){
+window.socket.once('send data', function(event){
 	include({
 		utils: '/js/common/utils.js',
 		interact: '/interactjs/dist/interact.min.js',

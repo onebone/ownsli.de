@@ -1,11 +1,10 @@
 'use strict';
 
 const {Document} = require('./document');
-const {SessionManager, Session} = require('./session');
+const {SessionManager} = require('./session');
 
 let io = null;
 let groups = {};
-
 class Sync{
 	/**
 	 * This function not for general use

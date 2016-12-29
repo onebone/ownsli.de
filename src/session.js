@@ -1,7 +1,6 @@
 'use strict';
 
 const Utils = require('./utils');
-const Sync = require('./sync');
 
 const sessions = new Map();
 
@@ -10,7 +9,7 @@ class SessionManager{
 	 * Add online session
 	 *
 	 * @param userId
-	 * @returns {Session}
+	 * @return Session
 	 */
 	static addSession(userId){
 		const token = Utils.createToken();
@@ -21,12 +20,12 @@ class SessionManager{
 	 * Removes session with token.
 	 *
 	 * @param token
-	 * @returns {boolean}
+	 * @return boolean
 	 */
 	static removeSession(token){
 		if(sessions[token]){
-			const sess = sessions[token];
-			Sync.leaveSession(sess);
+			const session = sessions[token];
+			require('./sync').leaveSession(session); // wtf...
 
 			sessions.delete(token);
 			return true;
@@ -39,7 +38,7 @@ class SessionManager{
 	 * Returns session matching with certain userId
 	 *
 	 * @param userId
-	 * @returns Session
+	 * @return Session
 	 */
 	static getSessionByUserId(userId){
 		userId = userId.toLowerCase();
@@ -60,17 +59,10 @@ class SessionManager{
 	 * Returns session matching with certain token
 	 *
 	 * @param token
-	 * @returns Session
+	 * @return Session
 	 */
 	static getSession(token){
-		for(const token in sessions){
-			if(sessions.hasOwnProperty(token)){
-				const session = sessions[token];
-				if(session.getToken() === token){
-					return session;
-				}
-			}
-		}
+		if(sessions[token]) return session[token];
 		return null;
 	}
 }

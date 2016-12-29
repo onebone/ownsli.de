@@ -9,7 +9,7 @@ module.exports.bindPropertyToAttribute = function(original, target, propertyName
 				return original.getAttribute('data-' + propertyName);
 			},
 		set: function(value){
-				onUpdate(target[propertyName], value);
+				onUpdate(target[propertyName], value, propertyName);
 				original.setAttribute('data-' + propertyName, value);
 			}
 	});

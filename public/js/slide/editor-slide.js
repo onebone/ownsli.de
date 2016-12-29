@@ -28,6 +28,7 @@ Slide.prototype.initSlide = function(node){
 		_this.setEditableSlide(slideNode);
 
 		var previewNode = document.createElement('div');
+		previewNode.classList.add('os-editor-slidelist-slide');
 		previewNode.setAttribute('data-os-slide-id', _this.id);
 		_this.setSlidePreview(previewNode);
 
@@ -44,10 +45,13 @@ Slide.prototype.initSlide = function(node){
 
 Slide.prototype.setEditableSlide = function(node){
 	this.slideNode = node;
+	//TODO append to slideList
 };
 
 Slide.prototype.setSlidePreview = function(node){
 	this.previewNode = node;
+	$('#os-editor-slidelist').append(node);
+	//TODO resize
 };
 
 Slide.prototype.setSlideLayout = function (node){
@@ -71,10 +75,10 @@ Slide.prototype.setSlideLayout = function (node){
 		});
 
 		window.addEventListener('click', function(){
-			layoutMorph.destroy();
+			if(!this.classList.contains('os-morph-anchor') || this !== node) layoutMorph.destroy();
 		}, {once: true});
 	});
-	
+
 	$('#os-editor-layout').append(node);
 };
 

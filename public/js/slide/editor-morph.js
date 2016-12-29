@@ -80,12 +80,18 @@ Object.freeze(ANCHORS);
 //Morph 제작
 function Morph(node, workspace, is2D, deleteCallback){
 	this.object = node;
+	this.boundObjects = [];
 	this.workspace = workspace;
 	this.is2D = (is2D === undefined) ? false : is2D;
 
 	var _this = this;
 	['os-x', 'os-y', 'os-z', 'os-width', 'os-height', 'os-rotation-x', 'os-rotation-y', 'os-rotation-z'].forEach(function(v){
-		utils.bindPropertyToAttribute(_this.object, _this, v);
+		utils.bindPropertyToAttribute(_this.object, _this, v, function(prev, next, prop){
+			_this.boundObjects.forEach(function(v){
+				v[prop] += next - prev;
+				v.updateNode();
+			});
+		});
 	});
 
 	var lastNode = {x: parseInt(this['os-x']), y: parseInt(this['os-y'])};
@@ -323,6 +329,14 @@ Morph.prototype.destroy = function(){
 	});
 
 	this.interactableObject.unset();
+};
+
+Morph.prototype.bind = function(){
+
+};
+
+Morph.prototype.unboundAll = function(){
+	
 };
 
 Morph.parseAnchorSyntax = function(statement, width, height){

@@ -9,7 +9,7 @@ window.socket.once('send data', function(event){
 		workspace: '/js/slide/editor-workspace.js',
 		clock: '/js/slide/editor-clock.js'
 	}, function(err){
-		if(err) return alert('Oops! An error occured while loading scripts...\n Please press F5 to refresh!');
+		if(err) return alert('Oops! An error occured while loading scripts...\nPlease press F5 to refresh!');
 
 		clock($('#os-editor-menu-clock'));
 	});

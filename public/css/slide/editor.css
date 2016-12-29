@@ -83,6 +83,11 @@ body, html {
 	height: 50px;
 	padding: 10px;
 	z-index: 6;
+	transition: background 300ms;
+}
+
+.os-editor-menu:hover:not(#os-editor-menu-clock) {
+	background: rgba(255, 255, 255, 0.3);
 }
 
 #os-editor-menubar {
@@ -109,10 +114,16 @@ body, html {
 #os-editor-menu-present {
 	background: #f4511e;
 	margin-left: auto;
+	width: 120px;
 }
 
 #os-editor-menu-finish {
 	background: #e64a19;
+	width: 100px;
+}
+
+#os-editor-menu-present:hover, #os-editor-menu-finish:hover {
+	background: #ff9800 !important;
 }
 
 #os-editor-slidelist {
@@ -130,7 +141,7 @@ body, html {
 	position: fixed;
 	top: 50px;
 	left: 200px;
-	right: 200px;
+	right: 220px;
 	bottom: 0;
 	background: #444;
 	overflow: auto;
@@ -163,11 +174,30 @@ body, html {
 }
 
 #os-editor-property-editor {
+	background: #333;
 	right: 0;
 	top: 50px;
 	bottom: 0;
 	position: fixed;
-	width: 200px;
+	padding: 10px;
+	width: 220px;
+}
+
+#os-editor-property-editor input {
+	color: #fff;
+}
+
+#os-editor-property-editor label {
+	color: #ff5722;
+}
+
+#os-editor-property-editor input[type=number]:focus + label {
+	color: #ff5722;
+}
+
+#os-editor-property-editor input[type=number]:focus {
+	border-bottom: 1px solid #ff5722;
+	box-shadow: 0 1px 0 0 #ff5722;
 }
 
 .material-tooltip .backdrop {

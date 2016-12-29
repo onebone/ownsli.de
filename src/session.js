@@ -62,7 +62,7 @@ class SessionManager{
 	 * @return Session
 	 */
 	static getSession(token){
-		if(sessions[token]) return session[token];
+		if(sessions[token]) return sessions[token];
 		return null;
 	}
 }

@@ -17,12 +17,14 @@ class Sync{
 			session(socket.request, socket.request.res, next);
 		});
 
-		io.sockets.on('connection', (socket) => {
+		io.on('connection', (socket) => {
 			const session = SessionManager.getSession(socket.request.session.token);
 
 			if(session === null){
 				return;
 			}
+
+			socket.emit('send data');
 		});
 	}
 

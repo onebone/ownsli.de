@@ -51,6 +51,12 @@ size | Vector2 | Size of shape
 type | int | Type of shape
 meta | object | Other data needed to render shape
 
+### SlideContent
+Name | Type | Description
+-----|------|------------
+slide| Slide| slide
+shapes| Shape[] | shapes in the slide
+
 # UpdateSlidePacket
 Name | Type | Description
 -----|------|------------
@@ -83,6 +89,17 @@ Name | Type | Description
 -----|------|------------
 document | int | Id of document
 slide (Optional)| int | Id of slide (If sent from server)
+
+## request data
+Name | Type | Description
+-----|------|------------
+document | int | Id of document
+
+## send data
+Name | Type | Description
+-----|------|------------
+document | int | Id of document
+slides | SlideContent[] | slides in document
 
 ## Examples
 ```js

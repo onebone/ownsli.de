@@ -331,12 +331,12 @@ Morph.prototype.destroy = function(){
 	this.interactableObject.unset();
 };
 
-Morph.prototype.bind = function(){
-
+Morph.prototype.bind = function(morph){
+	this.boundObjects.push(morph);
 };
 
 Morph.prototype.unboundAll = function(){
-	
+	this.boundObjects = [];
 };
 
 Morph.parseAnchorSyntax = function(statement, width, height){

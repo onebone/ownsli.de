@@ -130,7 +130,7 @@ body, html {
 	position: fixed;
 	top: 50px;
 	left: 200px;
-	right: 0;
+	right: 200px;
 	bottom: 0;
 	background: #444;
 	overflow: auto;
@@ -160,6 +160,14 @@ body, html {
 
 #os-editor-layout-close:hover {
 	color: #ff5722;
+}
+
+#os-editor-property-editor {
+	right: 0;
+	top: 50px;
+	bottom: 0;
+	position: fixed;
+	width: 200px;
 }
 
 .material-tooltip .backdrop {

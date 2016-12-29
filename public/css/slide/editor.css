@@ -60,8 +60,19 @@ body, html {
 	border: 2px solid #222;
 	width: 6px;
 	height: 6px;
-	border-radius: 5px;
 	position: absolute;
+}
+
+.os-morph-delete-anchor {
+	background: #F00;
+	border: none;
+	border-radius: 0;
+	width: 20px;
+	height: 20px;
+	color: #fff;
+	text-align: center;
+	line-height: 20px;
+	cursor: pointer;
 }
 
 .os-editor-menu {

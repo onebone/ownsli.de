@@ -78,14 +78,15 @@ var ANCHORS = [
 Object.freeze(ANCHORS);
 
 //Morph 제작
-function Morph(node, workspace){
+function Morph(node, workspace, is2D, deleteCallback){
 	this.object = node;
 	this.workspace = workspace;
+	this.is2D = (is2D === undefined) ? false : is2D;
+
 	var _this = this;
 	['os-x', 'os-y', 'os-z', 'os-width', 'os-height', 'os-rotation-x', 'os-rotation-y', 'os-rotation-z'].forEach(function(v){
 		utils.bindPropertyToAttribute(_this.object, _this, v);
 	});
-
 
 	var lastNode = {x: parseInt(this['os-x']), y: parseInt(this['os-y'])};
 
@@ -110,6 +111,9 @@ function Morph(node, workspace){
 		});
 
 	this.anchors = ANCHORS.map(function(v){
+		if(is2D){
+			if(v.do === 'rotate-x' || v.do === 'rotate-y') return null;
+		}
 		var anchor = document.createElement('div');
 		anchor.setAttribute('class', 'os-morph-anchor');
 		anchor.setAttribute('data-os-morph-anchor-x', v.x);
@@ -250,6 +254,17 @@ function Morph(node, workspace){
 		return anchor;
 	});
 
+	if(deleteCallback && typeof deleteCallback === 'function'){
+		var anchor = document.createElement('div');
+		anchor.setAttribute('class', 'os-morph-anchor os-morph-delete-anchor');
+		anchor.setAttribute('data-os-morph-anchor-x', '-30px');
+		anchor.setAttribute('data-os-morph-anchor-y', '-30px');
+		anchor.setAttribute('data-os-morph-anchor-do', 'remove');
+		anchor.addEventListener('click', deleteCallback);
+		anchor.innerHTML = '&times;';
+		this.anchors.push(anchor);
+		this.workspace.addToWorkspace(anchor);
+	}
 	this.updateAnchor();
 }
 
@@ -291,6 +306,7 @@ Morph.prototype.updateAnchor = function(){
 	var objRotationZ = Math.round(parseInt(this['os-rotation-z']));
 
 	this.anchors.forEach(function(v){
+		if(!v) return;
 		var anchorX = Morph.parseAnchorSyntax(v.getAttribute("data-os-morph-anchor-x"), objW, objH);
 		var anchorY = Morph.parseAnchorSyntax(v.getAttribute("data-os-morph-anchor-y"), objW, objH);
 
@@ -302,6 +318,7 @@ Morph.prototype.updateAnchor = function(){
 
 Morph.prototype.destroy = function(){
 	this.anchors.forEach(function(v){
+		if(!v) return;
 		v.remove();
 	});
 

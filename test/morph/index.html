@@ -38,7 +38,9 @@
 					return;
 				}
 
-				testMorph = new morph($('.os-editor-slide-root div'), workspace);
+				testMorph = new morph($('.os-editor-slide-root div'), workspace, true, function(){
+					alert('Deleted!');
+				});
 				button.innerHTML = "Destroy!";
 				destroyMode = true;
 			};

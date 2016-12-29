@@ -90,6 +90,26 @@ Name | Type | Description
 document | int | Id of document
 slide (Optional)| int | Id of slide (If sent from server)
 
+## create shape
+Name | Type | Description
+-----|------|------------
+document | int | Id of document
+slide| int | Id of slide
+shape (Optional) | int | Id of shape (If sent from server)
+
+## delete slide
+Name | Type | Description
+-----|------|------------
+document | int | Id of document
+slide| int | Id of slide
+
+## delete shape
+Name | Type | Description
+-----|------|------------
+document | int | Id of document
+slide| int | Id of slide
+shape | int | Id of shape
+
 ## request data
 Name | Type | Description
 -----|------|------------

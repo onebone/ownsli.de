@@ -40,6 +40,8 @@ id | int | Id of slide
 pos | Vector3 | Position of slide
 rot | Vector3 | Rotation of slide
 size | Vector2 | Size of slide
+order | int | Order of slide
+shapes | Shape[] | shapes in slide
 
 #### Shape
 Name | Type | Description
@@ -50,12 +52,6 @@ rot | Vector3 | Rotation of shape
 size | Vector2 | Size of shape
 type | int | Type of shape
 meta | object | Other data needed to render shape
-
-### SlideContent
-Name | Type | Description
------|------|------------
-slide| Slide| slide
-shapes| Shape[] | shapes in the slide
 
 # UpdateSlidePacket
 Name | Type | Description
@@ -110,6 +106,13 @@ document | int | Id of document
 slide| int | Id of slide
 shape | int | Id of shape
 
+## swap order
+Name | Type | Description
+-----|------|------------
+document | int | Id of document
+slide1| int | Id of slide1
+slide2| int | Id of slide2
+
 ## request data
 Name | Type | Description
 -----|------|------------
@@ -119,7 +122,11 @@ document | int | Id of document
 Name | Type | Description
 -----|------|------------
 document | int | Id of document
-slides | SlideContent[] | slides in document
+name | string | Name of document
+owner | string | User Id of owner
+slides | Slide[] | slides in document
+invitation | string[] | Invited user id
+lastSave | int | Last saved
 
 ## Examples
 ```js

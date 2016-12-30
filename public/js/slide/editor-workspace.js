@@ -4,6 +4,12 @@ function Workspace(slideRoot, workspaceRoot){
 	this.document = {
 		slides: []
 	};
+
+	Sortable.create($('#os-editor-slidelist'), {
+		onUpdate: function(evt){
+			//TODO socket emit swap order
+		}
+	});
 }
 
 Workspace.prototype.addToWorkspace = function(node){

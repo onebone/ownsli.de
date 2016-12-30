@@ -25,6 +25,7 @@
     "font-d2coding": "Joungkyun/font-d2coding#^1.2.1",
     "nanum-sqaure": "hiun/NanumSquare",
     "nanum-barun-gothic": "hiun/NanumBarunGothic#^1.0.0",
-    "interactjs": "^1.2.8"
+    "interactjs": "^1.2.8",
+    "Sortable": "sortablejs#^1.4.2"
   }
 }

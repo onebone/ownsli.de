@@ -1,9 +1,10 @@
 var isInitFinished = true;
 
-function Slide(data, workspace){
+function Slide(data, shapes, workspace){
 	this.workspace = workspace;
 	var _this = this;
-	['id', 'pos', 'rot', 'size'].forEach(function(v){
+	this.shapes = shapes;
+	['id', 'pos', 'rot', 'size', 'order'].forEach(function(v){
 		_this[v] = data[v];
 	});
 }
@@ -19,8 +20,10 @@ Slide.prototype.initSlide = function(node){
 	}
 
 	isInitFinished = false;
-	socket.once('create slide', function(data){
-		_this.id = data.slide;
+	//socket.once('create slide', function(data){
+		//_this.id = data.slide;
+		_this.id = 0;
+		//FIXME Test code : Removal required
 		isInitFinished = true;
 
 		var slideNode = document.createElement('div');
@@ -36,7 +39,7 @@ Slide.prototype.initSlide = function(node){
 		layoutNode.classList.add('os-editor-layout-slide');
 		layoutNode.innerHTML = `#${_this.id}`;
 		_this.setSlideLayout(layoutNode);
-	});
+	//});
 
 	socket.emit('create slide', {
 		document: documentId
@@ -49,12 +52,18 @@ Slide.prototype.setEditableSlide = function(node){
 };
 
 Slide.prototype.setSlidePreview = function(node){
+	var nodeWrapper
 	this.previewNode = node;
+	var resizeRate = 100 / this.size.x;
+	if(!isFinite(resizeRate)) resizeRate = 0;
+	if(resizeRate < 0) resizeRate = Math.abs(resizeRate);
+	node.style.transform = "scale(" + resizeRate + ")";
+	node.parentNode.style.width = '100px';
+	node.parentNode.style.height = (node.style.height * resizeRate) + 'px';
 	$('#os-editor-slidelist').append(node);
-	//TODO resize
 };
 
-Slide.prototype.setSlideLayout = function (node){
+Slide.prototype.setSlideLayout = function(node){
 	var _this = this;
 	this.layoutNode = node;
 	this.layoutNode.addEventListener('click', function(){
@@ -83,7 +92,7 @@ Slide.prototype.setSlideLayout = function (node){
 };
 
 Slide.prototype.onUpdate = function(){
-
+	if(this.previewNode);
 };
 
 Slide.prototype.toExportableData = function(){

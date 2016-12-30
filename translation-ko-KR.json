@@ -34,6 +34,7 @@
 	"slide.editor.redo": "다시 실행 (ctrl + shift + z)",
 	"slide.editor.present": "슬라이드 쇼",
 	"slide.editor.finish": "편집 완료",
+	"slide.editor.layout": "레이아웃 편집",
 
 	"slide.view.title": "슬라이드 보기 - %title%",
 	"slide.view.present": "슬라이드 쇼",

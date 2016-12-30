@@ -121,6 +121,13 @@
 				<%= translator('slide.editor.insert.slide') %>
 			</a>
 
+			<!-- Slide Layout Menu -->
+			<a id="os-editor-menu-layout" href="#!" class="os-editor-menu">
+				<i class="mdi mdi-view-dashboard"></i>
+				<%= translator('slide.editor.layout') %>
+			</a>
+
+			<!-- A simple clock -->
 			<span id="os-editor-menu-clock" class="os-editor-menu">
 				<%= new Date().toLocaleTimeString() %>
 			</span>
@@ -196,6 +203,7 @@
 			</div>
 		</section>
 
+		<script src="/Sortable/Sortable.min.js"></script>
 		<script src="/socket.io-client/dist/socket.io.min.js"></script>
 		<script src="/js/common/include.js"></script>
 		<script src="/js/slide/editor-main.js"></script>

@@ -1,6 +1,6 @@
 require('../init');
-const {DocumentManager, Slide} = require('../src/document');
-const {Vector3} = require('../src/math');
+const {DocumentManager, Document, Slide} = require('../src/document');
+const {Vector3, Vector2} = require('../src/math');
 const Utils = require('../src/utils');
 
 describe('Document', () => {
@@ -16,9 +16,16 @@ describe('Document', () => {
 		DocumentManager.getDocument(id).then((document) => {
 			if(document === null) throw new Error('document does not exist');
 			let len = Utils.rand(1, 5);
-			document._slides = [];
+			document._slides = {};
 			for(let i = 0; i < len; i++){
-				document._slides.push(new Slide(new Vector3(Utils.rand(-100, 100), Utils.rand(-100, 100), Utils.rand(-100, 100)), []));
+				document.addSlide(new Slide(
+					new Vector3(Utils.rand(-100, 100), Utils.rand(-100, 100), Utils.rand(-100, 100)), // position
+					new Vector2(Utils.rand(-100, 100), Utils.rand(-100, 100)), // size
+					new Vector3(Utils.rand(-100, 100), Utils.rand(-100, 100), Utils.rand(-100, 100)), // rotation
+					0, // order
+					[], // meta
+					[]
+				));
 			}
 
 			DocumentManager.saveDocument(document).then(() => done());

@@ -7,24 +7,24 @@ const Utils = require('./utils');
 // Document is wrapper of a presentation
 class Document{
 	/**
-	 * @param id string             | Id of document
-	 * @param owner string          | User Id of owner
-	 * @param name string           | Name of document
-	 * @param slides Slide[]        | Key of the array is page
-	 * @param invitation string[]   | Invited user id
-	 * @param lastSave int          | Last saved
+	 * @param {string} id           | Id of document
+	 * @param {string} owner        | User Id of owner
+	 * @param {string} name         | Name of document
+	 * @param {object} slides       | Key of the array is page
+	 * @param {string[]} invitation | Invited user id
+	 * @param {int} lastSave        | Timestamp of last saved
 	 */
 	constructor(id, owner, name, slides = [], invitation = [], lastSave = Date.now()){
 		this._id = id;
 		this._owner = owner;
 		this._name = name;
-		this._slides = slides;
+		this._slides = Array.isArray(slides) ? new Map(slides) : slides;
 		this._invitation = invitation;
 		this._lastSave = lastSave;
 	}
 
 	/**
-	 * @returns string
+	 * @return {string}
 	 */
 	getId(){
 		return this._id;
@@ -35,31 +35,54 @@ class Document{
 	}
 
 	/**
-	 * @return string
+	 * @return {string}
 	 */
 	getName(){
 		return this._name;
 	}
 
 	/**
-	 * @return Slide[]
+	 * @return {Slide[]}
 	 */
 	getSlides(){
 		return this._slides;
 	}
 
 	/**
-	 * @param page int
-	 * @return Slide
+	 * @param {int} id
+	 * @return {Slide}
 	 */
-	getSlide(page){
-		return this._slides[page];
+	getSlide(id){
+		return this._slides[id];
 	}
 
 	/**
-	 * @return int
+	 * @param {Slide} slide
+	 * @return {int}
 	 */
-	getPages(){
+	addSlide(slide){
+		if(!slide) return -1;
+		let max = 0;
+		for(const index in this._slides){ // max id of slide
+			if(this._slides.hasOwnProperty(index)){
+				const s = this._slides[index];
+				if(s.getOrder() >= slide.getOrder()){ // push order
+					s.setOrder(s.getOrder() + 1);
+				}
+
+				const i = parseInt(index);
+				if(i > max) max = i;
+			}
+		}
+
+		this._slides[max + 1] = slide;
+		return max + 1;
+	}
+
+	/**
+	 * @return {int}
+	 */
+	getSlideCount(){
 		return this._slides.length;
 	}
 
@@ -83,8 +106,18 @@ class Document{
 		return false;
 	}
 
+	/**
+	 * @return {string[]}
+	 */
 	getInvitations(){
 		return this._invitation;
+	}
+
+	/**
+	 * @return {int}
+	 */
+	getLastSave(){
+		return this._lastSave;
 	}
 
 	toArray(){
@@ -97,14 +130,21 @@ class Document{
 			lastSave: this._lastSave
 		};
 
-		this._slides.forEach((slide) => {
+		const _this = this;
+		Object.keys(this._slides).forEach((index) => {
+			const slide = _this._slides[index];
 			let shapes = [];
 			slide.getShapes().forEach((shape) => {
 				shapes.push(shape.toArray());
 			});
 
+			const pos = slide.getPosition();
+			const rot = slide.getRotation();
 			data.slides.push({ // slide info
-				vec: [slide.getPosition().getX(), slide.getPosition().getY(), slide.getPosition().getZ()],
+				vec: [pos.getX(), pos.getY(), pos.getZ()],
+				rotation: [rot.getX(), rot.getY(), rot.getZ()],
+				order: slide.getOrder(),
+				meta: slide.getMetadata(),
 				shapes: shapes
 			});
 		});
@@ -116,23 +156,116 @@ class Document{
 // Slide is a wrapper of slide which is included in Document
 class Slide{
 	/**
-	 * @param vec Vector3       | Position of slide where slide will be placed
-	 * @param shapes Shape[]    | Shapes which is included in slide
+	 * @param {Vector3} vec         | Position of slide where slide will be placed
+	 * @param {Vector2} size        | Size of slide
+	 * @param {Vector3} rotation    | Rotation of slide
+	 * @param {int} order           | Order of slide
+	 * @param {object} meta         | Metadata of slide
+	 * @param {object} shapes       | Shapes which is included in slide
 	 */
-	constructor(vec, shapes){
+	constructor(vec, size, rotation, order, meta, shapes){
 		this._vec = vec;
-		this._shapes = shapes;
+		this._size = size;
+		this._rotation = rotation;
+		this._order = order;
+		this._meta = meta;
+		this._shapes = Array.isArray(shapes) ? new Map(shapes) : shapes;
 	}
 
 	/**
-	 * @return Vector3
+	 * @return {Vector3}
 	 */
 	getPosition(){
 		return this._vec.add();
 	}
 
 	/**
-	 * @return Shape[]
+	 * @param {Vector3} vec
+	 */
+	setPosition(vec){
+		this._vec = vec.add();
+	}
+
+	/**
+	 * @return {Vector3}
+	 */
+	getRotation(){
+		return this._rotation.add();
+	}
+
+	/**
+	 * @param {Vector3} rot
+	 */
+	setRotation(rot){
+		this._rotation = rot.add();
+	}
+
+	/**
+	 * @return {Vector2}
+	 */
+	getSize(){
+		return this._size.add();
+	}
+
+	/**
+	 * @param {Vector2} vec
+	 */
+	setSize(vec){
+		this._size = vec.add();
+	}
+
+	/**
+	 * @return {int}
+	 */
+	getOrder(){
+		return this._order;
+	}
+
+	/**
+	 * @param {int} order
+	 */
+	setOrder(order){
+		this._order = order;
+	}
+
+	/**
+	 * @return {Object}
+	 */
+	getMetadata(){
+		return this._meta;
+	}
+
+	/**
+	 * @param {Object} meta
+	 */
+	setMetadata(meta){
+		this._meta = meta;
+	}
+
+	addShape(shape){
+		if(!shape) return -1;
+		let max = 0;
+		for(const index in this._shapes){ // max id of shape
+			if(this._shapes.hasOwnProperty(index)){
+				const i = parseInt(index);
+				if(i > max) max = i;
+			}
+		}
+
+		this._shapes[max + 1] = shape;
+		return max + 1;
+	}
+
+	/**
+	 * @param {int} id
+	 * @return {Shape}
+	 */
+	getShape(id){
+		return this._shapes[id];
+	}
+
+	/**
+	 * @return {Object}
 	 */
 	getShapes(){
 		return this._shapes;
@@ -142,40 +275,88 @@ class Slide{
 // Shape is an object which is placed on slide
 class Shape{
 	/**
-	 * @param vec Vector2	| Position of shape where an object will be placed
-	 * @param type int		| Type of shape
-	 * @param meta object	| Other data needed to render shape
+	 * @param {Vector2} vec	        | Position of shape where an object will be placed
+	 * @param {Vector3} rotation   | Rotation of shape
+	 * @param {Vector2} size       | Size of shape
+	 * @param {int} type	        | Type of shape
+	 * @param {Object} meta	        | Other data needed to render shape
 	 */
-	constructor(vec, type, meta){
+	constructor(vec, rotation, size, type, meta){
 		this._vec = vec;
+		this._rotation = rotation;
+		this._size = size;
 		this._type = type;
 		this._meta = meta;
 	}
 
 	/**
-	 * @return Vector2
+	 * @param {Vector2} vec
+	 */
+	setPosition(vec){
+		this._vec = vec.add();
+	}
+
+	/**
+	 * @return {Vector2}
 	 */
 	getPosition(){
 		return this._vec.add();
 	}
 
 	/**
-	 * @return int
+	 * @return {int}
 	 */
 	getType(){
 		return this._type;
 	}
 
 	/**
-	 * @return object
+	 * @return {Object}
 	 */
 	getMetadata(){
 		return this._meta;
 	}
 
+	/**
+	 * @param {Object} meta
+	 */
+	setMetadata(meta){
+		this._meta = meta;
+	}
+
+	/**
+	 * @return {Vector3}
+	 */
+	getRotation(){
+		return this._rotation.add();
+	}
+
+	/**
+	 * @param {Vector3} rot
+	 */
+	setRotation(rot){
+		this._rotation = rot.add();
+	}
+
+	/**
+	 * @return {Vector2}
+	 */
+	getSize(){
+		return this._size;
+	}
+
+	/**
+	 * @param {Vector2} size
+	 */
+	setSize(size){
+		this._size = size;
+	}
+
 	toArray(){
 		return {
 			vec: [this._vec.x, this._vec.y],
+			size: [this._size.x, this._size.y],
+			rotation: [this._rotation.x, this._rotation.y, this._rotation.z],
 			type: this._type,
 			meta: this._meta
 		};
@@ -186,9 +367,9 @@ class DocumentManager{
 	/**
 	 * Creates one document
 	 *
-	 * @param owner string
-	 * @param name string
-	 * @return Promise
+	 * @param {string} owner
+	 * @param {string} name
+	 * @return {Promise}
 	 */
 	static addDocument(owner, name){
 		return new Promise((resolve, reject) =>{
@@ -204,7 +385,7 @@ class DocumentManager{
 	}
 
 	/**
-	 * @param id string
+	 * @param {string} id
 	 */
 	static getDocument(id){
 		return new Promise((resolve, reject) => {
@@ -220,7 +401,7 @@ class DocumentManager{
 	}
 
 	/**
-	 * @param document Document
+	 * @param {Document} document
 	 */
 	static saveDocument(document){
 		document._lastSave = Date.now();
@@ -230,7 +411,7 @@ class DocumentManager{
 	}
 
 	/**
-	 * @param query
+	 * @param {Object} query
 	 * @param {int} mode
 	 * @param {int} page
 	 * @param {int} count

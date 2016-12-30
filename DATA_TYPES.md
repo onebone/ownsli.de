@@ -72,57 +72,77 @@ shape| int | Id of shape
 ## update slide
 Name | Type | Description
 -----|------|------------
-document | int | Id of document
+document | string | Id of document
 packets | UpdateSlidePacket[] | packets
 
 ## update shape
 Name | Type | Description
 -----|------|------------
-document | int | Id of document
+document | string | Id of document
 packets | UpdateShapePacket[] | packets
 
-## create slide
+## create slide (from client)
 Name | Type | Description
 -----|------|------------
-document | int | Id of document
-slide (Optional)| int | Id of slide (If sent from server)
+document | string | Id of document
+pos | Vector3 | Position of slide
+size | Vector2 | Size of slide
+order | int | Order of slide
 
-## create shape
+## create slide (from server)
 Name | Type | Description
 -----|------|------------
-document | int | Id of document
-slide| int | Id of slide
+document | string | Id of document
+slide | int | Id of slide
+
+## create shape (from client)
+Name | Type | Description
+-----|------|------------
+document | string | Id of document
+slide | int | Id of slide
+type | int | Type of shape
+pos | Vector3 | Position of shape
+size | Vector2 | Size of shape
+
+## create shape (from server)
+Name | Type | Description
+-----|------|-----------
+document | string | Id of document
+slide | int | Id of slide
+shape | int | Id of shape
+
+
 shape (Optional) | int | Id of shape (If sent from server)
 
 ## delete slide
 Name | Type | Description
 -----|------|------------
-document | int | Id of document
+document | string | Id of document
 slide| int | Id of slide
 
 ## delete shape
 Name | Type | Description
 -----|------|------------
-document | int | Id of document
+document | string | Id of document
 slide| int | Id of slide
 shape | int | Id of shape
 
 ## swap order
 Name | Type | Description
 -----|------|------------
-document | int | Id of document
+document | string | Id of document
 slide1| int | Id of slide1
 slide2| int | Id of slide2
 
 ## request data
 Name | Type | Description
 -----|------|------------
-document | int | Id of document
+document | string | Id of document
 
 ## send data
 Name | Type | Description
 -----|------|------------
-document | int | Id of document
+document | string | Id of document
 name | string | Name of document
 owner | string | User Id of owner
 slides | Slide[] | slides in document
@@ -131,21 +151,27 @@ lastSave | int | Last saved
 
 ## Examples
 ```js
-io.emit('update slide', [{
-    slide: 0,
-    posX: 2,
-    sizeY: 500,
-    rotationY: 30
-}]);
+io.emit('update slide', {
+    document: 'abc',
+    packets: [{
+        slide: 0,
+        posX: 2,
+        sizeY: 500,
+        rotationY: 30
+    }]
+});
 ```
 
 ```js
-io.emit('update shape', [{
-    slide: 0,
-    shape: 1,
-    posX: 2,
-    meta: {
-       html: '<span>blah blah</span>'
-    }
-}]);
+io.emit('update shape', {
+    document: 'abc',
+    packets: [{
+        slide: 0,
+        shape: 1,
+        posX: 2,
+        meta: {
+           html: '<span>blah blah</span>'
+       }
+    }]
+});
 ```

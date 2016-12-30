@@ -1,10 +1,12 @@
 'use strict';
 
-const {Document} = require('./document');
+const {DocumentManager, Document, Slide, Shape} = require('./document');
 const {SessionManager} = require('./session');
+const {Vector3, Vector2} = require('./math');
 
 let io = null;
 let groups = {};
+
 class Sync{
 	/**
 	 * This function not for general use
@@ -24,7 +26,265 @@ class Sync{
 				return;
 			}
 
-			socket.emit('send data');
+			socket.on('request data', (data) => {
+				const group = Sync.getGroup(data.document);
+				if(!group){
+					DocumentManager.getDocument(data.document).then(document => {
+						if(!document){
+							socket.emit('send data', null);
+							return;
+						}
+
+						if(Sync.createGroup(document, session)){
+							const slides = document.getSlides();
+							let slideArr = [];
+							slides.forEach(slide => {
+								let shapes = [];
+								slide.getShapes().forEach((shape) => {
+									shapes.push(shape.toArray());
+								});
+
+								const pos = slide.getPosition();
+								const rot = slide.getRotation();
+								slideArr.slides.push({ // slide info
+									vec: [pos.getX(), pos.getY(), pos.getZ()],
+									rotation: [rot.getX(), rot.getY(), rot.getZ()],
+									order: slide.getOrder(),
+									meta: slide.getMetadata(),
+									shapes: shapes
+								});
+							});
+							socket.emit('send data', {
+								id: document.getId(),
+								name: document.getName(),
+								owner: document.getOwner(),
+								sildes: slideArr,
+								invitation: document.getInvitations(),
+								lastSave: document.getLastSave(),
+
+							});
+						}
+					}).catch(err => {
+						socket.emit('send data', null);
+						console.error(err);
+					});
+				}else{
+					const document = group.getDocument();
+
+					const slides = document.getSlides();
+					let slideArr = [];
+					slides.forEach(slide => {
+						let shapes = [];
+						slide.getShapes().forEach((shape) => {
+							shapes.push(shape.toArray());
+						});
+
+						const pos = slide.getPosition();
+						const rot = slide.getRotation();
+						slideArr.slides.push({ // slide info
+							vec: [pos.getX(), pos.getY(), pos.getZ()],
+							rotation: [rot.getX(), rot.getY(), rot.getZ()],
+							order: slide.getOrder(),
+							meta: slide.getMetadata(),
+							shapes: shapes
+						});
+					});
+					socket.emit('send data', {
+						id: document.getId(),
+						name: document.getName(),
+						owner: document.getOwner(),
+						sildes: slideArr,
+						invitation: document.getInvitations(),
+						lastSave: document.getLastSave(),
+
+					});
+				}
+			});
+
+			// update slide
+			socket.on('update slide', (data) => {
+				if(typeof data.document !== 'string' || !Array.isArray(data.packets)) return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				data.packets.forEach((pk, index) => {
+					if(typeof pk.slide !== 'number'){
+						delete data.packets[index];
+						return;
+					}
+					const slide = group.getDocument().getSlide(pk.slide);
+					if(!slide){
+						delete data.packets[index];
+						return;
+					}
+
+					for(const property in pk){ // validation and data update
+						if(pk.hasOwnProperty(property)){
+							const data = pk[property];
+							switch(property.toLowerCase()){
+								case 'pos':
+									if(typeof data.x !== 'number' || typeof data.y !== 'number' || typeof data.z !== 'number'){
+										delete pk['pos'];
+										break;
+									}
+
+									slide.setPosition(new Vector3(data.x, data.y, data.z));
+									break;
+								case 'rot':
+									if(typeof data.x !== 'number' || typeof data.y !== 'number' || typeof data.z !== 'number'){
+										delete pk['rot'];
+										break;
+									}
+
+									slide.setRotation(new Vector3(data.x, data.y, data.z));
+									break;
+								case 'size':
+									if(typeof data.x !== 'number' || typeof data.y !== 'number'){
+										delete pk['size'];
+										break;
+									}
+
+									slide.setSize(new Vector2(data.x, data.y, data.z));
+									break;
+								case 'order':
+									if(typeof data !== 'number'){
+										delete pk['order'];
+										break;
+									}
+
+									slide.setOrder(data);
+									break;
+									// shapes will be updated in 'update shape' packet
+								case 'meta':
+									// TODO: Validate meta
+									slide.setMetadata(data);
+							}
+						}
+					}
+				});
+
+				socket.emit('update slide', data);
+				// TODO: Broadcast to group clients
+			});
+			// end update slide
+
+			// update shape
+			socket.on('update shape', (data) => {
+				if(typeof data.document !== 'string' || !Array.isArray(data.packets)) return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				data.packets.forEach((pk, index) =>{
+					if(typeof pk.slide !== 'number' || typeof pk.shape !== 'number'){
+						delete data.packets[index];
+						return;
+					}
+					const slide = group.getDocument().getSlide(pk.slide);
+					if(!slide){
+						delete data.packets[index];
+						return;
+					}
+					const shape = slide.getShape(pk.shape);
+					if(!shape){
+						delete data.packets[index];
+						return;
+					}
+
+					for(const property in pk){ // validation and data update
+						if(pk.hasOwnProperty(property)){
+							const data = pk[property];
+							switch(property.toLowerCase()){
+								case 'pos':
+									if(typeof data.x !== 'number' || typeof data.y !== 'number'){
+										delete pk['pos'];
+										break;
+									}
+
+									shape.setPosition(new Vector2(data.x, data.y));
+									break;
+								case 'rot':
+									if(typeof data.x !== 'number' || typeof data.y !== 'number' || typeof data.z !== 'number'){
+										delete pk['rot'];
+										break;
+									}
+
+									shape.setRotation(new Vector3(data.x, data.y, data.z));
+									break;
+								case 'size':
+									if(typeof data.x !== 'number' || typeof data.y !== 'number'){
+										delete pk['size'];
+										break;
+									}
+
+									shape.setSize(new Vector2(data.x, data.y));
+									break;
+								// type cannot be changed
+								case 'meta':
+									 // TODO
+									break;
+							}
+						}
+					}
+				});
+
+				// TODO: broadcast update shape packet to group clients
+				socket.emit(data);
+			});
+			// end update shape
+
+			// create slide
+			socket.on('create slide', (data) => {
+				if(typeof data.document !== 'string' || !data.size || !data.pos || typeof data.order !== 'number') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
+					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
+				const slideId = group.getDocument().addSlide(new Slide(
+				new Vector3(data.pos.x, data.pos.y, data.pos.z),
+					new Vector2(data.size.x, data.size.y),
+					new Vector3(0, 0, 0), // default rotation is 0, 0, 0
+					data.order,
+					{}, // empty meta
+					{} // empty shapes
+				));
+
+				socket.emit('create slide', {
+					document: data.document,
+					slide: slideId
+				}); // TODO Broadcast to group clients
+			});
+			// end create slide
+
+			// create shape
+			socket.on('create shape', (data) => {
+				if(typeof data.document !== 'string' || !data.size || !data.pos || typeof data.type !== 'number') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
+					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
+				const slide = group.getDocument().getSlide(data.slide);
+				if(!slide){
+					delete data.packets[index];
+					return;
+				}
+
+				const shapeId = slide.addShape(new Shape(
+					new Vector2(data.pos.x, data.pos.y),
+					new Vector3(0, 0, 0), // default rotation is 0,0,0
+					new Vector2(data.size.x, data.size.y),
+					data.type,
+					[]
+				));
+
+				socket.emit('create shape', {
+					document: data.document,
+					slide: data.slide,
+					shape: shapeId
+				}); // TODO Broadcast to all group clients
+			});
+			// end create shape
 		});
 	}
 
@@ -153,6 +413,26 @@ class Group{
 
 			session.__setGroup(document.getId());
 		});
+	}
+
+	/**
+	 * @return {Document}
+	 */
+	getDocument(){
+		return this._document;
+	}
+
+	/**
+	 * @param {Session} session
+	 * @return boolean
+	 */
+	hasSession(session){
+		for(const index in this._sessions){
+			if(this._sessions.hasOwnProperty(index)){
+				if(this._sessions[index] === session) return true;
+			}
+		}
+		return false;
 	}
 
 	getSessions(){

@@ -116,11 +116,19 @@ class Document{
 // Slide is a wrapper of slide which is included in Document
 class Slide{
 	/**
-	 * @param vec Vector3       | Position of slide where slide will be placed
-	 * @param shapes Shape[]    | Shapes which is included in slide
+	 * @param {Vector3} vec         | Position of slide where slide will be placed
+	 * @param {Vector2} size        | Size of slide
+	 * @param {Vector3} rotation    | Rotation of slide
+	 * @param {int} order           | Order of slide
+	 * @param {object} meta         | Metadata of slide
+	 * @param shapes Shape[]        | Shapes which is included in slide
 	 */
-	constructor(vec, shapes){
+	constructor(vec, size, rotation, order, meta, shapes){
 		this._vec = vec;
+		this._size = size;
+		this._rotation = rotation;
+		this._order = order;
+		this._meta = meta;
 		this._shapes = shapes;
 	}
 
@@ -129,6 +137,69 @@ class Slide{
 	 */
 	getPosition(){
 		return this._vec.add();
+	}
+
+	/**
+	 * @param {Vector3} vec
+	 */
+	setPosition(vec){
+		this._vec = vec.add();
+	}
+
+	/**
+	 * @return {Vector3}
+	 */
+	getRotation(){
+		return this._rotation.add();
+	}
+
+	/**
+	 * @param {Vector3} rot
+	 */
+	setRotation(rot){
+		this._rotation = rot.add();
+	}
+
+	/**
+	 * @return {Vector2}
+	 */
+	getSize(){
+		return this._size.add();
+	}
+
+	/**
+	 * @param {Vector2} vec
+	 */
+	setSize(vec){
+		this._size = vec.add();
+	}
+
+	/**
+	 * @return {int}
+	 */
+	getOrder(){
+		return this._order;
+	}
+
+	/**
+	 * @param {int} order
+	 */
+	setOrder(order){
+		this._order = order;
+	}
+
+	/**
+	 * @return {Object}
+	 */
+	getMetadata(){
+		return this._meta;
+	}
+
+	/**
+	 * @param {Object} meta
+	 */
+	setMetadata(meta){
+		this._meta = meta;
 	}
 
 	/**

@@ -58,9 +58,10 @@ class Document{
 
 	/**
 	 * @param {Slide} slide
+	 * @return {int}
 	 */
 	addSlide(slide){
-		if(!slide) return false;
+		if(!slide) return -1;
 		let max = 0;
 		for(const index in this._slides){ // max id of slide
 			if(this._slides.hasOwnProperty(index)){
@@ -75,7 +76,7 @@ class Document{
 		}
 
 		this._slides[max + 1] = slide;
-		return true;
+		return max + 1;
 	}
 
 	/**
@@ -161,7 +162,7 @@ class Slide{
 		this._rotation = rotation;
 		this._order = order;
 		this._meta = meta;
-		this._shapes = shapes;
+		this._shapes = Array.isArray(shapes) ? new Map(shapes) : shapes;
 	}
 
 	/**
@@ -234,8 +235,30 @@ class Slide{
 		this._meta = meta;
 	}
 
+	addShape(shape){
+		if(!shape) return -1;
+		let max = 0;
+		for(const index in this._shapes){ // max id of shape
+			if(this._shapes.hasOwnProperty(index)){
+				const i = parseInt(index);
+				if(i > max) max = i;
+			}
+		}
+
+		this._shapes[max + 1] = shape;
+		return max + 1;
+	}
+
 	/**
-	 * @return {Shape[]}
+	 * @param {int} id
+	 * @return {Shape}
+	 */
+	getShape(id){
+		return this._shapes[id];
+	}
+
+	/**
+	 * @return {Object}
 	 */
 	getShapes(){
 		return this._shapes;
@@ -257,6 +280,13 @@ class Shape{
 		this._size = size;
 		this._type = type;
 		this._meta = meta;
+	}
+
+	/**
+	 * @param {Vector2} vec
+	 */
+	setPosition(vec){
+		this._vec = vec.add();
 	}
 
 	/**

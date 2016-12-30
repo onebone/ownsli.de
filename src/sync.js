@@ -28,14 +28,22 @@ class Sync{
 
 			socket.emit('send data');
 
+			// update slide
 			socket.on('update slide', (data) => {
 				if(typeof data.document !== 'string' || !Array.isArray(data.packets)) return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
 
-				data.packets.forEach((pk) => {
-					if(typeof pk.slide !== 'number') return;
+				data.packets.forEach((pk, index) => {
+					if(typeof pk.slide !== 'number'){
+						delete data.packets[index];
+						return;
+					}
 					const slide = group.getDocument().getSlide(pk.slide);
+					if(!slide){
+						delete data.packets[index];
+						return;
+					}
 
 					for(const property in pk){ // validation and data update
 						if(pk.hasOwnProperty(property)){
@@ -83,7 +91,73 @@ class Sync{
 				});
 
 				socket.emit('update slide', data);
+				// TODO: Broadcast to group clients
 			});
+			// end update slide
+
+			// update shape
+			socket.on('update shape', (data) => {
+				if(typeof data.document !== 'string' || !Array.isArray(data.packets)) return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				data.packets.forEach((pk, index) =>{
+					if(typeof pk.slide !== 'number' || typeof pk.shape !== 'number'){
+						delete data.packets[index];
+						return;
+					}
+					const slide = group.getDocument().getSlide(pk.slide);
+					if(!slide){
+						delete data.packets[index];
+						return;
+					}
+					const shape = slide.getShape(pk.shape);
+					if(!shape){
+						delete data.packets[index];
+						return;
+					}
+
+					for(const property in pk){ // validation and data update
+						if(pk.hasOwnProperty(property)){
+							const data = pk[property];
+							switch(property.toLowerCase()){
+								case 'pos':
+									if(typeof data.x !== 'number' || typeof data.y !== 'number'){
+										delete pk['pos'];
+										break;
+									}
+
+									shape.setPosition(new Vector2(data.x, data.y));
+									break;
+								case 'rot':
+									if(typeof data.x !== 'number' || typeof data.y !== 'number' || typeof data.z !== 'number'){
+										delete pk['rot'];
+										break;
+									}
+
+									shape.setRotation(new Vector3(data.x, data.y, data.z));
+									break;
+								case 'size':
+									if(typeof data.x !== 'number' || typeof data.y !== 'number'){
+										delete pk['size'];
+										break;
+									}
+
+									shape.setSize(new Vector2(data.x, data.y));
+									break;
+								// type cannot be changed
+								case 'meta':
+									 // TODO
+									break;
+							}
+						}
+					}
+				});
+
+				// TODO: broadcast update shape packet to group clients
+				socket.emit(data);
+			});
+			// end update shape
 		});
 	}
 

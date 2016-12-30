@@ -21,11 +21,11 @@
 			include({
 				utils: '/js/common/utils.js',
 				morph: '/js/slide/editor-morph.js',
-				workspace: '/js/slide/editor-workspace.js',
 				interact: '/interactjs/dist/interact.min.js'
 			}, function(err){
 				if(err) return console.error(err);
-				workspace = new workspace(null, document.body);
+				workspace = document.body;
+
 				testMorph = new morph($('.os-editor-slide-root div'), workspace);
 			});
 

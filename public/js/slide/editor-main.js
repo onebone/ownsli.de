@@ -19,10 +19,15 @@ window.documentId = location.href.match(/[^#?]+\/slide\/edit\/([a-zA-Z0-9]+)/)[1
 		clock($('#os-editor-menu-clock'));
 		//FIXME Removal Required : test code
 		let myWorkspace = new workspace(null, $('#os-editor-workspace'));
-		let mySlide = new slide({id: 0, pos: {x: 0, y: 0, z: 0}, rot: {x: 0, y: 0, z: 0}, size: {x: 300, y: 200}, order: 0, meta: {}}, [], myWorkspace);
-		mySlide.initSlide()
+		let mySlide = slide.createSlide({id: 0, pos: {x: 0, y: 0, z: 0}, rot: {x: 0, y: 0, z: 0}, size: {x: 300, y: 200}, order: 0, meta: {}}, [], myWorkspace);
+		let mySlide2 = slide.createSlide({id: 1, pos: {x: 500, y: 0, z: 0}, rot: {x: 0, y: 0, z: 0}, size: {x: 200, y: 100}, order: 1, meta: {}}, [], myWorkspace);
 
-		let mySlide2 = new slide({id: 1, pos: {x: 500, y: 0, z: 0}, rot: {x: 0, y: 0, z: 0}, size: {x: 1000, y: 1000}, order: 1, meta: {}}, [], myWorkspace);
-		mySlide2.initSlide()
+		$('#os-editor-menu-layout').addEventListener('click', function(){
+			$('#os-editor-layout-dialog').style.animationName = 'up';
+		});
+
+		$('#os-editor-layout-close').addEventListener('click', function(){
+			$('#os-editor-layout-dialog').style.animationName = 'down';
+		});
 	});
 //});

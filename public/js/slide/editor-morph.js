@@ -78,10 +78,10 @@ var ANCHORS = [
 Object.freeze(ANCHORS);
 
 //Morph 제작
-function Morph(node, workspace, is2D, deleteCallback){
+function Morph(node, target, is2D, deleteCallback){
 	this.object = node;
 	this.boundObjects = [];
-	this.workspace = workspace;
+	this.workspace = target;
 	this.is2D = (is2D === undefined) ? false : is2D;
 
 	var _this = this;
@@ -255,7 +255,7 @@ function Morph(node, workspace, is2D, deleteCallback){
 
 				_this.updateNode();
 			});
-		_this.workspace.addToWorkspace(anchor);
+		_this.workspace.append(anchor);
 
 		return anchor;
 	});
@@ -269,7 +269,7 @@ function Morph(node, workspace, is2D, deleteCallback){
 		anchor.addEventListener('click', deleteCallback);
 		anchor.innerHTML = '&times;';
 		this.anchors.push(anchor);
-		this.workspace.addToWorkspace(anchor);
+		this.workspace.append(anchor);
 	}
 	this.updateAnchor();
 }

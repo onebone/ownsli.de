@@ -86,6 +86,11 @@ body, html {
 	width: 125px;
 	height: 125px;
 	margin-top: 10px;
+	cursor: pointer;
+}
+
+.os-editor-preview-active .os-editor-slidelist-indicator{
+	background: #ff5722;
 }
 
 .os-editor-slidelist-indicator {
@@ -172,15 +177,20 @@ body, html {
 
 #os-editor-layout-dialog {
 	background: #111;
-	width: 100vw;
-	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: calc(100vh - 50px);
 	position: fixed;
 	top: 100vh;
 	left: 0;
+	right: 220px;
 	animation-fill-mode: forwards;
 	animation-timing-function: ease-in-out;
 	animation-duration: 600ms;
-	z-index: 9;
+	overflow: hidden;
+	will-change: top;
+	z-index: 4;
 }
 
 #os-editor-layout-close {
@@ -190,6 +200,28 @@ body, html {
 	font-size: 40px;
 	color: #808080;
 	transition: color 500ms;
+}
+
+#os-editor-layout {
+	width: 1024px;
+	height: 768px;
+	background: #333;
+	overflow: scroll;
+	position: relative;
+}
+
+.os-editor-layout-slide {
+	/* 친구를 만나느라 #444 */
+	color: #444;
+	background: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	font-size: 1rem;
+	font-weight: 600;
+	top: 0;
+	left: 0;
 }
 
 #os-editor-layout-close:hover {
@@ -204,6 +236,7 @@ body, html {
 	position: fixed;
 	padding: 10px;
 	width: 220px;
+	z-index: 7;
 }
 
 #os-editor-property-editor input {
@@ -237,13 +270,13 @@ body, html {
 	}
 
 	to {
-		top: 0;
+		top: 50px;
 	}
 }
 
 @keyframes down {
 	from {
-		top: 0;
+		top: 50px;
 	}
 
 	to {

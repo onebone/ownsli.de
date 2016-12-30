@@ -1,6 +1,6 @@
 'use strict';
 
-const {Document, Slide, Shape} = require('./document');
+const {DocumentManager, Document, Slide, Shape} = require('./document');
 const {SessionManager} = require('./session');
 const {Vector3, Vector2} = require('./math');
 
@@ -26,7 +26,80 @@ class Sync{
 				return;
 			}
 
-			socket.emit('send data');
+			socket.on('request data', (data) => {
+				const group = Sync.getGroup(data.document);
+				if(!group){
+					DocumentManager.getDocument(data.document).then(document => {
+						if(!document){
+							socket.emit('send data', null);
+							return;
+						}
+
+						if(Sync.createGroup(document, session)){
+							const slides = document.getSlides();
+							let slideArr = [];
+							slides.forEach(slide => {
+								let shapes = [];
+								slide.getShapes().forEach((shape) => {
+									shapes.push(shape.toArray());
+								});
+
+								const pos = slide.getPosition();
+								const rot = slide.getRotation();
+								slideArr.slides.push({ // slide info
+									vec: [pos.getX(), pos.getY(), pos.getZ()],
+									rotation: [rot.getX(), rot.getY(), rot.getZ()],
+									order: slide.getOrder(),
+									meta: slide.getMetadata(),
+									shapes: shapes
+								});
+							});
+							socket.emit('send data', {
+								id: document.getId(),
+								name: document.getName(),
+								owner: document.getOwner(),
+								sildes: slideArr,
+								invitation: document.getInvitations(),
+								lastSave: document.getLastSave(),
+
+							});
+						}
+					}).catch(err => {
+						socket.emit('send data', null);
+						console.error(err);
+					});
+				}else{
+					const document = group.getDocument();
+
+					const slides = document.getSlides();
+					let slideArr = [];
+					slides.forEach(slide => {
+						let shapes = [];
+						slide.getShapes().forEach((shape) => {
+							shapes.push(shape.toArray());
+						});
+
+						const pos = slide.getPosition();
+						const rot = slide.getRotation();
+						slideArr.slides.push({ // slide info
+							vec: [pos.getX(), pos.getY(), pos.getZ()],
+							rotation: [rot.getX(), rot.getY(), rot.getZ()],
+							order: slide.getOrder(),
+							meta: slide.getMetadata(),
+							shapes: shapes
+						});
+					});
+					socket.emit('send data', {
+						id: document.getId(),
+						name: document.getName(),
+						owner: document.getOwner(),
+						sildes: slideArr,
+						invitation: document.getInvitations(),
+						lastSave: document.getLastSave(),
+
+					});
+				}
+			});
 
 			// update slide
 			socket.on('update slide', (data) => {

@@ -113,6 +113,13 @@ class Document{
 		return this._invitation;
 	}
 
+	/**
+	 * @return {int}
+	 */
+	getLastSave(){
+		return this._lastSave;
+	}
+
 	toArray(){
 		let data = {
 			id: this._id,
@@ -348,6 +355,8 @@ class Shape{
 	toArray(){
 		return {
 			vec: [this._vec.x, this._vec.y],
+			size: [this._size.x, this._size.y],
+			rotation: [this._rotation.x, this._rotation.y, this._rotation.z],
 			type: this._type,
 			meta: this._meta
 		};

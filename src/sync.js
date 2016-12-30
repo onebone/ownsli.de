@@ -1,6 +1,6 @@
 'use strict';
 
-const {Document} = require('./document');
+const {Document, Slide} = require('./document');
 const {SessionManager} = require('./session');
 const {Vector3, Vector2} = require('./math');
 
@@ -158,6 +158,31 @@ class Sync{
 				socket.emit(data);
 			});
 			// end update shape
+
+			// create slide
+			socket.on('create slide', (data) => {
+				if(typeof data.document !== 'string' || !data.size || !data.pos || typeof data.order !== 'number') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
+					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number'){
+					const slideId = group.getDocument().addSlide(new Slide(
+						new Vector3(data.pos.x, data.pos.y, data.pos.z),
+						new Vector2(data.size.x, data.size.y),
+						new Vector3(0, 0, 0), // default rotation is 0, 0, 0
+						data.order,
+						{}, // empty meta
+						{} // empty shapes
+					));
+
+					socket.emit('create slide', {
+						document: data.document,
+						slide: slideId
+					}); // TODO Broadcast to group clients
+				}
+			});
+			// end create slide
 		});
 	}
 

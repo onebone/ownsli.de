@@ -81,11 +81,19 @@ Name | Type | Description
 document | string | Id of document
 packets | UpdateShapePacket[] | packets
 
-## create slide
+## create slide (from client)
 Name | Type | Description
 -----|------|------------
 document | string | Id of document
-slide (Optional)| int | Id of slide (If sent from server)
+pos | Vector3 | Position of slide
+size | Vector2 | Size of slide
+order | int | Order of slide
+
+## create slide (from server)
+Name | Type | Description
+-----|------|------------
+document | string | Id of document
+slide | int | Id of slide
 
 ## create shape
 Name | Type | Description

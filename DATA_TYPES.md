@@ -42,6 +42,7 @@ rot | Vector3 | Rotation of slide
 size | Vector2 | Size of slide
 order | int | Order of slide
 shapes | Shape[] | shapes in slide
+meta | object | Other data needed to render slide
 
 #### Shape
 Name | Type | Description

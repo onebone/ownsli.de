@@ -115,16 +115,31 @@
 				</li>
 			</ul>
 
+			<a id="os-editor-menu-edit" href="#!" class="os-editor-menu dropdown-button" data-activates="edit-dropdown" data-constrainwidth="false">
+				<%= translator('slide.editor.edit') %>
+				<i class="mdi mdi-chevron-down"></i>
+			</a>
+
+			<ul id="edit-dropdown" class="dropdown-content">
+				<li>
+					<a id="os-editor-menu-layout" href="#!">
+						<i class="mdi mdi-view-dashboard"></i>
+						<%= translator('slide.editor.layout') %>
+					</a>
+				</li>
+
+				<li>
+					<a id="os-editor-menu-background" href="#!">
+						<i class="mdi mdi-terrain"></i>
+						<%= translator('slide.editor.background') %>
+					</a>
+				</li>
+			</ul>
+
 			<!-- Slide Insert Menu -->
 			<a id="os-editor-menu-insert" href="#!" class="os-editor-menu">
 				<i class="mdi mdi-shape-rectangle-plus"></i>
 				<%= translator('slide.editor.insert.slide') %>
-			</a>
-
-			<!-- Slide Layout Menu -->
-			<a id="os-editor-menu-layout" href="#!" class="os-editor-menu">
-				<i class="mdi mdi-view-dashboard"></i>
-				<%= translator('slide.editor.layout') %>
 			</a>
 
 			<!-- A simple clock -->

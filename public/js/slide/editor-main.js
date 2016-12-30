@@ -1,6 +1,7 @@
 window.socket = io();
 window.documentId = location.href.match(/[^#?]+\/slide\/edit\/([a-zA-Z0-9]+)/)[1];
 
+//FIXME Removal Required : test code
 //socket.once('send data', function(event){
 	include({
 		utils: '/js/common/utils.js',
@@ -16,5 +17,12 @@ window.documentId = location.href.match(/[^#?]+\/slide\/edit\/([a-zA-Z0-9]+)/)[1
 		}
 
 		clock($('#os-editor-menu-clock'));
+		//FIXME Removal Required : test code
+		let myWorkspace = new workspace(null, $('#os-editor-workspace'));
+		let mySlide = new slide({id: 0, pos: {x: 0, y: 0, z: 0}, rot: {x: 0, y: 0, z: 0}, size: {x: 300, y: 200}, order: 0, meta: {}}, [], myWorkspace);
+		mySlide.initSlide()
+
+		let mySlide2 = new slide({id: 1, pos: {x: 500, y: 0, z: 0}, rot: {x: 0, y: 0, z: 0}, size: {x: 1000, y: 1000}, order: 1, meta: {}}, [], myWorkspace);
+		mySlide2.initSlide()
 	});
 //});

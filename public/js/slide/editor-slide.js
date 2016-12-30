@@ -4,7 +4,7 @@ function Slide(data, shapes, workspace){
 	this.workspace = workspace;
 	var _this = this;
 	this.shapes = shapes;
-	['id', 'pos', 'rot', 'size', 'order'].forEach(function(v){
+	['id', 'pos', 'rot', 'size', 'order', 'meta'].forEach(function(v){
 		_this[v] = data[v];
 	});
 }
@@ -52,15 +52,18 @@ Slide.prototype.setEditableSlide = function(node){
 };
 
 Slide.prototype.setSlidePreview = function(node){
-	var nodeWrapper
+	var indicator = document.createElement('span');
+	indicator.classList.add('os-editor-slidelist-indicator');
+	indicator.innerText = this.order + 1;
+
+	this.previewWrapper = document.createElement('div');
+	this.previewWrapper.classList.add('os-editor-slidelist-wrapper')
 	this.previewNode = node;
-	var resizeRate = 100 / this.size.x;
-	if(!isFinite(resizeRate)) resizeRate = 0;
-	if(resizeRate < 0) resizeRate = Math.abs(resizeRate);
-	node.style.transform = "scale(" + resizeRate + ")";
-	node.parentNode.style.width = '100px';
-	node.parentNode.style.height = (node.style.height * resizeRate) + 'px';
-	$('#os-editor-slidelist').append(node);
+	this.previewWrapper.append(indicator);
+	this.previewWrapper.append(this.previewNode);
+
+	$('#os-editor-slidelist').append(this.previewWrapper);
+	this.onUpdate();
 };
 
 Slide.prototype.setSlideLayout = function(node){
@@ -92,7 +95,22 @@ Slide.prototype.setSlideLayout = function(node){
 };
 
 Slide.prototype.onUpdate = function(){
-	if(this.previewNode);
+	if(this.previewNode && this.slideNode){
+		var baseSize = this.size.x;
+		if(this.size.x < this.size.y) baseSize = this.size.y;
+
+		var resizeRate = 100 / baseSize;
+		if(!isFinite(resizeRate)) resizeRate = 0;
+		if(resizeRate < 0) resizeRate = Math.abs(resizeRate);
+
+		this.previewWrapper.querySelector('.os-editor-slidelist-indicator').innerText = this.order + 1;
+		this.previewNode.style.background = this.meta.background || '#fff';
+		this.previewNode.style.transform = "scale(" + resizeRate + ")";
+		this.slideNode.style.width = this.size.x + 'px';
+		this.slideNode.style.height = this.size.y + 'px';
+		this.previewNode.style.width = this.size.x + 'px';
+		this.previewNode.style.height = this.size.y + 'px';
+	}
 };
 
 Slide.prototype.toExportableData = function(){

@@ -75,6 +75,29 @@ body, html {
 	cursor: pointer;
 }
 
+.os-editor-slidelist-slide {
+	transform-origin: 0 0;
+}
+
+.os-editor-slidelist-wrapper {
+	position: relative;
+	top: 10px;
+	left: 45px;
+	width: 125px;
+	height: 125px;
+	margin-top: 10px;
+}
+
+.os-editor-slidelist-indicator {
+	color: #fff;
+	background: rgba(0, 0, 0, 0.7);
+	width: 50px;
+	display: block;
+	text-align: center;
+	border-radius: 5px;
+	margin-bottom: 5px;
+}
+
 .os-editor-menu {
 	color: #fff;
 	display: inline-block;
@@ -133,7 +156,7 @@ body, html {
 	top: 50px;
 	left: 0;
 	bottom: 0;
-	overflow-x: auto;
+	overflow-x: hidden;
 	overflow-y: scroll;
 }
 

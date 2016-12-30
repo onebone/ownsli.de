@@ -131,21 +131,27 @@ lastSave | int | Last saved
 
 ## Examples
 ```js
-io.emit('update slide', [{
-    slide: 0,
-    posX: 2,
-    sizeY: 500,
-    rotationY: 30
-}]);
+io.emit('update slide', {
+    document: 'abc',
+    packets: [{
+        slide: 0,
+        posX: 2,
+        sizeY: 500,
+        rotationY: 30
+    }]
+});
 ```
 
 ```js
-io.emit('update shape', [{
-    slide: 0,
-    shape: 1,
-    posX: 2,
-    meta: {
-       html: '<span>blah blah</span>'
-    }
-}]);
+io.emit('update shape', {
+    document: 'abc',
+    packets: [{
+        slide: 0,
+        shape: 1,
+        posX: 2,
+        meta: {
+           html: '<span>blah blah</span>'
+       }
+    }]
+});
 ```

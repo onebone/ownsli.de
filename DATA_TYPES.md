@@ -95,11 +95,23 @@ Name | Type | Description
 document | string | Id of document
 slide | int | Id of slide
 
-## create shape
+## create shape (from client)
 Name | Type | Description
 -----|------|------------
 document | string | Id of document
-slide| int | Id of slide
+slide | int | Id of slide
+type | int | Type of shape
+pos | Vector3 | Position of shape
+size | Vector2 | Size of shape
+
+## create shape (from server)
+Name | Type | Description
+-----|------|-----------
+document | string | Id of document
+slide | int | Id of slide
+shape | int | Id of shape
+
+
 shape (Optional) | int | Id of shape (If sent from server)
 
 ## delete slide

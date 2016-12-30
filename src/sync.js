@@ -1,6 +1,6 @@
 'use strict';
 
-const {Document, Slide} = require('./document');
+const {Document, Slide, Shape} = require('./document');
 const {SessionManager} = require('./session');
 const {Vector3, Vector2} = require('./math');
 
@@ -166,23 +166,52 @@ class Sync{
 				if(!group || !group.hasSession(session)) return;
 
 				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
-					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number'){
-					const slideId = group.getDocument().addSlide(new Slide(
-						new Vector3(data.pos.x, data.pos.y, data.pos.z),
-						new Vector2(data.size.x, data.size.y),
-						new Vector3(0, 0, 0), // default rotation is 0, 0, 0
-						data.order,
-						{}, // empty meta
-						{} // empty shapes
-					));
+					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
+				const slideId = group.getDocument().addSlide(new Slide(
+				new Vector3(data.pos.x, data.pos.y, data.pos.z),
+					new Vector2(data.size.x, data.size.y),
+					new Vector3(0, 0, 0), // default rotation is 0, 0, 0
+					data.order,
+					{}, // empty meta
+					{} // empty shapes
+				));
 
-					socket.emit('create slide', {
-						document: data.document,
-						slide: slideId
-					}); // TODO Broadcast to group clients
-				}
+				socket.emit('create slide', {
+					document: data.document,
+					slide: slideId
+				}); // TODO Broadcast to group clients
 			});
 			// end create slide
+
+			// create shape
+			socket.on('create shape', (data) => {
+				if(typeof data.document !== 'string' || !data.size || !data.pos || typeof data.type !== 'number') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
+					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
+				const slide = group.getDocument().getSlide(data.slide);
+				if(!slide){
+					delete data.packets[index];
+					return;
+				}
+
+				const shapeId = slide.addShape(new Shape(
+					new Vector2(data.pos.x, data.pos.y),
+					new Vector3(0, 0, 0), // default rotation is 0,0,0
+					new Vector2(data.size.x, data.size.y),
+					data.type,
+					[]
+				));
+
+				socket.emit('create shape', {
+					document: data.document,
+					slide: data.slide,
+					shape: shapeId
+				}); // TODO Broadcast to all group clients
+			});
+			// end create shape
 		});
 	}
 

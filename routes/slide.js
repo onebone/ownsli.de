@@ -5,6 +5,13 @@ const TITLE_REGEX = /^.{1,100}$/;
 const router = require('express').Router();
 
 router.get('/', (req, res, next) => {
+	if(!req.session || !req.session.token || SessionManager.getSession(req.session.token) === null){
+		res.render('login/index', {
+			'title': 'Login'
+		});
+		return;
+	}
+
 	res.render('slide/list');
 });
 

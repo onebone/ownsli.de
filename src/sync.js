@@ -38,20 +38,24 @@ class Sync{
 						if(Sync.createGroup(document, session)){
 							const slides = document.getSlides();
 							let slideArr = [];
-							slides.forEach(slide => {
-								let shapes = [];
-								slide.getShapes().forEach((shape) => {
-									shapes.push(shape.toArray());
+							Object.keys(slides).forEach(index => {
+								const slide = slides[index];
+								let shapesArr = [];
+
+								const shapes = slide.getShapes();
+								Object.keys(shapes).forEach(index => {
+									const shape = shapes[index];
+									shapesArr.push(shape.toArray());
 								});
 
 								const pos = slide.getPosition();
 								const rot = slide.getRotation();
-								slideArr.slides.push({ // slide info
+								slideArr.push({ // slide info
 									vec: [pos.getX(), pos.getY(), pos.getZ()],
 									rotation: [rot.getX(), rot.getY(), rot.getZ()],
 									order: slide.getOrder(),
 									meta: slide.getMetadata(),
-									shapes: shapes
+									shapes: shapesArr
 								});
 							});
 							socket.emit('send data', {
@@ -73,20 +77,25 @@ class Sync{
 
 					const slides = document.getSlides();
 					let slideArr = [];
-					slides.forEach(slide => {
-						let shapes = [];
-						slide.getShapes().forEach((shape) => {
-							shapes.push(shape.toArray());
+					Object.keys(slides).forEach(index => {
+						const slide = slides[index];
+
+						let shapesArr = [];
+console.log(slide);
+						const shapes = slide.getShapes();
+						Object.keys(shapes).forEach(index => {
+							const shape = shapes[index];
+							shapesArr.push(shape.toArray());
 						});
 
 						const pos = slide.getPosition();
 						const rot = slide.getRotation();
-						slideArr.slides.push({ // slide info
+						slideArr.push({ // slide info
 							vec: [pos.getX(), pos.getY(), pos.getZ()],
 							rotation: [rot.getX(), rot.getY(), rot.getZ()],
 							order: slide.getOrder(),
 							meta: slide.getMetadata(),
-							shapes: shapes
+							shapes: shapesArr
 						});
 					});
 					socket.emit('send data', {

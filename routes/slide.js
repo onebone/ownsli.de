@@ -50,36 +50,15 @@ router.get('/edit/:id', (req, res, next) => {
 
 	if(session === null) return res.redirect('/login');
 
-	res.render('slide/editor');
-
 	DocumentManager.getDocument(req.params.id).then(document => {
 		if(!document){
 			return;
 		}
 
 		if(Sync.createGroup(document, session)){
-			const slides = document.getSlides();
-			let slideArr = [];
-			Object.keys(slides).forEach(index => {
-				const slide = slides[index];
-				let shapesArr = [];
-
-				const shapes = slide.getShapes();
-				Object.keys(shapes).forEach(index => {
-					const shape = shapes[index];
-					shapesArr.push(shape.toArray());
-				});
-
-				const pos = slide.getPosition();
-				const rot = slide.getRotation();
-				slideArr.push({ // slide info
-					vec: [pos.getX(), pos.getY(), pos.getZ()],
-					rotation: [rot.getX(), rot.getY(), rot.getZ()],
-					order: slide.getOrder(),
-					meta: slide.getMetadata(),
-					shapes: shapesArr
-				});
-			});
+			res.render('slide/editor');
+		}else{
+			// TODO: render document does not exist...
 		}
 	}).catch(console.error);
 });

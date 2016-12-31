@@ -265,8 +265,8 @@ class Sync{
 			return false;
 		}
 
-		groups[document.getId()] = new Group(document, ...sessions);
-		return true;
+		if(!groups[document.getId()]) groups[document.getId()] = new Group(document, ...sessions);
+		return true; // return true even if group already exists
 	}
 
 	/**

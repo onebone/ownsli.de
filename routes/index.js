@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
+var router = require('express').Router();
 
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', (req, res, next) => {
+	if(!(req.session && req.session.token)) return res.redirect('/login');
+	res.redirect('/slide');
 });
 
 module.exports = router;

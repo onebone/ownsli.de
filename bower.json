@@ -27,6 +27,7 @@
     "nanum-barun-gothic": "hiun/NanumBarunGothic#^1.0.0",
     "interactjs": "^1.2.8",
     "Sortable": "sortablejs#^1.4.2",
-    "ace-builds": "^1.2.6"
+    "ace-builds": "^1.2.6",
+    "geometryangle": "TritonCode/Geometryangle"
   }
 }

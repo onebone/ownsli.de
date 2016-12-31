@@ -110,3 +110,50 @@ main {
 .slide-listing li.slide-listing-content a {
 	color: #aaa;
 }
+
+.input-field input {
+	color: #fff;
+}
+
+.input-field label {
+	color: #ff5722;
+}
+
+.input-field input[type=text]:focus + label {
+	color: #ff5722;
+}
+
+.input-field input[type=text]:focus {
+	border-bottom: 1px solid #ff5722;
+	box-shadow: 0 1px 0 0 #ff5722;
+}
+
+.create-row {
+	display: flex;
+	align-items: baseline;
+}
+
+#title-input-wrapper {
+	display: inline-block;
+	animation-duration: 1s;
+	animation-fill-mode: forwards;
+	animation-timing-function: ease-in-out;
+	overflow: hidden;
+	width: 0;
+}
+
+.create-row button {
+	margin-left: 10px;
+}
+
+@keyframes inflate {
+	from {
+		width: 0;
+		overflow: hidden;
+	}
+
+	to {
+		flex-grow: 1;
+		overflow: visible;
+	}
+}

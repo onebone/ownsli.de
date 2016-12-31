@@ -24,7 +24,8 @@ const sess = session({
 	saveUninitialized: false,
 	resave: false,
 	cookie: {
-		maxAge: 900000
+		//2 Days
+		maxAge: 1000 * 60 * 60 * 24 * 2
 	}
 });
 app.use(sess);

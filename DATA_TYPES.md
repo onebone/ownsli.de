@@ -111,9 +111,6 @@ document | string | Id of document
 slide | int | Id of slide
 shape | int | Id of shape
 
-
-shape (Optional) | int | Id of shape (If sent from server)
-
 ## delete slide
 Name | Type | Description
 -----|------|------------

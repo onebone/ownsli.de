@@ -43,7 +43,7 @@ var listDocuments = function(view, mode){
 					name: document.name,
 					date: new Date(document.lastSave),
 					author: document.owner,
-					link: '/document/d/' + document.id
+					link: '/slide/edit/' + document.id
 				});
 			});
 

@@ -7,6 +7,7 @@ function Slide(data, shapes, workspace){
 	['id', 'pos', 'rot', 'size', 'order', 'meta'].forEach(function(v){
 		_this[v] = data[v];
 	});
+	this.type = 'slide';
 	this.meta.background = this.meta.background || '#fff';
 
 	this.workspace.document.slides[this.id] = this;
@@ -18,15 +19,14 @@ Slide.createSlide = function(slideData, shapes, workspace, cb){
 	if(!isInitFinished){
 		//To prevent slide id is jammed
 		setTimeout(function(){
-			Slide.createSlide.apply(arguments);
+			Slide.createSlide.apply(this, arguments);
 		}, 1000);
 		return;
 	}
 
 	isInitFinished = false;
-	//socket.once('create slide', function(data){
-		//data.id = data.slide;
-		//FIXME Test code : Unannotating required
+	socket.once('create slide', function(data){
+		slideData.id = data.slide;
 		var _this = new Slide(slideData, shapes, workspace);
 		isInitFinished = true;
 
@@ -41,26 +41,28 @@ Slide.createSlide = function(slideData, shapes, workspace, cb){
 
 		var layoutNode = document.createElement('div');
 		layoutNode.classList.add('os-editor-layout-slide');
-		layoutNode.innerHTML = `#${_this.id}`;
+		layoutNode.innerHTML = '#' + _this.order;
 		_this.setSlideLayout(layoutNode);
 
 		cb(_this);
-	//});
+	});
 
 	socket.emit('create slide', {
-		document: documentId
+		document: documentId,
+		pos: slideData.pos,
+		size: slideData.size,
+		order: slideData.order
 	});
 };
 
 Slide.prototype.setEditableSlide = function(node){
 	this.slideNode = node;
-	//TODO append to slideList
 };
 
 Slide.prototype.setSlidePreview = function(node){
 	var indicator = document.createElement('span');
 	indicator.classList.add('os-editor-slidelist-indicator');
-	indicator.innerText = this.order + 1;
+	indicator.innerText = this.order;
 
 	this.previewWrapper = document.createElement('div');
 	this.previewWrapper.classList.add('os-editor-slidelist-wrapper')
@@ -108,8 +110,13 @@ Slide.prototype.setSlideLayout = function(node){
 		});
 
 		window.addEventListener('click', function(evt){
-			if(!evt.target.classList.contains('os-morph-anchor') && evt.target !== node) layoutMorph.destroy();
-		}, {once: true});
+			if(!evt.target.classList.contains('os-morph-anchor') && evt.target !== node){
+				layoutMorph.destroy();
+				layoutMorph = undefined;
+				evt.stopPropagation();
+				evt.preventDefault();
+			}
+		}, true, {once: true});
 	});
 
 	$('#os-editor-layout').append(node);
@@ -125,7 +132,7 @@ Slide.prototype.onUpdate = function(){
 		if(resizeRate < 0) resizeRate = Math.abs(resizeRate);
 
 		var _this = this;
-		this.previewWrapper.querySelector('.os-editor-slidelist-indicator').innerText = this.order + 1;
+		this.previewWrapper.querySelector('.os-editor-slidelist-indicator').innerText = this.order;
 		this.previewWrapper.addEventListener('click', function(){
 			_this.workspace.setWorkingSlide(_this.id);
 		});
@@ -143,6 +150,10 @@ Slide.prototype.onUpdate = function(){
 		this.slideNode.style.transform = "scale(" + editRate + ")";
 		this.slideNode.style.transformOrigin = "0 0";
 	}
+
+	if(this.layoutNode){
+		this.layoutNode.innerText = '#' + this.order;
+	}
 };
 
 Slide.prototype.toExportableData = function(){
@@ -150,7 +161,8 @@ Slide.prototype.toExportableData = function(){
 		id: this.id,
 		pos: this.pos,
 		rot: this.rot,
-		size: this.size
+		size: this.size,
+		order: this.order
 	};
 };
 

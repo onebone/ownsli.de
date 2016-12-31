@@ -47,7 +47,7 @@
 												break;
 										}
 									}else{
-										elements.info.innerHTML = 'You are logged in';
+										location.href = "/";
 									}
 								}
 							}else{
@@ -59,15 +59,28 @@
 				};
 			};
 		</script>
+
+		<link rel="stylesheet" href="/css/login.css">
 	</head>
 	<body>
-		<h1><%= title %></h1>
-		<p>Welcome to <%= translator('title') %></p>
-		<form onsubmit="return false">
-			<input id="userId" name="userId" type="text" placeholder="<%= translator('login.id') %>"/>
-			<input id="password" name="password" type="password" placeholder="<%= translator('login.password') %>"/>
-			<button id="sbBtn"><%= translator('login.title') %></button>
-		</form>
-		<p style="color: red;" id="info"></p>
+		<main class="login-main">
+			<header>
+				<h1><%= title %></h1>
+				<p>Welcome to <%= translator('title') %></p>
+			</header>
+			<section>
+				<form onsubmit="return false">
+					<input id="userId" name="userId" type="text" placeholder="<%= translator('login.id') %>"/>
+					<input id="password" name="password" type="password" placeholder="<%= translator('login.password') %>"/>
+					<button id="sbBtn"><%= translator('login.title') %></button>
+				</form>
+				<p id="info"></p>
+			</section>
+		</main>
+
+		<script src="/geometryangle/geometryangle.min.js"></script>
+		<script>
+			$('body').Geometryangle({mesh:{}, lights: [{}], line: {}, vertex: {}});
+		</script>
 	</body>
 </html>

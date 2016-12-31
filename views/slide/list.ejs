@@ -11,7 +11,7 @@
 	<body>
 		<nav>
 			<div class="nav-wrapper">
-				<a href="#!" class="brand-logo">
+				<a href="/" class="brand-logo">
 					<img class="os-logo" src="/img/logo.svg"> <%= translator('title') %>
 				</a>
 				<ul class="right hide-on-med-and-down" style="height: 100%; width: 40%">
@@ -43,10 +43,18 @@
 				</li>
 			</ul>
 
-			<a class="btn deep-orange waves-effect" href="/slide/create">
-				<span class="mdi mdi-plus"></span>
-				<%= translator('slide.list.create') %>
-			</a>
+			<form class="create-row" method="post" action="/slide/create">
+				<div class="input-field" id="title-input-wrapper">
+					<input type="text" id="title-input" name="title" maxlength="100" required>
+					<label for="title-input">
+						<%= translator('slide.list.create.title') %>
+					</label>
+				</div>
+				<button type="button" class="btn deep-orange waves-effect">
+					<span class="mdi mdi-plus"></span>
+					<%= translator('slide.list.create') %>
+				</button>
+			</form>
 		</main>
 
 		<script src="/js/common/include.js"></script>

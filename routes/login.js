@@ -21,6 +21,8 @@ const ERROR_ACCOUNT_ALREADY_EXIST = 3;
 // Already logged in
 const ERROR_ALREADY_LOGGED_IN = 4;
 
+const ID_REGEX = /^[a-zA-Z0-9][a-zA-Z0-9-_]{3,10}[a-zA-Z0-9]$/;
+
 router.get('/', function(req, res, next) {
 	res.render('login/index', { // TODO: Improve front end
 		title: 'Login'
@@ -96,7 +98,8 @@ router.post('/create', (req, res, next) => {
 	const password = req.body.password;
 
 	if(!userId || !password
-	|| typeof userId !== 'string' || typeof password !== 'string'){
+	|| typeof userId !== 'string' || typeof password !== 'string'
+	|| !ID_REGEX.test(userId)){
 		res.send(JSON.stringify({
 			status: true,
 			error: true,

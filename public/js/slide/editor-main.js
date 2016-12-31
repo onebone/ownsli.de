@@ -1,8 +1,9 @@
 window.socket = io();
 window.documentId = location.href.match(/[^#?]+\/slide\/edit\/([a-zA-Z0-9]+)/)[1];
+window.documentName = undefined;
+window.documentOwner = undefined;
 
-//FIXME Removal Required : test code
-//socket.once('send data', function(event){
+socket.once('send data', function(event){
 	include({
 		utils: '/js/common/utils.js',
 		interact: '/interactjs/dist/interact.min.js',
@@ -16,11 +17,11 @@ window.documentId = location.href.match(/[^#?]+\/slide\/edit\/([a-zA-Z0-9]+)/)[1
 			return alert('Oops! An error occured while loading scripts...\nPlease press F5 to refresh!');
 		}
 
+		window.documentName = event.name;
+		window.documentOwner = event.owner;
+
 		clock($('#os-editor-menu-clock'));
-		//FIXME Removal Required : test code
-		let myWorkspace = new workspace(null, $('#os-editor-workspace'));
-		let mySlide = slide.createSlide({id: 0, pos: {x: 0, y: 0, z: 0}, rot: {x: 0, y: 0, z: 0}, size: {x: 300, y: 200}, order: 0, meta: {}}, [], myWorkspace);
-		let mySlide2 = slide.createSlide({id: 1, pos: {x: 500, y: 0, z: 0}, rot: {x: 0, y: 0, z: 0}, size: {x: 200, y: 100}, order: 1, meta: {}}, [], myWorkspace);
+		var currentWorkspace = new workspace(null, $('#os-editor-workspace'));
 
 		$('#os-editor-menu-layout').addEventListener('click', function(){
 			$('#os-editor-layout-dialog').style.animationName = 'up';
@@ -29,5 +30,37 @@ window.documentId = location.href.match(/[^#?]+\/slide\/edit\/([a-zA-Z0-9]+)/)[1
 		$('#os-editor-layout-close').addEventListener('click', function(){
 			$('#os-editor-layout-dialog').style.animationName = 'down';
 		});
+
+		$('#os-editor-menu-insert-slide').addEventListener('click', function(){
+			slide.createSlide({
+				pos: {x: 0, y: 0, z: 0},
+				rot: {x: 0, y: 0, z: 0},
+				size: {x: 200, y: 300},
+				order: currentWorkspace.lastOrder(),
+				meta: {}
+			}, [], currentWorkspace);
+		});
+
+		/*var isCtrlPressing = false;
+
+		document.addEventListener('keydown', function(e){
+			if(e.which === 17) isCtrlPressing = true;
+		});
+
+		document.addEventListener('keyup', function(e){
+			if(e.which === 17) isCtrlPressing = false;
+		});*/
+
+		document.addEventListener('wheel', function(e){
+			if(e.ctrlKey){
+				e.stopPropagation();
+				e.preventDefault();
+				currentWorkspace.resize(e.deltaY);
+			}
+		});
 	});
-//});
+});
+
+socket.emit('request data', {
+	document: documentId
+});

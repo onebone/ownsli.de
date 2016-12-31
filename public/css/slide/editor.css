@@ -260,8 +260,18 @@ body, html {
 	background: #000;
 }
 
+.dropdown-content.nested.active{
+	animation: showOverflow 0s ease-in 225ms forwards;
+}
+
 .dropdown-content li>a {
 	color: #808080;
+}
+
+@keyframes showOverflow {
+	to {
+		overflow: visible;
+	}
 }
 
 @keyframes up {

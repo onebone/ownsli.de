@@ -1,0 +1,49 @@
+body, html {
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.login-main {
+	max-width: 300px;
+	padding: 15px;
+	background: rgba(0, 0, 0, 0.5);
+	color: #fff;
+}
+
+input {
+	border-bottom: solid 1px #ff5722 !important;
+}
+
+input:focus {
+	box-shadow: 0 1px 0 0 #ff5722 !important;
+}
+
+button {
+	background: #e0e1e2;
+	border: none;
+	padding: 10px;
+	width: 100%;
+	border-radius: 3px;
+	color: #444;
+}
+
+button:focus {
+	background: #e0e1e2;
+}
+
+button:active {
+	background: #888;
+}
+
+#info {
+	color: #ff5722;
+}

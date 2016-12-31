@@ -1,5 +1,8 @@
-const express = require('express');
-const router = express.Router();
+const {DocumentManager} = require('../src/document');
+const {SessionManager} = require('../src/session');
+const TITLE_REGEX = /^.{1,100}$/;
+
+const router = require('express').Router();
 
 router.get('/', (req, res, next) => {
 	res.render('slide/list');
@@ -15,8 +18,17 @@ router.get('/present/:id', (req, res, next) => {
 	res.send('');
 });
 
-router.get('/create/', (req, res, next) => {
-	//TODO Create new slide and redirect to editor
+router.post('/create/', (req, res, next) => {
+	if(!(req.session && req.session.token)) return next(res.locals.e('error.nosession', 403, {
+		redirect: '/login'
+	}));
+
+	if(!req.body.title || !TITLE_REGEX.test(req.body.title)) return next(res.locals.e('error.wrongtitle', 400));
+
+	const session = SessionManager.getSession(req.session.token);
+	DocumentManager.addDocument(session.getUserId(), req.body.title).then((id) => {
+		res.redirect(`/slide/edit/${id}`);
+	});
 });
 
 router.get('/share/:id/:user', (req, res, next) => {

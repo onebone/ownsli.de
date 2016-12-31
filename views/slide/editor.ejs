@@ -75,7 +75,7 @@
 				<i class="mdi mdi-chevron-down"></i>
 			</a>
 
-			<ul id="insert-dropdown" class="dropdown-content">
+			<ul id="insert-dropdown" class="dropdown-content nested">
 				<li>
 					<a href="#!" id="os-editor-menu-insert-richtext">
 						<i class="mdi mdi-textbox"></i>
@@ -95,9 +95,10 @@
 					</a>
 				</li>
 				<li>
-					<a href="#!" id="os-editor-menu-insert-url">
-						<i class="mdi mdi-link-variant"></i>
-						<%= translator('slide.editor.insert.url') %>
+					<a href="#!" id="os-editor-menu-insert-shape" data-activates="shape-dropdown" data-hover="hover" data-alignment="left">
+						<i class="mdi mdi-shape-plus"></i>
+						<%= translator('slide.editor.insert.shape') %>
+						<i class="mdi mdi-chevron-right"></i>
 					</a>
 				</li>
 				<li>
@@ -111,6 +112,21 @@
 					<a href="#!" id="os-editor-menu-insert-note">
 						<i class="mdi mdi-book-plus"></i>
 						<%= translator('slide.editor.insert.note') %>
+					</a>
+				</li>
+			</ul>
+
+			<ul id="shape-dropdown" class="dropdown-content">
+				<li>
+					<a href="#!" id="os-editor-menu-insert-rectangle">
+						<i class="mdi mdi-shape-rectangle-plus"></i>
+						<%= translator('slide.editor.insert.rectangle') %>
+					</a>
+				</li>
+				<li>
+					<a href="#!" id="os-editor-menu-insert-circle">
+						<i class="mdi mdi-shape-circle-plus"></i>
+						<%= translator('slide.editor.insert.circle') %>
 					</a>
 				</li>
 			</ul>
@@ -137,7 +153,7 @@
 			</ul>
 
 			<!-- Slide Insert Menu -->
-			<a id="os-editor-menu-insert" href="#!" class="os-editor-menu">
+			<a id="os-editor-menu-insert-slide" href="#!" class="os-editor-menu">
 				<i class="mdi mdi-shape-rectangle-plus"></i>
 				<%= translator('slide.editor.insert.slide') %>
 			</a>
@@ -163,6 +179,7 @@
 		</aside>
 
 		<aside id="os-editor-property-editor">
+			<h3></h3>
 			<div class="input-field">
 				<input id="posx" type="number">
 				<label for="posx"><%= translator('slide.editor.property.posx') %></label>
@@ -205,8 +222,6 @@
 		</aside>
 
 		<main id="os-editor-workspace">
-			<div id="os-editor-slides">
-			</div>
 		</main>
 
 		<section id="os-editor-layout-dialog">
@@ -221,6 +236,28 @@
 		<section id="os-editor-share-dialog"></section>
 		<section id="os-editor-code-edit-dialog"></section>
 
+		<script>
+			var TRANSLATION = {
+				'slide.editor.property.slide': '<%= translator("slide.editor.property.slide") %>',
+				'slide.editor.property.shape.richtext': '<%= translator("slide.editor.property.shape.richtext") %>',
+				'slide.editor.property.shape.image': '<%= translator("slide.editor.property.shape.image") %>',
+				'slide.editor.property.shape.video': '<%= translator("slide.editor.property.shape.video") %>',
+				'slide.editor.property.shape.html': '<%= translator("slide.editor.property.shape.html") %>'
+			};
+		</script>
+		<script>
+			(function(){
+				jQuery('#os-editor-menu-insert-shape').dropdown({
+					inDuration: 300,
+					outDuration: 225,
+					constrain_width: false,
+					hover: true,
+					gutter: (jQuery('#insert-dropdown').width()) + 4,
+					belowOrigin: false,
+					alignment: 'left'
+				});
+			})();
+		</script>
 		<script src="/Sortable/Sortable.min.js"></script>
 		<script src="/socket.io-client/dist/socket.io.min.js"></script>
 		<script src="/js/common/include.js"></script>

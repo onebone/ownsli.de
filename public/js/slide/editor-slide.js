@@ -1,9 +1,9 @@
 var isInitFinished = true;
 
-function Slide(data, shapes, workspace){
+function Slide(data, workspace){
 	this.workspace = workspace;
 	var _this = this;
-	this.shapes = shapes;
+	this.shapes = {};
 	['id', 'pos', 'rot', 'size', 'order', 'meta'].forEach(function(v){
 		_this[v] = data[v];
 	});
@@ -41,6 +41,7 @@ Slide.createSlide = function(slideData, shapes, workspace, cb){
 
 		var layoutNode = document.createElement('div');
 		layoutNode.classList.add('os-editor-layout-slide');
+		layoutNode.setAttribute('data-os-slide-id', _this.id);
 		layoutNode.innerHTML = '#' + _this.order;
 		_this.setSlideLayout(layoutNode);
 
@@ -89,34 +90,22 @@ Slide.prototype.setSlideLayout = function(node){
 	_temp.updateNode();
 	_temp.destroy();
 
-	var layoutMorph;
-	this.layoutNode.addEventListener('click', function(){
-		if(layoutMorph) return;
-
-		layoutMorph = new morph(node, _this.workspace.morphSpace, false, function(){
-			//TODO Removal
-		});
-
-		node.addEventListener('os:update', function(){
-			_this.pos.x = layoutMorph['os-x'];
-			_this.pos.y = layoutMorph['os-y'];
-			_this.pos.z = layoutMorph['os-z'];
-			_this.rot.x = layoutMorph['os-rotation-x'];
-			_this.rot.y = layoutMorph['os-rotation-y'];
-			_this.rot.z = layoutMorph['os-rotation-z'];
-			_this.size.x = layoutMorph['os-width'];
-			_this.size.y = layoutMorph['os-height'];
+	morph.clickMorph(this.layoutNode, this.workspace.morphSpace, this, {
+		compareAttrName: 'data-os-slide-id',
+		update: function(changes){
+			//TODO socket
+			_this.workspace.propertyEditor.update();
 			_this.onUpdate();
-		});
-
-		window.addEventListener('click', function(evt){
-			if(!evt.target.classList.contains('os-morph-anchor') && evt.target !== node){
-				layoutMorph.destroy();
-				layoutMorph = undefined;
-				evt.stopPropagation();
-				evt.preventDefault();
-			}
-		}, true, {once: true});
+		},
+		remove: function(){
+			//TODO Removal
+			_this.workspace.propertyEditor.bind(null);
+		},
+		create: function(){
+			_this.workspace.propertyEditor.bind(_this, function(){
+				_this.onUpdate();
+			});
+		}
 	});
 
 	$('#os-editor-layout').append(node);

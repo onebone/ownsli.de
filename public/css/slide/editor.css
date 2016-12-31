@@ -239,6 +239,10 @@ body, html {
 	z-index: 7;
 }
 
+#os-editor-property-editor h3 {
+	color: #fff;
+}
+
 #os-editor-property-editor input {
 	color: #fff;
 }

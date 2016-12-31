@@ -15,6 +15,7 @@ function Workspace(slideRoot, workspaceRoot){
 
 	this.workingSlideId = undefined;
 	this.morphSpace = $('#os-editor-layout');
+	this.propertyEditor = new propertyEditor();
 }
 
 Workspace.prototype.setWorkingSlide = function(id){
@@ -75,13 +76,6 @@ Workspace.prototype.lastOrder = function(){
 	}).reduce(function(prev, curr){
 		if(prev < curr.order) return curr.order;
 	}, 0) + 1;
-};
-
-Workspace.prototype.bindWithPropertyEditor = function(element){
-	//if(element instanceof slide){
-	if(element.type === 'slide'){
-
-	}
 };
 
 Workspace.prototype.deleteSlide = function(id){

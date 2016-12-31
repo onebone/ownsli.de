@@ -347,5 +347,88 @@ Morph.parseAnchorSyntax = function(statement, width, height){
 	.split(HEIGHT_HALF).join(Math.round(height / 2) + 'px');
 };
 
+Morph.clickMorph = function(node, morphSpace, object, options){
+	var morph = undefined;
+	var compareAttrName = options.compareAttrName || 'id';
+	var update = options.update || function(){};
+	var create = options.create || function(){};
+	var remove = options.remove;
+
+	node.addEventListener('click', function(evt){
+		if(morph) return;
+		create();
+		morph = new Morph(node, morphSpace, false, remove);
+
+		node.addEventListener('os:update', function(){
+			var changes = [];
+			if(object.pos.x !== morph['os-x']){
+				changes.push('os-x');
+				object.pos.x = morph['os-x'];
+			}
+
+			if(object.pos.y !== morph['os-y']){
+				changes.push('os-y');
+				object.pos.y = morph['os-y'];
+			}
+
+			if(object.pos.z !== morph['os-z']){
+				changes.push('os-z');
+				object.pos.z = morph['os-z'];
+			}
+
+			if(object.rot.x !== morph['os-rotation-x']){
+				changes.push('os-rotation-x');
+				object.rot.x = morph['os-rotation-x'];
+			}
+
+			if(object.rot.y !== morph['os-rotation-y']){
+				changes.push('os-rotation-y');
+				object.rot.y = morph['os-rotation-y'];
+			}
+
+			if(object.rot.z !== morph['os-rotation-z']){
+				changes.push('os-rotation-z');
+				object.rot.z = morph['os-rotation-z'];
+			}
+
+
+			if(object.size.x !== morph['os-width']){
+				changes.push('os-width');
+				object.size.x = morph['os-width'];
+			}
+
+			if(object.size.y !== morph['os-height']){
+				changes.push('os-height');
+				object.size.y = morph['os-height'];
+			}
+			update(changes);
+		});
+
+		evt.stopPropagation();
+		evt.preventDefault();
+
+		var handler = function(evt){
+			if(
+				!evt.target.classList.contains('os-morph-anchor')
+				&& evt.target.getAttribute(compareAttrName) !== node.getAttribute(compareAttrName)
+				&& evt.target.parentNode.parentNode.id !== 'os-editor-property-editor'
+			){
+				//Mobile Fortress Destroyer
+				morph.destroy();
+				morph = undefined;
+				evt.preventDefault();
+			}else window.addEventListener('click', handler, {
+				once: true,
+				capture: true
+			});
+		};
+
+		//ClariS - CLICK
+		window.addEventListener('click', handler, {
+			once: true,
+			capture: true
+		});
+	});
+};
 
 module.exports = Morph;

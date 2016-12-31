@@ -1,5 +1,7 @@
 const {DocumentManager} = require('../src/document');
 const {SessionManager} = require('../src/session');
+const multer = require('multer');
+
 const TITLE_REGEX = /^.{1,100}$/;
 
 const router = require('express').Router();
@@ -29,6 +31,11 @@ router.post('/create/', (req, res, next) => {
 	DocumentManager.addDocument(session.getUserId(), req.body.title).then((id) => {
 		res.redirect(`/slide/edit/${id}`);
 	});
+});
+
+//TODO upload resource
+router.post('/upload/:id', (req, res, next) => {
+
 });
 
 router.get('/share/:id/:user', (req, res, next) => {

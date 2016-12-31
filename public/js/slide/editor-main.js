@@ -8,6 +8,7 @@ socket.once('send data', function(event){
 		utils: '/js/common/utils.js',
 		interact: '/interactjs/dist/interact.min.js',
 		morph: '/js/slide/editor-morph.js',
+		propertyEditor: '/js/slide/editor-property-editor.js',
 		workspace: '/js/slide/editor-workspace.js',
 		slide: '/js/slide/editor-slide.js',
 		clock: '/js/slide/editor-clock.js'
@@ -38,7 +39,14 @@ socket.once('send data', function(event){
 				size: {x: 200, y: 300},
 				order: currentWorkspace.lastOrder(),
 				meta: {}
-			}, [], currentWorkspace);
+			}, currentWorkspace);
+		});
+
+		event.slides.forEach(function(v){
+			var slide = new slide(v, currentWorkspace);
+			v.shapes.forEach(function(s){
+				new shape(s, v);
+			});
 		});
 
 		/*var isCtrlPressing = false;

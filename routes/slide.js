@@ -6,9 +6,7 @@ const router = require('express').Router();
 
 router.get('/', (req, res, next) => {
 	if(!req.session || !req.session.token || SessionManager.getSession(req.session.token) === null){
-		res.render('login/index', {
-			'title': 'Login'
-		});
+		res.redirect('/login');
 		return;
 	}
 

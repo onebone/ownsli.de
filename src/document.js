@@ -3,6 +3,7 @@
 
 const MongoConnection = require('./mongo');
 const Utils = require('./utils');
+const {Vector3, Vector2} = require('./math');
 
 // Document is wrapper of a presentation
 class Document{
@@ -18,7 +19,31 @@ class Document{
 		this._id = id;
 		this._owner = owner;
 		this._name = name;
-		this._slides = Array.isArray(slides) ? new Map(slides) : slides;
+		if(Array.isArray(slides)){
+			this._slides = {};
+			for(let i = 0; i < slides.length; i++){
+				if(slides[i] instanceof Slide){
+					this._slides[i] = slides[i];
+				}else{
+					slides[i].vec = slides[i].vec || new Vector3();
+					slides[i].size = slides[i].size || new Vector2();
+					slides[i].rot = slides[i].rot || new Vector3();
+
+					this._slides[i] = new Slide(
+						new Vector3(slides[i].vec.x, slides[i].vec.y, slides[i].vec.z),
+						new Vector2(slides[i].size.x, slides[i].size.y),
+						new Vector3(slides[i].rot.x, slides[i].rot.y, slides[i].rot.z),
+						slides[i].order,
+						slides[i].meta,
+						slides[i].shapes
+					);
+				}
+			}
+		}else if(typeof slides === 'object'){
+			this._slides = slides;
+		}else{
+			this._slides = {};
+		}
 		this._invitation = invitation;
 		this._lastSave = lastSave;
 	}
@@ -42,7 +67,7 @@ class Document{
 	}
 
 	/**
-	 * @return {Slide[]}
+	 * @return {Object}
 	 */
 	getSlides(){
 		return this._slides;
@@ -133,19 +158,24 @@ class Document{
 		const _this = this;
 		Object.keys(this._slides).forEach((index) => {
 			const slide = _this._slides[index];
-			let shapes = [];
-			slide.getShapes().forEach((shape) => {
-				shapes.push(shape.toArray());
+			let shapesArr = [];
+
+			const shapes = slide.getShapes();
+			Object.keys(shapes).forEach((index) => {
+				const shape = shapes[index];
+				shapesArr.push(shape.toArray());
 			});
 
 			const pos = slide.getPosition();
 			const rot = slide.getRotation();
+			const size = slide.getSize();
 			data.slides.push({ // slide info
 				vec: [pos.getX(), pos.getY(), pos.getZ()],
 				rotation: [rot.getX(), rot.getY(), rot.getZ()],
+				size: [size.getX(), size.getY()],
 				order: slide.getOrder(),
 				meta: slide.getMetadata(),
-				shapes: shapes
+				shapes: shapesArr
 			});
 		});
 
@@ -169,7 +199,31 @@ class Slide{
 		this._rotation = rotation;
 		this._order = order;
 		this._meta = meta;
-		this._shapes = Array.isArray(shapes) ? new Map(shapes) : shapes;
+
+		if(Array.isArray(shapes)){
+			this._shapes = {};
+			for(let i = 0; i < shapes.length; i++){
+				if(shapes[i] instanceof Shape){
+					this._shapes[i] = shapes[i];
+				}else{
+					shapes[i].vec = shapes[i].vec || new Vector3();
+					shapes[i].size = shapes[i].size || new Vector2();
+					shapes[i].rot = shapes[i].rot || new Vector3();
+
+					this._shapes[i] = new Shape(
+						new Vector2(shapes[i].vec.x, shapes[i].vec.y),
+						new Vector2(shapes[i].size.x, shapes[i].pos.y),
+						new Vector3(shapes[i].rot.x, shapes[i].rot.y, shapes[i].rot.z),
+						shapes[i].type,
+						shapes[i].meta
+					);
+				}
+			}
+		}else if(typeof shapes === 'object'){
+			this._shapes = shapes;
+		}else{
+			this._shapes = {};
+		}
 	}
 
 	/**

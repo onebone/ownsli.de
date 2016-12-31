@@ -29,74 +29,41 @@ class Sync{
 			socket.on('request data', (data) => {
 				const group = Sync.getGroup(data.document);
 				if(!group){
-					DocumentManager.getDocument(data.document).then(document => {
-						if(!document){
-							socket.emit('send data', null);
-							return;
-						}
-
-						if(Sync.createGroup(document, session)){
-							const slides = document.getSlides();
-							let slideArr = [];
-							slides.forEach(slide => {
-								let shapes = [];
-								slide.getShapes().forEach((shape) => {
-									shapes.push(shape.toArray());
-								});
-
-								const pos = slide.getPosition();
-								const rot = slide.getRotation();
-								slideArr.slides.push({ // slide info
-									vec: [pos.getX(), pos.getY(), pos.getZ()],
-									rotation: [rot.getX(), rot.getY(), rot.getZ()],
-									order: slide.getOrder(),
-									meta: slide.getMetadata(),
-									shapes: shapes
-								});
-							});
-							socket.emit('send data', {
-								id: document.getId(),
-								name: document.getName(),
-								owner: document.getOwner(),
-								sildes: slideArr,
-								invitation: document.getInvitations(),
-								lastSave: document.getLastSave(),
-
-							});
-						}
-					}).catch(err => {
-						socket.emit('send data', null);
-						console.error(err);
-					});
+					socket.emit('send data', null); // there is no group found matching the document
 				}else{
 					const document = group.getDocument();
 
 					const slides = document.getSlides();
 					let slideArr = [];
-					slides.forEach(slide => {
-						let shapes = [];
-						slide.getShapes().forEach((shape) => {
-							shapes.push(shape.toArray());
+
+					Object.keys(slides).forEach(index => {
+						const slide = slides[index];
+
+						let shapesArr = [];
+
+						const shapes = slide.getShapes();
+						Object.keys(shapes).forEach(index => {
+							const shape = shapes[index];
+							shapesArr.push(shape.toArray());
 						});
 
 						const pos = slide.getPosition();
 						const rot = slide.getRotation();
-						slideArr.slides.push({ // slide info
+						slideArr.push({ // slide info
 							vec: [pos.getX(), pos.getY(), pos.getZ()],
 							rotation: [rot.getX(), rot.getY(), rot.getZ()],
 							order: slide.getOrder(),
 							meta: slide.getMetadata(),
-							shapes: shapes
+							shapes: shapesArr
 						});
 					});
 					socket.emit('send data', {
 						id: document.getId(),
 						name: document.getName(),
 						owner: document.getOwner(),
-						sildes: slideArr,
+						slides: slideArr,
 						invitation: document.getInvitations(),
-						lastSave: document.getLastSave(),
-
+						lastSave: document.getLastSave()
 					});
 				}
 			});
@@ -154,7 +121,7 @@ class Sync{
 
 									slide.setOrder(data);
 									break;
-									// shapes will be updated in 'update shape' packet
+								// shapes will be updated in 'update shape' packet
 								case 'meta':
 									// TODO: Validate meta
 									slide.setMetadata(data);
@@ -220,7 +187,7 @@ class Sync{
 									break;
 								// type cannot be changed
 								case 'meta':
-									 // TODO
+									// TODO
 									break;
 							}
 						}
@@ -241,7 +208,7 @@ class Sync{
 				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
 					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
 				const slideId = group.getDocument().addSlide(new Slide(
-				new Vector3(data.pos.x, data.pos.y, data.pos.z),
+					new Vector3(data.pos.x, data.pos.y, data.pos.z),
 					new Vector2(data.size.x, data.size.y),
 					new Vector3(0, 0, 0), // default rotation is 0, 0, 0
 					data.order,
@@ -299,8 +266,8 @@ class Sync{
 			return false;
 		}
 
-		groups[document.getId()] = new Group(document, ...sessions);
-		return true;
+		if(!groups[document.getId()]) groups[document.getId()] = new Group(document, ...sessions);
+		return true; // return true even if group already exists
 	}
 
 	/**
@@ -405,6 +372,7 @@ class Group{
 	constructor(document, ...sessions){
 		this._document = document;
 		this._sessions = sessions;
+		this._creationTime = Date.now();
 
 		this._sessions.forEach((session) => {
 			if(session.getGroup() !== null){
@@ -413,6 +381,13 @@ class Group{
 
 			session.__setGroup(document.getId());
 		});
+	}
+
+	/**
+	 * @return {number}
+	 */
+	getCreationTime(){
+		return this._creationTime;
 	}
 
 	/**

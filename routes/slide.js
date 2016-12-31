@@ -1,12 +1,18 @@
 const {DocumentManager} = require('../src/document');
 const {SessionManager} = require('../src/session');
 const multer = require('multer');
+const Sync = require('../src/sync');
 
 const TITLE_REGEX = /^.{1,100}$/;
 
 const router = require('express').Router();
 
 router.get('/', (req, res, next) => {
+	if(!req.session || !req.session.token || SessionManager.getSession(req.session.token) === null){
+		res.redirect('/login');
+		return;
+	}
+
 	res.render('slide/list');
 });
 
@@ -43,8 +49,25 @@ router.get('/share/:id/:user', (req, res, next) => {
 });
 
 router.get('/edit/:id', (req, res, next) => {
-	//TODO Send presentation data
-	res.render('slide/editor');
+	if(typeof req.params.id !== 'string') return; // just quit; do not give anything
+
+	if(!req.session || !req.session.token) return res.redirect('/login');
+
+	const session = SessionManager.getSession(req.session.token);
+
+	if(session === null) return res.redirect('/login');
+
+	DocumentManager.getDocument(req.params.id).then(document => {
+		if(!document){
+			return;
+		}
+
+		if(Sync.createGroup(document, session)){
+			res.render('slide/editor');
+		}else{
+			// TODO: render document does not exist...
+		}
+	}).catch(console.error);
 });
 
 module.exports = router;

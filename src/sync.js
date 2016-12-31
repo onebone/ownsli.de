@@ -35,6 +35,7 @@ class Sync{
 
 					const slides = document.getSlides();
 					let slideArr = [];
+
 					Object.keys(slides).forEach(index => {
 						const slide = slides[index];
 

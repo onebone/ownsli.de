@@ -39,6 +39,10 @@ class Document{
 					);
 				}
 			}
+		}else if(typeof slides === 'object'){
+			this._slides = slides;
+		}else{
+			this._slides = {};
 		}
 		this._invitation = invitation;
 		this._lastSave = lastSave;
@@ -215,6 +219,10 @@ class Slide{
 					);
 				}
 			}
+		}else if(typeof shapes === 'object'){
+			this._shapes = shapes;
+		}else{
+			this._shapes = {};
 		}
 	}
 

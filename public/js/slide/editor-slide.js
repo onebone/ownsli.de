@@ -168,7 +168,7 @@ Slide.prototype.onUpdate = function(emit){
 						pos: {x: parseFloat(this.pos.x), y: parseFloat(this.pos.y), z: parseFloat(this.pos.z)},
 						rot: {x: parseFloat(this.rot.x), y: parseFloat(this.rot.y), z: parseFloat(this.rot.z)},
 						slide: this.id,
-						size: this.size,
+						size: {x: parseFloat(this.size.x), y: parseFloat(this.size.y)},
 						meta: this.meta
 					}
 				]
@@ -198,7 +198,7 @@ Slide.prototype.toExportableData = function(){
 };
 
 socket.on('update slide', function(data){
-	console.log(data); // TODO Make it work
+	console.log(data); // FIXME position does not work, size is too sensitive
 	if(Array.isArray(data.packets)){
 		data.packets.forEach(function(packet){
 			var slide = window.currentWorkspace.document.slides[packet.slide];
@@ -217,6 +217,8 @@ socket.on('update slide', function(data){
 					x: packet.pos.x, y: packet.pos.y, z: packet.pos.z
 				};
 			}
+
+			slide.onUpdate(false);
 		});
 	}
 });

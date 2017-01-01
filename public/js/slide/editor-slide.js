@@ -92,7 +92,7 @@ Slide.prototype.setSlidePreview = function(node){
 	indicator.innerText = this.order;
 
 	this.previewWrapper = document.createElement('div');
-	this.previewWrapper.classList.add('os-editor-slidelist-wrapper')
+	this.previewWrapper.classList.add('os-editor-slidelist-wrapper');
 	this.previewNode = node;
 	this.previewWrapper.append(indicator);
 	this.previewWrapper.append(this.previewNode);

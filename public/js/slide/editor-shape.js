@@ -1,5 +1,5 @@
 var RICH_TEXT = 0;
-var TYPE_RECTANGLE = 1
+var TYPE_RECTANGLE = 1;
 var TYPE_IMAGE = 2;
 var TYPE_VIDEO = 3;
 var TYPE_HTML = 4;
@@ -28,6 +28,7 @@ function Shape(data, parentSlide){
 			console.log(morph);
 			_this.workspace.propertyEditor.bind(_this, function(change){
 				//TODO socket
+
 				_this.onUpdate();
 			});
 		},

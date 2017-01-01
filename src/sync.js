@@ -7,19 +7,6 @@ const {Vector3, Vector2} = require('./math');
 let io = null;
 let groups = {};
 
-/**
- * @param {Group} group
- * @param {string} type
- * @param {Object} data
- */
-const broadcast2group = (group, type, data) => {
-	const sockets = group.getSockets();
-	Object.keys(sockets).forEach(token => {
-		const socket = sockets[token];
-		socket.emit(type, data);
-	});
-};
-
 class Sync{
 	/**
 	 * This function not for general use
@@ -113,7 +100,7 @@ class Sync{
 				});
 
 				//socket.emit('update slide', data);
-				broadcast2group(group, 'update slide', data);
+				group.broadcast('update slide', data);
 			});
 			// end update slide
 
@@ -177,7 +164,7 @@ class Sync{
 				});
 
 				//socket.emit(data);
-				broadcast2group(group, 'update shape', data);
+				group.broadcast('update shape', data);
 			});
 			// end update shape
 
@@ -219,7 +206,7 @@ class Sync{
 					order: slide.getOrder(),
 					meta: slide.getMetadata()
 				});*/
-				broadcast2group(group, 'create slide', {
+				group.broadcast('create slide', {
 					document: data.document,
 					slide: slideId,
 					pos: {
@@ -264,7 +251,7 @@ class Sync{
 					slide: data.slide,
 					shape: shapeId
 				});*/
-				broadcast2group(group, 'create shape', {
+				group.broadcast('create shape', {
 					document: data.document,
 					slide: data.slide,
 					shape: shapeId
@@ -420,6 +407,17 @@ class Group{
 
 	getSockets(){
 		return this._sockets;
+	}
+
+	/**
+	 * @param {string} type
+	 * @param {Object} data
+	 */
+	broadcast(type, data){
+		Object.keys(this._sockets).forEach(token => {
+			const socket = this._sockets[token];
+			socket.emit(type, data);
+		});
 	}
 
 	/**

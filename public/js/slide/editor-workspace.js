@@ -50,22 +50,29 @@ Workspace.prototype.getWorkingSlide = function(){
 };
 
 Workspace.prototype.resize = function(amount){
-	var workingSlide = this.getWorkingSlide();
-	if(!workingSlide) return;
-	if(!workingSlide.slideNode) return;
-
-	var transform = workingSlide.slideNode.style.transform;
-	if(!transform) return;
-
-	var scaleMatch = transform.match(SCALE_REGEX);
-	if(!scaleMatch) return;
-
-	var scale = parseFloat(scaleMatch[1]);
-	if(!isFinite(scale)) return;
+	var scale = this.getWorkingSlideScale();
+	if(scale === null) return;
 
 	if(amount < 0){
-		workingSlide.slideNode.style.transform = 'scale(' + (scale + 0.5) + ')';
-	}else workingSlide.slideNode.style.transform = 'scale(' + (scale - 0.5) + ')';
+		workingSlide.slideNode.style.transform = 'scale(' + (Math.min(10000, scale + 0.5)) + ')';
+	}else workingSlide.slideNode.style.transform = 'scale(' + (Math.max(0.0001, scale - 0.5)) + ')';
+};
+
+Workspace.prototype.getWorkingSlideScale = function(){
+	var workingSlide = this.getWorkingSlide();
+	if(!workingSlide) return null;
+	if(!workingSlide.slideNode) return null;
+
+	var transform = workingSlide.slideNode.style.transform;
+	if(!transform) return null;
+
+	var scaleMatch = transform.match(SCALE_REGEX);
+	if(!scaleMatch) return null;
+
+	var scale = parseFloat(scaleMatch[1]);
+	if(!isFinite(scale)) return null;
+
+	return scale;
 };
 
 //Misaka 20001

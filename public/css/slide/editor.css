@@ -75,6 +75,12 @@ body, html {
 	cursor: pointer;
 }
 
+.os-dialog {
+	max-width: 600px;
+	max-height: 300px;
+	position: fixed;
+}
+
 .os-editor-slidelist-slide {
 	transform-origin: 0 0;
 }
@@ -175,6 +181,10 @@ body, html {
 	overflow: auto;
 }
 
+#os-editor-workspace *[data-os-shape-id] {
+	position: absolute;
+}
+
 #os-editor-layout-dialog {
 	background: #111;
 	display: flex;
@@ -260,6 +270,14 @@ body, html {
 	box-shadow: 0 1px 0 0 #ff5722;
 }
 
+#os-editor-property-editor button {
+	display: none;
+}
+
+#os-editor-property-editor[data-os-property-editor-type="shape"] button {
+	display: block;
+	width: 100%;
+}
 .material-tooltip .backdrop {
 	background: #000;
 }

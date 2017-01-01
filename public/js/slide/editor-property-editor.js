@@ -17,13 +17,25 @@ PropertyEditor.prototype.bind = function(element, update){
 	this.elem = element;
 	this.updateCallback = update || function(){};
 
-	if(element && element.type === 'slide'){
-		this.node.querySelector('h3').innerText = "Slide #" + element.order;
-	}else if(element && element.type === 'shape'){
-
-	}else this.node.querySelector('h3').innerText = '';
-
 	var _this = this;
+	if(element && element.type === 'slide'){
+		this.node.setAttribute('data-os-property-editor-type', 'slide');
+		this.node.querySelector('h3').innerText = "#" + element.order;
+	}else if(element && element.elemType === 'shape'){
+		this.node.setAttribute('data-os-property-editor-type', 'shape');
+		this.node.querySelector('button').onclick = function(){
+			_this.elem.onEdit();
+		};
+	}else{
+		this.node.setAttribute('data-os-property-editor-type', 'null');
+		this.node.querySelector('h3').innerText = '';
+		Object.keys(MAPPING).forEach(function(v){
+			$(v).value = '';
+		});
+		Materialize.updateTextFields();
+		return;
+	}
+
 	Object.keys(MAPPING).forEach(function(v){
 		var value = MAPPING[v][0].split('.');
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const {DocumentManager, Document, Slide, Shape} = require('./document');
+const {Document, Slide, Shape} = require('./document');
 const {SessionManager} = require('./session');
 const {Vector3, Vector2} = require('./math');
 
@@ -31,40 +31,9 @@ class Sync{
 				if(!group){
 					socket.emit('send data', null); // there is no group found matching the document
 				}else{
-					const document = group.getDocument();
+					group.setSocket(session, socket);
 
-					const slides = document.getSlides();
-					let slideArr = [];
-
-					Object.keys(slides).forEach(index => {
-						const slide = slides[index];
-
-						let shapesArr = [];
-
-						const shapes = slide.getShapes();
-						Object.keys(shapes).forEach(index => {
-							const shape = shapes[index];
-							shapesArr.push(shape.toArray());
-						});
-
-						const pos = slide.getPosition();
-						const rot = slide.getRotation();
-						slideArr.push({ // slide info
-							vec: [pos.getX(), pos.getY(), pos.getZ()],
-							rotation: [rot.getX(), rot.getY(), rot.getZ()],
-							order: slide.getOrder(),
-							meta: slide.getMetadata(),
-							shapes: shapesArr
-						});
-					});
-					socket.emit('send data', {
-						id: document.getId(),
-						name: document.getName(),
-						owner: document.getOwner(),
-						slides: slideArr,
-						invitation: document.getInvitations(),
-						lastSave: document.getLastSave()
-					});
+					socket.emit('send data', group.getDocument().toArray());
 				}
 			});
 
@@ -130,8 +99,8 @@ class Sync{
 					}
 				});
 
-				socket.emit('update slide', data);
-				// TODO: Broadcast to group clients
+				//socket.emit('update slide', data);
+				group.broadcast('update slide', data);
 			});
 			// end update slide
 
@@ -194,8 +163,8 @@ class Sync{
 					}
 				});
 
-				// TODO: broadcast update shape packet to group clients
-				socket.emit(data);
+				//socket.emit(data);
+				group.broadcast('update shape', data);
 			});
 			// end update shape
 
@@ -207,19 +176,51 @@ class Sync{
 
 				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
 					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
-				const slideId = group.getDocument().addSlide(new Slide(
+				const slide = new Slide(
+					-1,
 					new Vector3(data.pos.x, data.pos.y, data.pos.z),
 					new Vector2(data.size.x, data.size.y),
 					new Vector3(0, 0, 0), // default rotation is 0, 0, 0
 					data.order,
 					data.meta || {}, // empty meta
 					{} // empty shapes
-				));
+				);
+				const slideId = group.getDocument().addSlide(slide);
 
-				socket.emit('create slide', {
+				const pos = slide.getPosition();
+				const rot = slide.getRotation();
+				const size = slide.getSize();
+
+				/*socket.emit('create slide', {
 					document: data.document,
-					slide: slideId
-				}); // TODO Broadcast to group clients
+					slide: slideId,
+					pos: {
+						x: pos.x, y: pos.y, z: pos.z
+					},
+					rot: {
+						x: rot.x, y: rot.y, z: rot.z
+					},
+					size: {
+						x: size.x, y: size.y
+					},
+					order: slide.getOrder(),
+					meta: slide.getMetadata()
+				});*/
+				group.broadcast('create slide', {
+					document: data.document,
+					slide: slideId,
+					pos: {
+						x: pos.x, y: pos.y, z: pos.z
+					},
+					rot: {
+						x: rot.x, y: rot.y, z: rot.z
+					},
+					size: {
+						x: size.x, y: size.y
+					},
+					order: slide.getOrder(),
+					meta: slide.getMetadata()
+				});
 			});
 			// end create slide
 
@@ -245,11 +246,16 @@ class Sync{
 					data.meta || {}
 				));
 
-				socket.emit('create shape', {
+				/*socket.emit('create shape', {
 					document: data.document,
 					slide: data.slide,
 					shape: shapeId
-				}); // TODO Broadcast to all group clients
+				});*/
+				group.broadcast('create shape', {
+					document: data.document,
+					slide: data.slide,
+					shape: shapeId
+				});
 			});
 			// end create shape
 		});
@@ -372,6 +378,7 @@ class Group{
 	constructor(document, ...sessions){
 		this._document = document;
 		this._sessions = sessions;
+		this._sockets = {};
 		this._creationTime = Date.now();
 
 		this._sessions.forEach((session) => {
@@ -380,6 +387,36 @@ class Group{
 			}
 
 			session.__setGroup(document.getId());
+		});
+	}
+
+	/**
+	 * @param {Session} session
+	 * @param socket
+	 */
+	setSocket(session, socket){
+		this._sockets[session.getToken()] = socket;
+	}
+
+	/**
+	 * @param {Session} session
+	 */
+	getSocket(session){
+		return this._sockets[session.getToken()] || null;
+	}
+
+	getSockets(){
+		return this._sockets;
+	}
+
+	/**
+	 * @param {string} type
+	 * @param {Object} data
+	 */
+	broadcast(type, data){
+		Object.keys(this._sockets).forEach(token => {
+			const socket = this._sockets[token];
+			socket.emit(type, data);
 		});
 	}
 
@@ -429,13 +466,13 @@ class Group{
 	 * @param {Session} sessions
 	 */
 	removeSession(...sessions){
-		const _this = this;
 		sessions.forEach((session) => {
-			_this._sessions.forEach((sess, index) =>{
+			this._sessions.forEach((sess, index) =>{
 				if(!sess) return;
 
 				if(sess.getUserId() === session.getUserId()){
-					_this._sessions.splice(index, 1);
+					this._sessions.splice(index, 1);
+					delete this._sockets[session.getToken()];
 				}
 			});
 		});

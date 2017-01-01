@@ -82,6 +82,7 @@ Workspace.prototype.lastOrder = function(){
 		return _this.document.slides[v];
 	}).reduce(function(prev, curr){
 		if(prev < curr.order) return curr.order;
+		return prev;
 	}, 0) + 1;
 };
 

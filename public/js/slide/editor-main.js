@@ -57,7 +57,11 @@ socket.once('send data', function(event){
 			}, slide);
 		});
 
-		event.slides.forEach(function(v){
+		Object.keys(event.slides).sort(function(a, b){
+			return event.slides[a].order > event.slides[b].order ? 1 : -1;
+		}).forEach(function(index){
+			var v = event.slides[index];
+
 			var _slide = new slide(v, currentWorkspace);
 			v.shapes.forEach(function(s){
 				new shape(s, _slide);

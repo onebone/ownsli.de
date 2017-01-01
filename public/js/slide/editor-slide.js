@@ -1,5 +1,11 @@
 var isInitFinished = true;
 
+socket.on('create slide', function(data){
+	data.id = data.slide;
+	var _this = new Slide(data, window.currentWorkspace);
+	isInitFinished = true;
+});
+
 function Slide(data, workspace){
 	this.workspace = workspace;
 	var _this = this;
@@ -7,6 +13,7 @@ function Slide(data, workspace){
 	['id', 'pos', 'rot', 'size', 'order', 'meta'].forEach(function(v){
 		_this[v] = data[v];
 	});
+
 	this.type = 'slide';
 	this.meta.background = this.meta.background || '#fff';
 
@@ -50,11 +57,32 @@ function Slide(data, workspace){
 		_this.workspace.propertyEditor.update();
 		_this.onUpdate();
 	});
+
+	socket.on('update slide', function(data){
+		if(typeof data.size === 'object'
+			&& typeof data.size.x === 'number' && typeof data.size.y === 'number'&& typeof data.size.z === 'number'){
+			this.size = {
+				x: data.size.x,
+				y: data.size.y,
+				z: data.size.z
+			};
+		}
+
+		if(typeof data.pos === 'object'
+			&& typeof data.pos.x === 'number' && typeof data.pos.y === 'number' && typeof data.pos.z === 'number'){
+			this.pos = {
+				x: data.pos.x,
+				y: data.pos.y,
+				z: data.pos.z
+			};
+		}
+
+		_this.onUpdate(false);
+		//console.log(data);
+	});
 }
 
-Slide.createSlide = function(slideData, shapes, workspace, cb){
-	if(!cb) cb = function(){};
-
+Slide.createSlide = function(slideData, shapes, workspace){
 	if(!isInitFinished){
 		//To prevent slide id is jammed
 		setTimeout(function(){
@@ -64,13 +92,6 @@ Slide.createSlide = function(slideData, shapes, workspace, cb){
 	}
 
 	isInitFinished = false;
-	socket.once('create slide', function(data){
-		slideData.id = data.slide;
-		var _this = new Slide(slideData, shapes, workspace);
-		isInitFinished = true;
-
-		cb(_this);
-	});
 
 	socket.emit('create slide', {
 		document: documentId,
@@ -91,7 +112,7 @@ Slide.prototype.setSlidePreview = function(node){
 	indicator.innerText = this.order;
 
 	this.previewWrapper = document.createElement('div');
-	this.previewWrapper.classList.add('os-editor-slidelist-wrapper')
+	this.previewWrapper.classList.add('os-editor-slidelist-wrapper');
 	this.previewNode = node;
 	this.previewWrapper.append(indicator);
 	this.previewWrapper.append(this.previewNode);
@@ -118,7 +139,7 @@ Slide.prototype.setSlideLayout = function(node){
 	$('#os-editor-layout').append(node);
 };
 
-Slide.prototype.onUpdate = function(){
+Slide.prototype.onUpdate = function(emit){
 	if(this.previewNode && this.slideNode){
 		var baseSize = this.size.x;
 		if(this.size.x < this.size.y) baseSize = this.size.y;
@@ -141,6 +162,19 @@ Slide.prototype.onUpdate = function(){
 		this.previewNode.style.background = this.meta.background;
 		this.previewNode.style.transform = "scale(" + resizeRate + ")";
 		this.previewNode.innerHTML = this.slideNode.innerHTML;
+
+		if(emit !== false){
+			socket.emit('update slide', {
+				document: documentId,
+				packets: [
+					{
+						slide: this.id,
+						size: this.size,
+						meta: this.meta
+					}
+				]
+			});
+		}
 
 		var wantedWidth = window.innerWidth - 420;
 		var editRate = wantedWidth / this.size.x;

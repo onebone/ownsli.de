@@ -40,9 +40,11 @@ class Sync{
 
 			// update slide
 			socket.on('update slide', (data) => {
+				console.log('update slide' , data);
 				if(typeof data.document !== 'string' || !Array.isArray(data.packets)) return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
+				console.log('a');
 
 				data.packets.forEach((pk, index) => {
 					if(typeof pk.slide !== 'number'){
@@ -60,6 +62,7 @@ class Sync{
 							const data = pk[property];
 							switch(property.toLowerCase()){
 								case 'pos':
+									console.log('pos',data, typeof data.x);
 									if(typeof data.x !== 'number' || typeof data.y !== 'number' || typeof data.z !== 'number'){
 										delete pk['pos'];
 										break;
@@ -101,6 +104,7 @@ class Sync{
 				});
 
 				//socket.emit('update slide', data);
+				console.log('send', data);
 				group.broadcast('update slide', data);
 			});
 			// end update slide

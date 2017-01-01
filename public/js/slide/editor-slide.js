@@ -69,6 +69,15 @@ function Slide(data, workspace){
 			};
 		}
 
+		if(typeof data.rot === 'object'
+			&& typeof data.rot.x === 'number' && typeof data.rot.y === 'number' && typeof data.rot.z === 'number'){
+			this.rot = {
+				x: data.rot.x,
+				y: data.rot.y,
+				z: data.rot.z
+			};
+		}
+
 		_this.onUpdate(false);
 		//console.log(data);
 	});
@@ -156,6 +165,8 @@ Slide.prototype.onUpdate = function(emit){
 				document: documentId,
 				packets: [
 					{
+						pos: {x: parseFloat(this.pos.x), y: parseFloat(this.pos.y), z: parseFloat(this.pos.z)},
+						rot: {x: parseFloat(this.rot.x), y: parseFloat(this.rot.y), z: parseFloat(this.rot.z)},
 						slide: this.id,
 						size: this.size,
 						meta: this.meta
@@ -185,6 +196,30 @@ Slide.prototype.toExportableData = function(){
 		meta: this.meta
 	};
 };
+
+socket.on('update slide', function(data){
+	console.log(data); // TODO Make it work
+	if(Array.isArray(data.packets)){
+		data.packets.forEach(function(packet){
+			var slide = window.currentWorkspace.document.slides[packet.slide];
+			if(!slide) return console.log('aa');
+
+			if(typeof packet.size === 'object'
+				&& typeof packet.size.x === 'number' && typeof packet.size.y === 'number'){
+				slide.size = {
+					x: packet.size.x, y: packet.size.y
+				};
+			}
+
+			if(typeof packet.pos === 'object'
+				&& typeof packet.pos.x === 'number' && typeof packet.pos.y === 'number' && typeof packet.pos.z === 'number'){
+				slide.pos = {
+					x: packet.pos.x, y: packet.pos.y, z: packet.pos.z
+				};
+			}
+		});
+	}
+});
 
 socket.on('create slide', function(data){
 	data.id = data.slide;

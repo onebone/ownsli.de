@@ -260,7 +260,15 @@
 				</div>
 			</section>
 			<section id="os-editor-video-edit-dialog" class="os-dialog"></section>
-			<section id="os-editor-text-edit-dialog" class="os-dialog"></section>
+			<section id="os-editor-text-edit-dialog" class="os-dialog">
+				<textarea>
+				</textarea>
+
+				<div class="dialog-bottom">
+					<a href="#!" class="waves-effect waves-blue btn-flat" id="imgdialog-ok"><%= translator('slide.editor.edit.ok') %></a>
+					<a href="#!" class="waves-effect waves-orange btn-flat" id="imgdialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
+				</div>
+			</section>
 			<section id="os-editor-code-edit-dialog" class="os-dialog"></section>
 			<section id="os-editor-slidenote-edit-dialog" class="os-dialog"></section>
 			<section id="os-editor-new-font-dialog" class="os-dialog"></section>
@@ -280,6 +288,7 @@
 				});
 			})();
 		</script>
+		<script src="/tinymce/tinymce.min.js"></script>
 		<script src="/Sortable/Sortable.min.js"></script>
 		<script src="/socket.io-client/dist/socket.io.min.js"></script>
 		<script src="/js/common/include.js"></script>

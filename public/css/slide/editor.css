@@ -294,6 +294,12 @@ body, html {
 	display: block;
 	width: 100%;
 }
+
+#os-editor-text-edit-dialog {
+	width: 800px;
+	height: 800px;
+}
+
 .material-tooltip .backdrop {
 	background: #000;
 }

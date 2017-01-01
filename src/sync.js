@@ -238,24 +238,30 @@ class Sync{
 					//FIXME no packets in data. delete data.packets[index];
 					return;
 				}
-
-				const shapeId = slide.addShape(new Shape(
+				const shape = new Shape(
+					-1,
 					new Vector2(data.pos.x, data.pos.y),
 					new Vector3(0, 0, 0), // default rotation is 0,0,0
 					new Vector2(data.size.x, data.size.y),
 					data.type,
 					data.meta || {}
-				));
+				);
+				const shapeId = slide.addShape(shape);
 
 				/*socket.emit('create shape', {
 					document: data.document,
 					slide: data.slide,
 					shape: shapeId
 				});*/
+
 				group.broadcast('create shape', {
 					document: data.document,
 					slide: data.slide,
-					shape: shapeId
+					shape: shapeId,
+					pos: shape.getPosition(),
+					rot: shape.getRotation(),
+					size: shape.getSize(),
+					meta: shape.getMetadata()
 				});
 			});
 			// end create shape

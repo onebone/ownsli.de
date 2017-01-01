@@ -205,6 +205,7 @@ class Slide{
 				shapes[index].rot = shapes[index].rot || new Vector3();
 
 				this._shapes[index] = new Shape(
+					index,
 					new Vector2(shapes[index].vec.x, shapes[index].vec.y),
 					new Vector2(shapes[index].size.x, shapes[index].pos.y),
 					new Vector3(shapes[index].rot.x, shapes[index].rot.y, shapes[index].rot.z),
@@ -294,16 +295,10 @@ class Slide{
 
 	addShape(shape){
 		if(!shape) return -1;
-		let max = 0;
-		for(const index in this._shapes){ // max id of shape
-			if(this._shapes.hasOwnProperty(index)){
-				const i = parseInt(index);
-				if(i > max) max = i;
-			}
-		}
+		if(shape._id === -1) shape._id = shapeId;
 
-		this._shapes[max + 1] = shape;
-		return max + 1;
+		this._shapes[shapeId] = shape;
+		return shapeId++;
 	}
 
 	/**
@@ -322,21 +317,36 @@ class Slide{
 	}
 }
 
+let shapeId = 0;
 // Shape is an object which is placed on slide
 class Shape{
 	/**
+	 * @param {int} id             | Id of shape
 	 * @param {Vector2} vec	        | Position of shape where an object will be placed
 	 * @param {Vector3} rotation   | Rotation of shape
 	 * @param {Vector2} size       | Size of shape
 	 * @param {int} type	        | Type of shape
 	 * @param {Object} meta	        | Other data needed to render shape
 	 */
-	constructor(vec, rotation, size, type, meta){
+	constructor(id, vec, rotation, size, type, meta){
+		this._id = id;
+		this._id = id || shapeId++;
+		if(this._id >= shapeId){
+			shapeId = this._id + 1;
+		}
+
 		this._vec = vec;
 		this._rotation = rotation;
 		this._size = size;
 		this._type = type;
 		this._meta = meta;
+	}
+
+	/**
+	 * @return {int}
+	 */
+	getId(){
+		return this._id;
 	}
 
 	/**
@@ -404,6 +414,7 @@ class Shape{
 
 	toArray(){
 		return {
+			shape: this._id,
 			pos: [this._vec.x, this._vec.y],
 			size: [this._size.x, this._size.y],
 			rot: [this._rotation.x, this._rotation.y, this._rotation.z],

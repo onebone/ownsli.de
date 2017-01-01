@@ -58,9 +58,9 @@ Shape.prototype.convertToHTMLShape = function(){
 	this.type = TYPE_HTML;
 	this.onUpdate();
 };
-var isInitFinished = true;
 
 function ImageShape(data, parentSlide){
+	if(!data.meta) data.meta = {};
 	if(!data.meta.src) data.meta.src = "http://placehold.it/500?text=Please+change+me";
 	Shape.apply(this, arguments);
 }
@@ -130,36 +130,31 @@ ImageShape.prototype.onUpdate = function(){
 	this.node.src = this.meta.src;
 };
 
-ImageShape.createShape = function(shapeData, slide, cb){
-	if(!cb) cb = function(){};
-
-	if(!isInitFinished){
-		//To prevent shape id is jammed
-		setTimeout(function(){
-			ImageShape.createShape.apply(this, arguments);
-		}, 1000);
-		return;
-	}
-
-	isInitFinished = false;
+ImageShape.createShape = function(shapeData, slide, emit){
 	shapeData.type = TYPE_IMAGE;
+	if(!shapeData.meta) shapeData.meta = {};
 	if(!shapeData.meta.src) shapeData.meta.src = "http://placehold.it/500?text=Please+change+me";
-	socket.once('create shape', function(data){
-		shapeData.id = data.shape;
-		var _this = new ImageShape(shapeData, slide);
-		isInitFinished = true;
-		cb(_this);
-	});
 
-	socket.emit('create shape', {
-		document: documentId,
-		slide: slide.id,
-		pos: shapeData.pos,
-		size: shapeData.size,
-		meta: shapeData.meta,
-		type: shapeData.type
-	});
+	if(emit !== false){
+		socket.emit('create shape', {
+			document: documentId,
+			slide: slide.id,
+			pos: shapeData.pos,
+			size: shapeData.size,
+			meta: shapeData.meta,
+			type: shapeData.type
+		});
+	}
 };
+
+socket.on('create shape', function(data){
+	var slide = window.currentWorkspace.document.slides[data.slide];
+	if(!slide) return;
+
+	data.id = data.shape;
+	// TODO: 도형 타입으로 생성 도형 다르게 하기
+	new ImageShape(data, slide);
+});
 
 Shape.ImageShape = ImageShape;
 module.exports = Shape;

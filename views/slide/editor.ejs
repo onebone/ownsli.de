@@ -245,14 +245,27 @@
 			</div>
 		</section>
 
-		<section id="os-editor-share-dialog" class="os-dialog"></section>
-		<section id="os-editor-image-edit-dialog" class="os-dialog"></section>
-		<section id="os-editor-video-edit-dialog" class="os-dialog"></section>
-		<section id="os-editor-text-edit-dialog" class="os-dialog"></section>
-		<section id="os-editor-code-edit-dialog" class="os-dialog"></section>
-		<section id="os-editor-slidenote-edit-dialog" class="os-dialog"></section>
-		<section id="os-editor-new-font-dialog" class="os-dialog"></section>
-		<section id="os-editor-upload-resource-dialog" class="os-dialog"></section>
+		<section id="os-editor-dialogs">
+			<section id="os-editor-share-dialog" class="os-dialog"></section>
+			<section id="os-editor-image-edit-dialog" class="os-dialog">
+				<div class="input-field">
+					<input id="os-editor-image-src" type="text">
+					<label for="os-editor-image-src">
+						<%= translator('slide.editor.edit.imagesrc') %>
+					</label>
+				</div>
+				<div class="dialog-bottom">
+					<a href="#!" class="waves-effect waves-blue btn-flat" id="imgdialog-ok"><%= translator('slide.editor.edit.ok') %></a>
+					<a href="#!" class="waves-effect waves-orange btn-flat" id="imgdialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
+				</div>
+			</section>
+			<section id="os-editor-video-edit-dialog" class="os-dialog"></section>
+			<section id="os-editor-text-edit-dialog" class="os-dialog"></section>
+			<section id="os-editor-code-edit-dialog" class="os-dialog"></section>
+			<section id="os-editor-slidenote-edit-dialog" class="os-dialog"></section>
+			<section id="os-editor-new-font-dialog" class="os-dialog"></section>
+			<section id="os-editor-upload-resource-dialog" class="os-dialog"></section>
+		</section>
 
 		<script>
 			(function(){

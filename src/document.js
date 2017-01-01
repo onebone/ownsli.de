@@ -15,35 +15,33 @@ class Document{
 	 * @param {string[]} invitation | Invited user id
 	 * @param {int} lastSave        | Timestamp of last saved
 	 */
-	constructor(id, owner, name, slides = [], invitation = [], lastSave = Date.now()){
+	constructor(id, owner, name, slides = {}, invitation = [], lastSave = Date.now()){
 		this._id = id;
 		this._owner = owner;
 		this._name = name;
-		if(Array.isArray(slides)){
-			this._slides = {};
-			for(let i = 0; i < slides.length; i++){
-				if(slides[i] instanceof Slide){
-					this._slides[i] = slides[i];
-				}else{
-					slides[i].vec = slides[i].vec || new Vector3();
-					slides[i].size = slides[i].size || new Vector2();
-					slides[i].rot = slides[i].rot || new Vector3();
+		this._slides = {};
 
-					this._slides[i] = new Slide(
-						new Vector3(slides[i].vec.x, slides[i].vec.y, slides[i].vec.z),
-						new Vector2(slides[i].size.x, slides[i].size.y),
-						new Vector3(slides[i].rot.x, slides[i].rot.y, slides[i].rot.z),
-						slides[i].order,
-						slides[i].meta,
-						slides[i].shapes
-					);
-				}
+		Object.keys(slides).forEach((index) => {
+			const data = slides[index];
+			if(data instanceof Slide){
+				this._slides[index] = data;
+			}else{
+				slides[index].vec = slides[index].vec || new Vector3();
+				slides[index].size = slides[index].size || new Vector2();
+				slides[index].rot = slides[index].rot || new Vector3();
+
+				this._slides[index] = new Slide(
+					parseInt(index),
+					new Vector3(slides[index].vec.x, slides[index].vec.y, slides[index].vec.z),
+					new Vector2(slides[index].size.x, slides[index].size.y),
+					new Vector3(slides[index].rot.x, slides[index].rot.y, slides[index].rot.z),
+					slides[index].order,
+					slides[index].meta,
+					slides[index].shapes
+				);
 			}
-		}else if(typeof slides === 'object'){
-			this._slides = slides;
-		}else{
-			this._slides = {};
-		}
+		});
+
 		this._invitation = invitation;
 		this._lastSave = lastSave;
 	}
@@ -87,21 +85,9 @@ class Document{
 	 */
 	addSlide(slide){
 		if(!slide) return -1;
-		let max = 0;
-		for(const index in this._slides){ // max id of slide
-			if(this._slides.hasOwnProperty(index)){
-				const s = this._slides[index];
-				if(s.getOrder() >= slide.getOrder()){ // push order
-					s.setOrder(s.getOrder() + 1);
-				}
 
-				const i = parseInt(index);
-				if(i > max) max = i;
-			}
-		}
-
-		this._slides[max + 1] = slide;
-		return max + 1;
+		this._slides[slideId] = slide;
+		return slideId++;
 	}
 
 	/**
@@ -150,14 +136,13 @@ class Document{
 			id: this._id,
 			owner: this._owner,
 			name: this._name,
-			slides: [],
+			slides: {},
 			invitation: this._invitation,
 			lastSave: this._lastSave
 		};
 
-		const _this = this;
 		Object.keys(this._slides).forEach((index) => {
-			const slide = _this._slides[index];
+			const slide = this._slides[index];
 			let shapesArr = [];
 
 			const shapes = slide.getShapes();
@@ -169,23 +154,27 @@ class Document{
 			const pos = slide.getPosition();
 			const rot = slide.getRotation();
 			const size = slide.getSize();
-			data.slides.push({ // slide info
-				vec: [pos.getX(), pos.getY(), pos.getZ()],
-				rotation: [rot.getX(), rot.getY(), rot.getZ()],
+
+			data.slides[slide.getId()] = {
+				id: slide.getId(),
+				pos: [pos.getX(), pos.getY(), pos.getZ()],
+				rot: [rot.getX(), rot.getY(), rot.getZ()],
 				size: [size.getX(), size.getY()],
 				order: slide.getOrder(),
 				meta: slide.getMetadata(),
 				shapes: shapesArr
-			});
+			};
 		});
 
 		return data;
 	}
 }
 
+let slideId = 1;
 // Slide is a wrapper of slide which is included in Document
 class Slide{
 	/**
+	 * @param {int} id           | id of slide
 	 * @param {Vector3} vec         | Position of slide where slide will be placed
 	 * @param {Vector2} size        | Size of slide
 	 * @param {Vector3} rotation    | Rotation of slide
@@ -193,37 +182,44 @@ class Slide{
 	 * @param {object} meta         | Metadata of slide
 	 * @param {object} shapes       | Shapes which is included in slide
 	 */
-	constructor(vec, size, rotation, order, meta, shapes){
+	constructor(id, vec, size, rotation, order, meta, shapes){
+		this._id = id || slideId++;
+		if(this._id >= slideId){
+			slideId = this._id + 1;
+		}
+
 		this._vec = vec;
 		this._size = size;
 		this._rotation = rotation;
 		this._order = order;
 		this._meta = meta;
 
-		if(Array.isArray(shapes)){
-			this._shapes = {};
-			for(let i = 0; i < shapes.length; i++){
-				if(shapes[i] instanceof Shape){
-					this._shapes[i] = shapes[i];
-				}else{
-					shapes[i].vec = shapes[i].vec || new Vector3();
-					shapes[i].size = shapes[i].size || new Vector2();
-					shapes[i].rot = shapes[i].rot || new Vector3();
+		this._shapes = {};
+		Object.keys(shapes).forEach((index) => {
+			const data = shapes[index];
+			if(data instanceof Slide){
+				this._shapes[index] = data;
+			}else{
+				shapes[index].vec = shapes[index].vec || new Vector3();
+				shapes[index].size = shapes[index].size || new Vector2();
+				shapes[index].rot = shapes[index].rot || new Vector3();
 
-					this._shapes[i] = new Shape(
-						new Vector2(shapes[i].vec.x, shapes[i].vec.y),
-						new Vector2(shapes[i].size.x, shapes[i].pos.y),
-						new Vector3(shapes[i].rot.x, shapes[i].rot.y, shapes[i].rot.z),
-						shapes[i].type,
-						shapes[i].meta
-					);
-				}
+				this._shapes[index] = new Shape(
+					new Vector2(shapes[index].vec.x, shapes[index].vec.y),
+					new Vector2(shapes[index].size.x, shapes[index].pos.y),
+					new Vector3(shapes[index].rot.x, shapes[index].rot.y, shapes[index].rot.z),
+					shapes[index].type,
+					shapes[index].meta
+				);
 			}
-		}else if(typeof shapes === 'object'){
-			this._shapes = shapes;
-		}else{
-			this._shapes = {};
-		}
+		});
+	}
+
+	/**
+	 * @return int
+	 */
+	getId(){
+		return this._id;
 	}
 
 	/**
@@ -408,9 +404,9 @@ class Shape{
 
 	toArray(){
 		return {
-			vec: [this._vec.x, this._vec.y],
+			pos: [this._vec.x, this._vec.y],
 			size: [this._size.x, this._size.y],
-			rotation: [this._rotation.x, this._rotation.y, this._rotation.z],
+			rot: [this._rotation.x, this._rotation.y, this._rotation.z],
 			type: this._type,
 			meta: this._meta
 		};

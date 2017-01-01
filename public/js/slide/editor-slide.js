@@ -7,6 +7,7 @@ function Slide(data, workspace){
 	['id', 'pos', 'rot', 'size', 'order', 'meta'].forEach(function(v){
 		_this[v] = data[v];
 	});
+
 	this.type = 'slide';
 	this.meta.background = this.meta.background || '#fff';
 

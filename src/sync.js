@@ -1,6 +1,6 @@
 'use strict';
 
-const {DocumentManager, Document, Slide, Shape} = require('./document');
+const {Document, Slide, Shape} = require('./document');
 const {SessionManager} = require('./session');
 const {Vector3, Vector2} = require('./math');
 
@@ -31,40 +31,7 @@ class Sync{
 				if(!group){
 					socket.emit('send data', null); // there is no group found matching the document
 				}else{
-					const document = group.getDocument();
-
-					const slides = document.getSlides();
-					let slideArr = [];
-
-					Object.keys(slides).forEach(index => {
-						const slide = slides[index];
-
-						let shapesArr = [];
-
-						const shapes = slide.getShapes();
-						Object.keys(shapes).forEach(index => {
-							const shape = shapes[index];
-							shapesArr.push(shape.toArray());
-						});
-
-						const pos = slide.getPosition();
-						const rot = slide.getRotation();
-						slideArr.push({ // slide info
-							vec: [pos.getX(), pos.getY(), pos.getZ()],
-							rotation: [rot.getX(), rot.getY(), rot.getZ()],
-							order: slide.getOrder(),
-							meta: slide.getMetadata(),
-							shapes: shapesArr
-						});
-					});
-					socket.emit('send data', {
-						id: document.getId(),
-						name: document.getName(),
-						owner: document.getOwner(),
-						slides: slideArr,
-						invitation: document.getInvitations(),
-						lastSave: document.getLastSave()
-					});
+					socket.emit('send data', group.getDocument().toArray());
 				}
 			});
 
@@ -207,18 +174,35 @@ class Sync{
 
 				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
 					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
-				const slideId = group.getDocument().addSlide(new Slide(
+				const slide = new Slide(
+					-1,
 					new Vector3(data.pos.x, data.pos.y, data.pos.z),
 					new Vector2(data.size.x, data.size.y),
 					new Vector3(0, 0, 0), // default rotation is 0, 0, 0
 					data.order,
 					{}, // empty meta
 					{} // empty shapes
-				));
+				);
+				const slideId = group.getDocument().addSlide(slide);
+
+				const pos = slide.getPosition();
+				const rot = slide.getRotation();
+				const size = slide.getSize();
 
 				socket.emit('create slide', {
 					document: data.document,
-					slide: slideId
+					slide: slideId,
+					pos: {
+						x: pos.x, y: pos.y, z: pos.z
+					},
+					rot: {
+						x: rot.x, y: rot.y, z: rot.z
+					},
+					size: {
+						x: size.x, y: size.y
+					},
+					order: slide.getOrder(),
+					meta: slide.getMetadata()
 				}); // TODO Broadcast to group clients
 			});
 			// end create slide

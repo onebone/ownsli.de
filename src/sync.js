@@ -7,6 +7,19 @@ const {Vector3, Vector2} = require('./math');
 let io = null;
 let groups = {};
 
+/**
+ * @param {Group} group
+ * @param {string} type
+ * @param {Object} data
+ */
+const broadcast2group = (group, type, data) => {
+	const sockets = group.getSockets();
+	Object.keys(sockets).forEach(token => {
+		const socket = sockets[token];
+		socket.emit(type, data);
+	});
+};
+
 class Sync{
 	/**
 	 * This function not for general use
@@ -31,6 +44,8 @@ class Sync{
 				if(!group){
 					socket.emit('send data', null); // there is no group found matching the document
 				}else{
+					group.setSocket(session, socket);
+
 					socket.emit('send data', group.getDocument().toArray());
 				}
 			});
@@ -97,8 +112,8 @@ class Sync{
 					}
 				});
 
-				socket.emit('update slide', data);
-				// TODO: Broadcast to group clients
+				//socket.emit('update slide', data);
+				broadcast2group(group, 'update slide', data);
 			});
 			// end update slide
 
@@ -161,8 +176,8 @@ class Sync{
 					}
 				});
 
-				// TODO: broadcast update shape packet to group clients
-				socket.emit(data);
+				//socket.emit(data);
+				broadcast2group(group, 'update shape', data);
 			});
 			// end update shape
 
@@ -189,7 +204,7 @@ class Sync{
 				const rot = slide.getRotation();
 				const size = slide.getSize();
 
-				socket.emit('create slide', {
+				/*socket.emit('create slide', {
 					document: data.document,
 					slide: slideId,
 					pos: {
@@ -203,7 +218,22 @@ class Sync{
 					},
 					order: slide.getOrder(),
 					meta: slide.getMetadata()
-				}); // TODO Broadcast to group clients
+				});*/
+				broadcast2group(group, 'create slide', {
+					document: data.document,
+					slide: slideId,
+					pos: {
+						x: pos.x, y: pos.y, z: pos.z
+					},
+					rot: {
+						x: rot.x, y: rot.y, z: rot.z
+					},
+					size: {
+						x: size.x, y: size.y
+					},
+					order: slide.getOrder(),
+					meta: slide.getMetadata()
+				});
 			});
 			// end create slide
 
@@ -229,11 +259,16 @@ class Sync{
 					data.meta || {}
 				));
 
-				socket.emit('create shape', {
+				/*socket.emit('create shape', {
 					document: data.document,
 					slide: data.slide,
 					shape: shapeId
-				}); // TODO Broadcast to all group clients
+				});*/
+				broadcast2group(group, 'create shape', {
+					document: data.document,
+					slide: data.slide,
+					shape: shapeId
+				});
 			});
 			// end create shape
 		});
@@ -356,6 +391,7 @@ class Group{
 	constructor(document, ...sessions){
 		this._document = document;
 		this._sessions = sessions;
+		this._sockets = {};
 		this._creationTime = Date.now();
 
 		this._sessions.forEach((session) => {
@@ -365,6 +401,25 @@ class Group{
 
 			session.__setGroup(document.getId());
 		});
+	}
+
+	/**
+	 * @param {Session} session
+	 * @param socket
+	 */
+	setSocket(session, socket){
+		this._sockets[session.getToken()] = socket;
+	}
+
+	/**
+	 * @param {Session} session
+	 */
+	getSocket(session){
+		return this._sockets[session.getToken()] || null;
+	}
+
+	getSockets(){
+		return this._sockets;
 	}
 
 	/**
@@ -413,13 +468,13 @@ class Group{
 	 * @param {Session} sessions
 	 */
 	removeSession(...sessions){
-		const _this = this;
 		sessions.forEach((session) => {
-			_this._sessions.forEach((sess, index) =>{
+			this._sessions.forEach((sess, index) =>{
 				if(!sess) return;
 
 				if(sess.getUserId() === session.getUserId()){
-					_this._sessions.splice(index, 1);
+					this._sessions.splice(index, 1);
+					delete this._sockets[session.getToken()];
 				}
 			});
 		});

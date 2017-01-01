@@ -97,40 +97,24 @@ function Morph(node, target, is2D, deleteCallback, logCallback){
 	var lastNode = {x: parseInt(this['os-x']), y: parseInt(this['os-y'])};
 
 	this.interactableObject = interact(node)
-		.origin('self')
+		//.origin('self')
 		.draggable({})
 		.on('dragmove', function(event){
 			var ox = parseInt(_this['os-x']);
 			var oy = parseInt(_this['os-y']);
 
+			_this.updateNode();
+			var multiplier = 1;
 			if(logCallback){
-				var xSign = 1;
-				if(event.dx < 0){
-					xSign = -1;
-					event.dx = -event.dx;
-				}
-
-				var ySign = 1;
-				if(event.dy < 0){
-					ySign = -1;
-					event.dy = -event.dy;
-				}
-
-				event.dx = xSign * Math.pow(event.dx, 1 / logCallback());
-				event.dy = ySign * Math.pow(event.dy, 1 / logCallback());
+				multiplier = 1.5 / logCallback();
 			}
-
-			event.dx += ox - lastNode.x;
-			event.dy += oy - lastNode.y;
-
-			_this['os-x'] = ox + event.dx;
-			_this['os-y'] = oy + event.dy;
+			_this['os-x'] = ox + event.dx * multiplier;
+			_this['os-y'] = oy + event.dy * multiplier;
 
 			lastNode = {
 				x: ox,
 				y: oy
 			};
-			_this.updateNode();
 		});
 
 	this.anchors = ANCHORS.map(function(v){
@@ -152,7 +136,6 @@ function Morph(node, target, is2D, deleteCallback, logCallback){
 		var last = {w: initialScale.w, h: initialScale.h};
 
 		interact(anchor)
-			.origin('self')
 			.draggable({
 				origin: [initialScale.x, initialScale.y]
 			})
@@ -168,34 +151,41 @@ function Morph(node, target, is2D, deleteCallback, logCallback){
 			.on('dragmove', function(event){
 				//Original XYWH of object
 
-				if(logCallback){
+				/*if(logCallback){
 					var xSign = 1;
 					if(event.dx < 0){
-						xSign = -1;
+						xSign = -1.5;
 						event.dx = -event.dx;
 					}
 
 					var ySign = 1;
 					if(event.dy < 0){
-						ySign = -1;
+						ySign = -1.5;
 						event.dy = -event.dy;
 					}
 
 					event.dx = xSign * Math.pow(event.dx, 1 / logCallback());
 					event.dy = ySign * Math.pow(event.dy, 1 / logCallback());
+				}*/
+
+				var multiplier = 1;
+				if(logCallback){
+					multiplier = 1.3 / logCallback();
 				}
+				event.dx = event.dx * multiplier;
+				event.dy = event.dy * multiplier;
 
 				var ox = parseInt(_this['os-x']);
 				var oy = parseInt(_this['os-y']);
 				var ow = parseInt(_this['os-width']);
 				var oh = parseInt(_this['os-height']);
 
-				var needsRev = (v.do.includes('left') || v.do.includes('up')) && v.do !== 'right-up';
+				/*var needsRev = (v.do.includes('left') || v.do.includes('up')) && v.do !== 'right-up';
 				event.dx += (ow - last.w) * (needsRev ? -1 : 1);
 				event.dy += (oh - last.h) * (needsRev ? -1 : 1);
 				last = {
 					w: ow, h: oh
-				};
+				};*/
 				// FIXME 대각선으로 조정한 경우 다음 조정이 제대로 이루어지지 않음
 
 				//Updated values

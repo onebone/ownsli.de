@@ -75,9 +75,25 @@ body, html {
 	cursor: pointer;
 }
 
+#os-editor-dialogs {
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 10;
+	display: none;
+	justify-content: center;
+	align-items: center;
+	background: rgba(0, 0, 0, 0.7);
+}
+
 .os-dialog {
-	max-width: 600px;
-	max-height: 300px;
+	display: none;
+	background: #fff;
+	width: 600px;
+	height: 300px;
+	padding: 30px;
 	position: fixed;
 }
 
@@ -288,6 +304,16 @@ body, html {
 
 .dropdown-content li>a {
 	color: #808080;
+}
+
+.dialog-bottom {
+	position: absolute;
+	right: 1rem;
+	bottom: 1rem;
+}
+
+.waves-effect.waves-blue .waves-ripple {
+	 background-color: rgba(33, 150, 243, 0.65);
 }
 
 @keyframes showOverflow {

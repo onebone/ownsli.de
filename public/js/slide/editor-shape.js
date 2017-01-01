@@ -18,14 +18,15 @@ function Shape(data, parentSlide){
 		compareAttrName: 'data-os-shape-id',
 		remove: function(){
 			//TODO Removal
+			_this.morph = undefined;
 			_this.workspace.propertyEditor.bind(null);
 		},
 		destroy: function(){
+			_this.morph = undefined;
 			_this.workspace.propertyEditor.bind(null);
 		},
 		create: function(morph){
 			_this.morph = morph;
-			console.log(morph);
 			_this.workspace.propertyEditor.bind(_this, function(change){
 				//TODO socket
 
@@ -48,8 +49,13 @@ function Shape(data, parentSlide){
 	parentSlide.slideNode.append(this.node);
 }
 
+Shape.prototype.onUpdate = function(){
+	//TODO socket
+	this.parent.onUpdate();
+};
+
 Shape.prototype.convertToHTMLShape = function(){
-	this.type = 'html';
+	this.type = TYPE_HTML;
 	this.onUpdate();
 };
 var isInitFinished = true;
@@ -85,11 +91,43 @@ ImageShape.prototype.init = function(){
 };
 
 ImageShape.prototype.onEdit = function(){
+	var _this = this;
+	$('#os-editor-dialogs').style.display = 'flex';
 	$('#os-editor-image-edit-dialog').style.display = 'block';
+	$('#os-editor-image-src').value = _this.meta.src;
+	$('#imgdialog-ok').onclick = function(){
+		var preImg = document.createElement('img');
+		preImg.src = $('#os-editor-image-src').value;
+		preImg.onload = function(){
+			if(_this.morph !== undefined && _this.morphGenerator.morph !== undefined){
+				_this.morph['os-width'] = preImg.naturalWidth;
+				_this.morph['os-height'] = preImg.naturalHeight;
+				_this.morphGenerator.regenerate();
+			}
+			_this.node.setAttribute('data-os-width', preImg.naturalWidth);
+			_this.node.setAttribute('data-os-height', preImg.naturalHeight);
+			_this.node.style.width = preImg.naturalWidth + 'px';
+			_this.node.style.height = preImg.naturalHeight + 'px';
+			_this.size.x = preImg.naturalWidth;
+			_this.size.y = preImg.naturalHeight;
+			_this.meta.src = $('#os-editor-image-src').value;
+			_this.onUpdate();
+			$('#os-editor-dialogs').style.display = 'none';
+			$('#os-editor-image-edit-dialog').style.display = 'none';
+			$('#os-editor-image-src').value = '';
+		};
+	};
+
+	$('#imgdialog-cancel').onclick = function(){
+		$('#os-editor-dialogs').style.display = 'none';
+		$('#os-editor-image-edit-dialog').style.display = 'none';
+		$('#os-editor-image-src').value = '';
+	};
 };
 
 ImageShape.prototype.onUpdate = function(){
-	this.parent.onUpdate();
+	Shape.prototype.onUpdate.apply(this, arguments);
+	this.node.src = this.meta.src;
 };
 
 ImageShape.createShape = function(shapeData, slide, cb){

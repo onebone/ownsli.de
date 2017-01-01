@@ -11,6 +11,45 @@ function Slide(data, workspace){
 	this.meta.background = this.meta.background || '#fff';
 
 	this.workspace.document.slides[this.id] = this;
+
+	var slideNode = document.createElement('div');
+	slideNode.setAttribute('data-os-slide-id', _this.id);
+	_this.setEditableSlide(slideNode);
+
+	var previewNode = document.createElement('div');
+	previewNode.classList.add('os-editor-slidelist-slide');
+	previewNode.setAttribute('data-os-slide-id', _this.id);
+	_this.setSlidePreview(previewNode);
+
+	var layoutNode = document.createElement('div');
+	layoutNode.classList.add('os-editor-layout-slide');
+	layoutNode.setAttribute('data-os-slide-id', _this.id);
+	layoutNode.innerHTML = '#' + _this.order;
+	_this.setSlideLayout(layoutNode);
+
+	this.morphGenerator = new morph.ClickMorphWrapper(this.layoutNode, this.workspace.morphSpace, this, {
+		compareAttrName: 'data-os-slide-id',
+		remove: function(){
+			//TODO Removal
+			_this.workspace.propertyEditor.bind(null);
+		},
+		destroy: function(){
+			_this.workspace.propertyEditor.bind(null);
+		},
+		create: function(morph){
+			_this.morph = morph;
+			_this.workspace.propertyEditor.bind(_this, function(change){
+				//TODO socket
+				_this.onUpdate();
+			});
+		}
+	});
+
+	this.morphGenerator.bindProperty(function(changes){
+		//TODO socket
+		_this.workspace.propertyEditor.update();
+		_this.onUpdate();
+	});
 }
 
 Slide.createSlide = function(slideData, shapes, workspace, cb){
@@ -29,21 +68,6 @@ Slide.createSlide = function(slideData, shapes, workspace, cb){
 		slideData.id = data.slide;
 		var _this = new Slide(slideData, shapes, workspace);
 		isInitFinished = true;
-
-		var slideNode = document.createElement('div');
-		slideNode.setAttribute('data-os-slide-id', _this.id);
-		_this.setEditableSlide(slideNode);
-
-		var previewNode = document.createElement('div');
-		previewNode.classList.add('os-editor-slidelist-slide');
-		previewNode.setAttribute('data-os-slide-id', _this.id);
-		_this.setSlidePreview(previewNode);
-
-		var layoutNode = document.createElement('div');
-		layoutNode.classList.add('os-editor-layout-slide');
-		layoutNode.setAttribute('data-os-slide-id', _this.id);
-		layoutNode.innerHTML = '#' + _this.order;
-		_this.setSlideLayout(layoutNode);
 
 		cb(_this);
 	});
@@ -89,24 +113,6 @@ Slide.prototype.setSlideLayout = function(node){
 	_temp['os-height'] = _this.size.y;
 	_temp.updateNode();
 	_temp.destroy();
-
-	morph.clickMorph(this.layoutNode, this.workspace.morphSpace, this, {
-		compareAttrName: 'data-os-slide-id',
-		update: function(changes){
-			//TODO socket
-			_this.workspace.propertyEditor.update();
-			_this.onUpdate();
-		},
-		remove: function(){
-			//TODO Removal
-			_this.workspace.propertyEditor.bind(null);
-		},
-		create: function(){
-			_this.workspace.propertyEditor.bind(_this, function(){
-				_this.onUpdate();
-			});
-		}
-	});
 
 	$('#os-editor-layout').append(node);
 };

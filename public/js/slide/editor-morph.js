@@ -347,75 +347,46 @@ Morph.parseAnchorSyntax = function(statement, width, height){
 	.split(HEIGHT_HALF).join(Math.round(height / 2) + 'px');
 };
 
-Morph.clickMorph = function(node, morphSpace, object, options){
-	var morph = undefined;
-	var compareAttrName = options.compareAttrName || 'id';
-	var update = options.update || function(){};
-	var create = options.create || function(){};
-	var remove = options.remove;
+function ClickMorphWrapper(node, morphSpace, object, options){
+	this.morph = {};
+	this.node = node;
+	this.morphSpace = morphSpace;
+	this.object = object;
+
+	this.compareAttrName = options.compareAttrName || 'id';
+	this.create = options.create || function(){};
+	this.destroy = options.destroy;
+	this.remove = options.remove;
+
+	var _this = this;
 
 	node.addEventListener('click', function(evt){
-		if(morph) return;
-		create();
-		morph = new Morph(node, morphSpace, false, remove);
-
-		node.addEventListener('os:update', function(){
-			var changes = [];
-			if(object.pos.x !== morph['os-x']){
-				changes.push('os-x');
-				object.pos.x = morph['os-x'];
-			}
-
-			if(object.pos.y !== morph['os-y']){
-				changes.push('os-y');
-				object.pos.y = morph['os-y'];
-			}
-
-			if(object.pos.z !== morph['os-z']){
-				changes.push('os-z');
-				object.pos.z = morph['os-z'];
-			}
-
-			if(object.rot.x !== morph['os-rotation-x']){
-				changes.push('os-rotation-x');
-				object.rot.x = morph['os-rotation-x'];
-			}
-
-			if(object.rot.y !== morph['os-rotation-y']){
-				changes.push('os-rotation-y');
-				object.rot.y = morph['os-rotation-y'];
-			}
-
-			if(object.rot.z !== morph['os-rotation-z']){
-				changes.push('os-rotation-z');
-				object.rot.z = morph['os-rotation-z'];
-			}
-
-
-			if(object.size.x !== morph['os-width']){
-				changes.push('os-width');
-				object.size.x = morph['os-width'];
-			}
-
-			if(object.size.y !== morph['os-height']){
-				changes.push('os-height');
-				object.size.y = morph['os-height'];
-			}
-			update(changes);
-		});
-
+		_this.generate();
 		evt.stopPropagation();
 		evt.preventDefault();
+	});
+};
 
+ClickMorphWrapper.prototype.generate = function(noRegister){
+	var _this = this;
+	if(JSON.stringify(_this.morph) !== '{}') return;
+
+	_this.morph = new Morph(_this.node, _this.morphSpace, false, function(){
+		_this.remove();
+	});
+	_this.create(_this.morph);
+
+	if(!noRegister){
 		var handler = function(evt){
 			if(
 				!evt.target.classList.contains('os-morph-anchor')
-				&& evt.target.getAttribute(compareAttrName) !== node.getAttribute(compareAttrName)
+				&& evt.target.getAttribute(_this.compareAttrName) !== _this.node.getAttribute(_this.compareAttrName)
 				&& evt.target.parentNode.parentNode.id !== 'os-editor-property-editor'
 			){
 				//Mobile Fortress Destroyer
-				morph.destroy();
-				morph = undefined;
+				_this.morph.destroy();
+				_this.morph = {};
+				_this.destroy();
 				evt.preventDefault();
 			}else window.addEventListener('click', handler, {
 				once: true,
@@ -428,7 +399,69 @@ Morph.clickMorph = function(node, morphSpace, object, options){
 			once: true,
 			capture: true
 		});
+	}
+};
+
+ClickMorphWrapper.prototype.regenerate = function(){
+	this.morph.destroy();
+	this.morph = {};
+	this.destroy();
+	this.generate(true);
+};
+
+ClickMorphWrapper.prototype.bindProperty = function(update){
+	update = update || function(){};
+	var _this = this;
+
+	_this.node.addEventListener('os:update', function(){
+		var morph = _this.morph;
+		var node = _this.node;
+		var object = _this.object;
+
+		var changes = [];
+		if(object.pos.x !== morph['os-x']){
+			changes.push('os-x');
+			object.pos.x = morph['os-x'];
+		}
+
+		if(object.pos.y !== morph['os-y']){
+			changes.push('os-y');
+			object.pos.y = morph['os-y'];
+		}
+
+		if(object.pos.z !== morph['os-z']){
+			changes.push('os-z');
+			object.pos.z = morph['os-z'];
+		}
+
+		if(object.rot.x !== morph['os-rotation-x']){
+			changes.push('os-rotation-x');
+			object.rot.x = morph['os-rotation-x'];
+		}
+
+		if(object.rot.y !== morph['os-rotation-y']){
+			changes.push('os-rotation-y');
+			object.rot.y = morph['os-rotation-y'];
+		}
+
+		if(object.rot.z !== morph['os-rotation-z']){
+			changes.push('os-rotation-z');
+			object.rot.z = morph['os-rotation-z'];
+		}
+
+		if(object.size.x !== morph['os-width']){
+			changes.push('os-width');
+			object.size.x = morph['os-width'];
+		}
+
+		if(object.size.y !== morph['os-height']){
+			changes.push('os-height');
+			object.size.y = morph['os-height'];
+		}
+		update(changes);
 	});
 };
+
+Morph.ClickMorphWrapper = ClickMorphWrapper;
 
 module.exports = Morph;

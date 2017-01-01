@@ -43,9 +43,9 @@ socket.once('send data', function(event){
 		});
 
 		event.slides.forEach(function(v){
-			var slide = new slide(v, currentWorkspace);
+			var _slide = new slide(v, currentWorkspace);
 			v.shapes.forEach(function(s){
-				new shape(s, v);
+				new shape(s, _slide);
 			});
 		});
 

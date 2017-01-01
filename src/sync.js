@@ -180,7 +180,7 @@ class Sync{
 					new Vector2(data.size.x, data.size.y),
 					new Vector3(0, 0, 0), // default rotation is 0, 0, 0
 					data.order,
-					{}, // empty meta
+					data.meta || {}, // empty meta
 					{} // empty shapes
 				);
 				const slideId = group.getDocument().addSlide(slide);
@@ -209,15 +209,15 @@ class Sync{
 
 			// create shape
 			socket.on('create shape', (data) => {
-				if(typeof data.document !== 'string' || !data.size || !data.pos || typeof data.type !== 'number') return;
+				if(typeof data.document !== 'string' || !data.size || !data.pos || typeof data.type !== 'number' || typeof data.slide !== 'number') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
 
-				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
+				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number'
 					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
 				const slide = group.getDocument().getSlide(data.slide);
 				if(!slide){
-					delete data.packets[index];
+					//FIXME no packets in data. delete data.packets[index];
 					return;
 				}
 
@@ -226,7 +226,7 @@ class Sync{
 					new Vector3(0, 0, 0), // default rotation is 0,0,0
 					new Vector2(data.size.x, data.size.y),
 					data.type,
-					[]
+					data.meta || {}
 				));
 
 				socket.emit('create shape', {

@@ -11,6 +11,7 @@ socket.once('send data', function(event){
 		propertyEditor: '/js/slide/editor-property-editor.js',
 		workspace: '/js/slide/editor-workspace.js',
 		slide: '/js/slide/editor-slide.js',
+		shape: '/js/slide/editor-shape.js',
 		clock: '/js/slide/editor-clock.js'
 	}, function(err){
 		if(err){
@@ -22,7 +23,7 @@ socket.once('send data', function(event){
 		window.documentOwner = event.owner;
 
 		clock($('#os-editor-menu-clock'));
-		var currentWorkspace = new workspace(null, $('#os-editor-workspace'));
+		window.currentWorkspace = new workspace(null, $('#os-editor-workspace'));
 
 		$('#os-editor-menu-layout').addEventListener('click', function(){
 			$('#os-editor-layout-dialog').style.animationName = 'up';
@@ -36,10 +37,24 @@ socket.once('send data', function(event){
 			slide.createSlide({
 				pos: {x: 0, y: 0, z: 0},
 				rot: {x: 0, y: 0, z: 0},
-				size: {x: 200, y: 300},
+				size: {x: 300, y: 200},
 				order: currentWorkspace.lastOrder(),
 				meta: {}
 			}, currentWorkspace);
+		});
+
+		$('#os-editor-menu-insert-image').addEventListener('click', function(){
+			if(currentWorkspace.workingSlideId === undefined) return;
+			var slide = currentWorkspace.document.slides[currentWorkspace.workingSlideId];
+
+			if(!slide) return;
+
+			shape.ImageShape.createShape({
+				pos: {x: 0, y: 0},
+				rot: {x: 0, y: 0, z: 0},
+				size: {x: 100, y: 100},
+				meta: {}
+			}, slide);
 		});
 
 		Object.keys(event.slides).forEach(function(index){
@@ -49,16 +64,6 @@ socket.once('send data', function(event){
 				new shape(s, _slide);
 			});
 		});
-
-		/*var isCtrlPressing = false;
-
-		document.addEventListener('keydown', function(e){
-			if(e.which === 17) isCtrlPressing = true;
-		});
-
-		document.addEventListener('keyup', function(e){
-			if(e.which === 17) isCtrlPressing = false;
-		});*/
 
 		document.addEventListener('wheel', function(e){
 			if(e.ctrlKey){

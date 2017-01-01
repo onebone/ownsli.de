@@ -77,7 +77,8 @@ Slide.createSlide = function(slideData, shapes, workspace, cb){
 		document: documentId,
 		pos: slideData.pos,
 		size: slideData.size,
-		order: slideData.order
+		order: slideData.order,
+		meta: slideData.meta
 	});
 };
 
@@ -140,6 +141,7 @@ Slide.prototype.onUpdate = function(){
 		this.previewNode.style.height = this.size.y + 'px';
 		this.previewNode.style.background = this.meta.background;
 		this.previewNode.style.transform = "scale(" + resizeRate + ")";
+		this.previewNode.innerHTML = this.slideNode.innerHTML;
 
 		var wantedWidth = window.innerWidth - 420;
 		var editRate = wantedWidth / this.size.x;
@@ -158,7 +160,8 @@ Slide.prototype.toExportableData = function(){
 		pos: this.pos,
 		rot: this.rot,
 		size: this.size,
-		order: this.order
+		order: this.order,
+		meta: this.meta
 	};
 };
 

@@ -78,7 +78,7 @@ var ANCHORS = [
 Object.freeze(ANCHORS);
 
 //Morph 제작
-function Morph(node, target, is2D, deleteCallback){
+function Morph(node, target, is2D, deleteCallback, logCallback){
 	this.object = node;
 	this.boundObjects = [];
 	this.workspace = target;
@@ -102,6 +102,23 @@ function Morph(node, target, is2D, deleteCallback){
 		.on('dragmove', function(event){
 			var ox = parseInt(_this['os-x']);
 			var oy = parseInt(_this['os-y']);
+
+			if(logCallback){
+				var xSign = 1;
+				if(event.dx < 0){
+					xSign = -1;
+					event.dx = -event.dx;
+				}
+
+				var ySign = 1;
+				if(event.dy < 0){
+					ySign = -1;
+					event.dy = -event.dy;
+				}
+
+				event.dx = xSign * Math.pow(event.dx, 1 / logCallback());
+				event.dy = ySign * Math.pow(event.dy, 1 / logCallback());
+			}
 
 			event.dx += ox - lastNode.x;
 			event.dy += oy - lastNode.y;
@@ -150,6 +167,24 @@ function Morph(node, target, is2D, deleteCallback){
 			})
 			.on('dragmove', function(event){
 				//Original XYWH of object
+
+				if(logCallback){
+					var xSign = 1;
+					if(event.dx < 0){
+						xSign = -1;
+						event.dx = -event.dx;
+					}
+
+					var ySign = 1;
+					if(event.dy < 0){
+						ySign = -1;
+						event.dy = -event.dy;
+					}
+
+					event.dx = xSign * Math.pow(event.dx, 1 / logCallback());
+					event.dy = ySign * Math.pow(event.dy, 1 / logCallback());
+				}
+
 				var ox = parseInt(_this['os-x']);
 				var oy = parseInt(_this['os-y']);
 				var ow = parseInt(_this['os-width']);
@@ -357,6 +392,7 @@ function ClickMorphWrapper(node, morphSpace, object, options){
 	this.create = options.create || function(){};
 	this.destroy = options.destroy;
 	this.remove = options.remove;
+	this.logCallback = options.logCallback;
 
 	var _this = this;
 
@@ -373,7 +409,7 @@ ClickMorphWrapper.prototype.generate = function(noRegister){
 
 	_this.morph = new Morph(_this.node, _this.morphSpace, false, function(){
 		_this.remove();
-	});
+	}, this.logCallback);
 	_this.create(_this.morph);
 
 	if(!noRegister){
@@ -381,7 +417,8 @@ ClickMorphWrapper.prototype.generate = function(noRegister){
 			if(
 				!evt.target.classList.contains('os-morph-anchor')
 				&& evt.target.getAttribute(_this.compareAttrName) !== _this.node.getAttribute(_this.compareAttrName)
-				&& evt.target.parentNode.parentNode.id !== 'os-editor-property-editor'
+				&& !(evt.target.parentNode && evt.target.parentNode.id === 'os-editor-property-editor')
+				&& !(evt.target.parentNode && evt.target.parentNode.parentNode && evt.target.parentNode.parentNode.id === 'os-editor-property-editor')
 			){
 				//Mobile Fortress Destroyer
 				_this.morph.destroy();

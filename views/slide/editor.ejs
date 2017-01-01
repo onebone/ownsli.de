@@ -150,6 +150,13 @@
 						<%= translator('slide.editor.background') %>
 					</a>
 				</li>
+
+				<li>
+					<a id="os-editor-menu-font" href="#!">
+						<i class="mdi mdi-format-annotation-plus"></i>
+						<%= translator('slide.editor.newfont') %>
+					</a>
+				</li>
 			</ul>
 
 			<!-- Slide Insert Menu -->
@@ -178,7 +185,7 @@
 		<aside id="os-editor-slidelist">
 		</aside>
 
-		<aside id="os-editor-property-editor">
+		<aside id="os-editor-property-editor" data-os-property-editor-type="null">
 			<h3></h3>
 			<div class="input-field">
 				<input id="posx" type="number">
@@ -219,6 +226,11 @@
 				<input id="rotz" type="number">
 				<label for="rotz"><%= translator('slide.editor.property.rotz') %></label>
 			</div>
+
+			<button class="deep-orange btn waves-effect waves-light" type="button" id="os-edit-shape">
+				<i class="mdi mdi-pencil"></i>
+				<%= translator('slide.editor.edit.shape') %>
+			</button>
 		</aside>
 
 		<main id="os-editor-workspace">
@@ -233,18 +245,15 @@
 			</div>
 		</section>
 
-		<section id="os-editor-share-dialog"></section>
-		<section id="os-editor-code-edit-dialog"></section>
+		<section id="os-editor-share-dialog" class="os-dialog"></section>
+		<section id="os-editor-image-edit-dialog" class="os-dialog"></section>
+		<section id="os-editor-video-edit-dialog" class="os-dialog"></section>
+		<section id="os-editor-text-edit-dialog" class="os-dialog"></section>
+		<section id="os-editor-code-edit-dialog" class="os-dialog"></section>
+		<section id="os-editor-slidenote-edit-dialog" class="os-dialog"></section>
+		<section id="os-editor-new-font-dialog" class="os-dialog"></section>
+		<section id="os-editor-upload-resource-dialog" class="os-dialog"></section>
 
-		<script>
-			var TRANSLATION = {
-				'slide.editor.property.slide': '<%= translator("slide.editor.property.slide") %>',
-				'slide.editor.property.shape.richtext': '<%= translator("slide.editor.property.shape.richtext") %>',
-				'slide.editor.property.shape.image': '<%= translator("slide.editor.property.shape.image") %>',
-				'slide.editor.property.shape.video': '<%= translator("slide.editor.property.shape.video") %>',
-				'slide.editor.property.shape.html': '<%= translator("slide.editor.property.shape.html") %>'
-			};
-		</script>
 		<script>
 			(function(){
 				jQuery('#os-editor-menu-insert-shape').dropdown({

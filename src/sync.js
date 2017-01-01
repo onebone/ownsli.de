@@ -31,6 +31,7 @@ class Sync{
 				if(!group){
 					socket.emit('send data', null); // there is no group found matching the document
 				}else{
+					group.addSession(session);
 					group.setSocket(session, socket);
 
 					socket.emit('send data', group.getDocument().toArray());

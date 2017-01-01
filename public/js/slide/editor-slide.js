@@ -1,11 +1,3 @@
-var isInitFinished = true;
-
-socket.on('create slide', function(data){
-	data.id = data.slide;
-	var _this = new Slide(data, window.currentWorkspace);
-	isInitFinished = true;
-});
-
 function Slide(data, workspace){
 	this.workspace = workspace;
 	var _this = this;
@@ -82,24 +74,20 @@ function Slide(data, workspace){
 	});
 }
 
-Slide.createSlide = function(slideData, shapes, workspace){
-	if(!isInitFinished){
-		//To prevent slide id is jammed
-		setTimeout(function(){
-			Slide.createSlide.apply(this, arguments);
-		}, 1000);
-		return;
+Slide.createSlide = function(slideData, workspace, emit){
+	if(slideData.id !== undefined && Object.keys(workspace.document.slides).map(function(key){
+		return parseInt(key);
+	}).indexOf(slideData.id) !== -1) return console.log('aa');
+
+	if(emit !== false){
+		socket.emit('create slide', {
+			document: documentId,
+			pos: slideData.pos,
+			size: slideData.size,
+			order: slideData.order,
+			meta: slideData.meta
+		});
 	}
-
-	isInitFinished = false;
-
-	socket.emit('create slide', {
-		document: documentId,
-		pos: slideData.pos,
-		size: slideData.size,
-		order: slideData.order,
-		meta: slideData.meta
-	});
 };
 
 Slide.prototype.setEditableSlide = function(node){
@@ -197,5 +185,10 @@ Slide.prototype.toExportableData = function(){
 		meta: this.meta
 	};
 };
+
+socket.on('create slide', function(data){
+	data.id = data.slide;
+	new Slide(data, window.currentWorkspace);
+});
 
 module.exports = Slide;

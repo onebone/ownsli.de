@@ -41,7 +41,6 @@ class Sync{
 
 			// update slide
 			socket.on('update slide', (data) => {
-				console.log('update slide' , data);
 				if(typeof data.document !== 'string' || !Array.isArray(data.packets)) return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
@@ -104,7 +103,6 @@ class Sync{
 				});
 
 				//socket.emit('update slide', data);
-				console.log('send', data);
 				group.broadcast('update slide', data, session);
 			});
 			// end update slide
@@ -178,7 +176,6 @@ class Sync{
 				if(typeof data.document !== 'string' || typeof data.size  !== 'object' || typeof data.pos !== 'object' || typeof data.order !== 'number') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
-
 				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
 					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
 				const slide = new Slide(

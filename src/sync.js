@@ -265,7 +265,8 @@ class Sync{
 					pos: shape.getPosition(),
 					rot: shape.getRotation(),
 					size: shape.getSize(),
-					meta: shape.getMetadata()
+					meta: shape.getMetadata(),
+					type: shape.getType()
 				});
 			});
 			// end create shape

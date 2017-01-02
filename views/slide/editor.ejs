@@ -259,19 +259,82 @@
 					<a href="#!" class="waves-effect waves-orange btn-flat" id="imgdialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
 				</div>
 			</section>
-			<section id="os-editor-video-edit-dialog" class="os-dialog"></section>
-			<section id="os-editor-text-edit-dialog" class="os-dialog">
-				<textarea>
-				</textarea>
+
+			<section id="os-editor-video-edit-dialog" class="os-dialog">
+				<div class="input-field">
+					<input id="os-editor-video-src-raw" type="text">
+					<label for="os-editor-video-src-raw">
+						<%= translator('slide.editor.edit.videosrc') %>
+					</label>
+				</div>
+				<div class="ui horizontal divider">
+					Or
+				</div>
+				<div class="input-field">
+					<input id="os-editor-video-src-youtube" type="text">
+					<label for="os-editor-video-src-youtube">
+						<%= translator('slide.editor.edit.youtube') %>
+					</label>
+				</div>
 
 				<div class="dialog-bottom">
-					<a href="#!" class="waves-effect waves-blue btn-flat" id="imgdialog-ok"><%= translator('slide.editor.edit.ok') %></a>
-					<a href="#!" class="waves-effect waves-orange btn-flat" id="imgdialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
+					<a href="#!" class="waves-effect waves-blue btn-flat" id="viddialog-ok"><%= translator('slide.editor.edit.ok') %></a>
+					<a href="#!" class="waves-effect waves-orange btn-flat" id="viddialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
+				</div>
+			</section>
+
+			<section id="os-editor-text-edit-dialog" class="os-dialog">
+				<textarea id="os-editor-tinymce-attachment"></textarea>
+
+				<div class="dialog-bottom">
+					<a href="#!" class="waves-effect waves-blue btn-flat" id="txtdialog-ok"><%= translator('slide.editor.edit.ok') %></a>
+					<a href="#!" class="waves-effect waves-orange btn-flat" id="txtdialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
+				</div>
+			</section>
+			<section id="os-editor-shape-edit-dialog" class="os-dialog">
+				<div class="input-field">
+					<select id="os-editor-shape-type">
+						<option value="rectangle" selected><%= translator('slide.editor.shape.rectangle') %></option>
+						<option value="circle"><%= translator('slide.editor.shape.circle') %></option>
+					</select>
+					<label><%= translator('slide.editor.shape.type') %></label>
+				</div>
+				<br>
+				<div class="input-field">
+					<input id="os-editor-shape-color" class="color" type="text">
+					<label for="os-editor-shape-color">
+						<%= translator('slide.editor.edit.color') %>
+					</label>
+				</div>
+
+				<div class="dialog-bottom">
+					<a href="#!" class="waves-effect waves-blue btn-flat" id="shpdialog-ok"><%= translator('slide.editor.edit.ok') %></a>
+					<a href="#!" class="waves-effect waves-orange btn-flat" id="shpdialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
 				</div>
 			</section>
 			<section id="os-editor-code-edit-dialog" class="os-dialog"></section>
 			<section id="os-editor-slidenote-edit-dialog" class="os-dialog"></section>
-			<section id="os-editor-new-font-dialog" class="os-dialog"></section>
+			<section id="os-editor-background-edit-dialog" class="os-dialog">
+				<div class="input-field">
+					<input id="os-editor-background-src" type="text">
+					<label for="os-editor-background-src">
+						<%= translator('slide.editor.edit.imagesrc') %>
+					</label>
+				</div>
+				<div class="ui horizontal divider">
+					Or
+				</div>
+				<div class="input-field">
+					<input id="os-editor-background-color" class="color" type="text">
+					<label for="os-editor-background-color">
+						<%= translator('slide.editor.edit.color') %>
+					</label>
+				</div>
+				<div class="dialog-bottom">
+					<a href="#!" class="waves-effect waves-blue btn-flat" id="bgdialog-ok"><%= translator('slide.editor.edit.ok') %></a>
+					<a href="#!" class="waves-effect waves-orange btn-flat" id="bgdialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
+				</div>
+			</section>
 			<section id="os-editor-upload-resource-dialog" class="os-dialog"></section>
 		</section>
 
@@ -286,8 +349,14 @@
 					belowOrigin: false,
 					alignment: 'left'
 				});
+
+				jQuery(document).ready(function() {
+					jQuery('select').material_select();
+				});
 			})();
 		</script>
+		<script src="/color-picker/color.all.min.js"></script>
+		<script src="/color-picker/javascript_implementation/jsColorPicker.min.js"></script>
 		<script src="/tinymce/tinymce.min.js"></script>
 		<script src="/Sortable/Sortable.min.js"></script>
 		<script src="/socket.io-client/dist/socket.io.min.js"></script>

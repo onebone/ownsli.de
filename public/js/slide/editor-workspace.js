@@ -53,6 +53,8 @@ Workspace.prototype.resize = function(amount){
 	var scale = this.getWorkingSlideScale();
 	if(scale === null) return;
 
+	var workingSlide = this.getWorkingSlide();
+
 	if(amount < 0){
 		workingSlide.slideNode.style.transform = 'scale(' + (Math.min(10000, scale + 0.5)) + ')';
 	}else workingSlide.slideNode.style.transform = 'scale(' + (Math.max(0.0001, scale - 0.5)) + ')';

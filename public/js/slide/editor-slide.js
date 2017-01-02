@@ -201,6 +201,7 @@ socket.on('update slide', function(data){
 	console.log(data); // FIXME position does not work, size is too sensitive
 	if(Array.isArray(data.packets)){
 		data.packets.forEach(function(packet){
+			if(!packet) return console.log('aa'); //FIXME packet is null
 			var slide = window.currentWorkspace.document.slides[packet.slide];
 			if(!slide) return console.log('aa');
 

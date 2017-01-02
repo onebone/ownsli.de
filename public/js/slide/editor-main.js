@@ -57,6 +57,95 @@ socket.once('send data', function(event){
 			}, slide);
 		});
 
+		$('#os-editor-menu-insert-richtext').addEventListener('click', function(){
+			if(currentWorkspace.workingSlideId === undefined) return;
+			var slide = currentWorkspace.document.slides[currentWorkspace.workingSlideId];
+
+			if(!slide) return;
+
+			shape.TextShape.createShape({
+				pos: {x: 0, y: 0},
+				rot: {x: 0, y: 0, z: 0},
+				size: {x: 100, y: 100},
+				meta: {}
+			}, slide);
+		});
+
+		$('#os-editor-menu-insert-video').addEventListener('click', function(){
+			if(currentWorkspace.workingSlideId === undefined) return;
+			var slide = currentWorkspace.document.slides[currentWorkspace.workingSlideId];
+
+			if(!slide) return;
+
+			shape.VideoShape.createShape({
+				pos: {x: 0, y: 0},
+				rot: {x: 0, y: 0, z: 0},
+				size: {x: 100, y: 100},
+				meta: {}
+			}, slide);
+		});
+
+		$('#os-editor-menu-insert-rectangle').addEventListener('click', function(){
+			if(currentWorkspace.workingSlideId === undefined) return;
+			var slide = currentWorkspace.document.slides[currentWorkspace.workingSlideId];
+
+			if(!slide) return;
+
+			shape.RectangleShape.createShape({
+				pos: {x: 0, y: 0},
+				rot: {x: 0, y: 0, z: 0},
+				size: {x: 100, y: 100},
+				meta: {
+					type: 'rectangle'
+				}
+			}, slide);
+		});
+
+		$('#os-editor-menu-insert-circle').addEventListener('click', function(){
+			if(currentWorkspace.workingSlideId === undefined) return;
+			var slide = currentWorkspace.document.slides[currentWorkspace.workingSlideId];
+
+			if(!slide) return;
+
+			shape.RectangleShape.createShape({
+				pos: {x: 0, y: 0},
+				rot: {x: 0, y: 0, z: 0},
+				size: {x: 100, y: 100},
+				meta: {
+					type: 'circle'
+				}
+			}, slide);
+		});
+
+		const URL_REGEX = /^url\((.+)\)$/;
+		$('#os-editor-menu-background').addEventListener('click', function(){
+			var slide = currentWorkspace.getWorkingSlide();
+			if(!slide) return;
+
+			$('#os-editor-dialogs').style.display = 'flex';
+			$('#os-editor-background-edit-dialog').style.display = 'block';
+			var match = slide.meta.background.match(URL_REGEX);
+			if(match){
+				$('#os-editor-background-src').value = match[1];
+			}else{
+				$('#os-editor-background-color').value = slide.meta.background;
+			}
+
+			$('#bgdialog-ok').onclick = function(){
+				if($('#os-editor-background-src').value) slide.meta.background = 'url(' + $('#os-editor-background-src').value + ')';
+				else slide.meta.background = $('#os-editor-background-color').value;
+
+				slide.onUpdate();
+				$('#os-editor-dialogs').style.display = 'none';
+				$('#os-editor-background-edit-dialog').style.display = 'none';
+			};
+
+			$('#bgdialog-cancel').onclick = function(){
+				$('#os-editor-dialogs').style.display = 'none';
+				$('#os-editor-background-edit-dialog').style.display = 'none';
+			};
+		});
+
 		Object.keys(event.slides).sort(function(a, b){
 			return event.slides[a].order > event.slides[b].order ? 1 : -1;
 		}).forEach(function(index){
@@ -64,7 +153,7 @@ socket.once('send data', function(event){
 
 			var _slide = new slide(v, currentWorkspace);
 			v.shapes.forEach(function(s){
-				new shape(s, _slide);
+				shape.fromType(s, _slide);
 			});
 		});
 
@@ -77,7 +166,7 @@ socket.once('send data', function(event){
 		});
 
 		tinymce.init({
-			selector: 'textarea',
+			selector: '#os-editor-tinymce-attachment',
 			height: 500,
 			theme: 'modern',
 			plugins: [
@@ -87,9 +176,38 @@ socket.once('send data', function(event){
 				'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'
 			],
 			toolbar1: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
-			toolbar2: 'print preview media | forecolor backcolor emoticons | codesample | fontsizeselect fontselect',
+			toolbar2: 'print preview media | forecolor backcolor emoticons | codesample | fontsizeselect fontselect customfont',
+			setup: function(editor){
+				editor.addButton('customfont', {
+					text: 'New Font',
+					icon: false,
+					onclick: function() {
+						editor.windowManager.open({
+							title: 'New Font',
+							body: [
+								{type: 'Label', text: 'Enter your fontname.\n(warning: unless you upload your stylesheet, font may not be shown from other computers)'},
+								{type: 'textbox', name: 'fontname', label: 'FontName'}
+							],
+							onsubmit: function(e) {
+								// Insert content when the window form is submitted
+								editor.execCommand('FontName', false, e.data.fontname);
+							}
+						});
+					}
+				});
+			},
 			image_advtab: true
 		});
+	});
+
+	var colors = jsColorPicker('input.color', {
+		customBG: '#222',
+		readOnly: true,
+		// patch: false,
+		init: function(elm, colors){
+			elm.style.backgroundColor = elm.value;
+			elm.style.color = colors.rgbaMixCustom.luminance > 0.22 ? '#222' : '#ddd';
+		}
 	});
 });
 

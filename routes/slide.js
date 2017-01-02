@@ -1,6 +1,8 @@
 const {DocumentManager} = require('../src/document');
 const {SessionManager} = require('../src/session');
+const fs = require('fs');
 const multer = require('multer');
+const path = require('path');
 const Sync = require('../src/sync');
 
 const TITLE_REGEX = /^.{1,100}$/;
@@ -68,6 +70,17 @@ router.get('/edit/:id', (req, res, next) => {
 			// TODO: render document does not exist...
 		}
 	}).catch(console.error);
+});
+
+router.post('/upload', (req, res) => {
+	if(!req.session || !req.session.token) return res.redirect('/login');
+	const session = SessionManager.getSession(req.session.token);
+	if(session === null) return res.redirect('/login');
+
+	fs.readFile(req.files.uploadFile.path, (error, data) => {
+		const dest = path.join(__dirname, 'contents', req.files.uploadFile.name);
+		// todo
+	});
 });
 
 module.exports = router;

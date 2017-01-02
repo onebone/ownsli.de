@@ -5,6 +5,7 @@ const chalk = require('chalk');
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const favicon = require('serve-favicon');
+const fs = require('fs');
 const httpErrors = require('./src/error');
 const logger = require('morgan');
 const path = require('path');
@@ -12,6 +13,12 @@ const preventInjection = require('./src/prevent-injection');
 const requestLanguage = require('express-request-language');
 const resolveLanguage = require('./src/resolve-language');
 const session = require('express-session');
+
+try{
+	fs.mkdirSync(path.join(__dirname, 'contents'));
+}catch(e){
+	if(e.code !== 'EEXIST') throw e;
+}
 
 const app = express();
 

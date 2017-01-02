@@ -9,7 +9,8 @@
 			var ERROR_INVALID_FORM = 0;
 			var ERROR_INVALID_DATA = 1;
 			var ERROR_SERVER_SIDE = 2;
-			var ERROR_OTHER_ALREADY_LOGGED_IN = 3;
+			// err code 3 is changed to -> ERROR_ACCOUNT_ALREADY_EXIST
+			//var ERROR_OTHER_ALREADY_LOGGED_IN = 3;
 			var ERROR_ALREADY_LOGGED_IN = 4;
 
 			var elements = {};
@@ -39,9 +40,9 @@
 											case ERROR_SERVER_SIDE:
 												elements.info.innerHTML = '<%= translator("error.login.2") %>';
 												break;
-											case ERROR_OTHER_ALREADY_LOGGED_IN:
-												elements.info.innerHTML = '<%= translator("error.login.3") %>';
-												break;
+											//case ERROR_OTHER_ALREADY_LOGGED_IN:
+											//	elements.info.innerHTML = '<%= translator("error.login.3") %>';
+											//	break;
 											case ERROR_ALREADY_LOGGED_IN:
 												elements.info.innerHTML = '<%= translator("error.login.4") %>';
 												break;

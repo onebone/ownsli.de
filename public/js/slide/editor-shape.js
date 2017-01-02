@@ -56,13 +56,53 @@ function Shape(data, parentSlide){
 	this.morphGenerator.bindProperty(function(changes){
 		//TODO socket
 		_this.workspace.propertyEditor.update();
-		_this.onUpdate();
+		_this.onUpdate(changes);
 	});
 
 	parentSlide.slideNode.append(this.node);
 }
 
-Shape.prototype.onUpdate = function(){
+var lastSent = 0;
+Shape.prototype.onUpdate = function(changes){
+	if(Date.now() - lastSent > 50 && Array.isArray(changes) && changes.length > 0){
+		lastSent = Date.now();
+		var data = {};
+
+		var change;
+		while(change = changes.pop()){
+			switch(change){
+				case 'os-x':
+				case 'os-y':
+					data.pos = {
+						x: parseFloat(this.pos.x), y: parseFloat(this.pos.y)
+					};
+					break;
+				case 'os-rotation-x':
+				case 'os-rotation-y':
+				case 'os-rotation-z':
+					data.rot = {
+						x: parseFloat(this.rot.x), y: parseFloat(this.rot.y), z: parseFloat(this.rot.z)
+					};
+					break;
+				case 'os-width':
+				case 'os-height':
+					data.size = {
+						x: parseFloat(this.size.x), y: parseFloat(this.size.y)
+					};
+					break;
+			}
+		}
+
+		data.slide = this.parent.id;
+		data.shape = this.id;
+		socket.emit('update shape', {
+			document: documentId,
+			packets: [
+				data
+			]
+		});
+	}
+
 	//TODO socket
 	this.parent.onUpdate();
 };
@@ -396,6 +436,79 @@ RectangleShape.createShape = function(shapeData, slide, emit){
 		});
 	}
 };
+
+socket.on('update shape', function(data){
+	if(Array.isArray(data.packets)){
+		data.packets.forEach(function(packet){
+			if(!packet) return;
+
+			var slide = window.currentWorkspace.document.slides[packet.slide];
+			if(!slide) return;
+			var shape = slide.shapes[packet.shape];
+			if(!shape) return;
+
+			if(typeof packet.size === 'object'
+				&& typeof packet.size.x === 'number' && typeof packet.size.y === 'number'){
+				shape.size = {
+					x: packet.size.x, y: packet.size.y
+				};
+			}
+
+			if(typeof packet.pos === 'object'
+				&& typeof packet.pos.x === 'number' && typeof packet.pos.y === 'number'){
+				shape.pos = {
+					x: packet.pos.x, y: packet.pos.y
+				};
+			}
+
+			if(typeof packet.rot === 'object'
+				&& typeof packet.rot.x === 'number' && typeof packet.rot.y === 'number' && typeof packet.rot.z === 'number'){
+				shape.rot = {
+					x: packet.rot.x, y: packet.rot.y, z: packet.rot.z
+				};
+			}
+
+			var node = shape.node;
+
+			node.setAttribute('os-x', shape.pos.x);
+			node.setAttribute('os-y', shape.pos.y);
+			node.setAttribute('os-z', shape.pos.z);
+
+			node.setAttribute('os-rotation-x', shape.rot.x);
+			node.setAttribute('os-rotation-y', shape.rot.y);
+			node.setAttribute('os-rotation-z', shape.rot.z);
+
+			node.setAttribute('os-width', shape.size.x);
+			node.setAttribute('os-height', shape.size.y);
+
+			if(shape.morph){
+				shape.morph['os-x'] = shape.pos.x;
+				shape.morph['os-y'] = shape.pos.y;
+				shape.morph['os-rotation-x'] = shape.rot.x;
+				shape.morph['os-rotation-y'] = shape.rot.y;
+				shape.morph['os-rotation-z'] = shape.rot.z;
+				shape.morph['os-width'] = shape.size.x;
+				shape.morph['os-height'] = shape.size.y;
+
+				shape.morph.updateAnchor();
+			}
+
+			shape.workspace.propertyEditor.update();
+			shape.onUpdate();
+			console.log('yes shape update!');
+
+			node.style.width = shape.size.x + 'px';
+			node.style.height = shape.size.y + 'px';
+
+			var centerX = shape.pos.x + Math.round(shape.size.x / 2);
+			var centerY = shape.pos.y + Math.round(shape.size.y / 2);
+
+			node.style.transformOrigin = node.style.webkitTransformOrigin = node.style.mozTransformOrigin = node.style.msTransformOrigin =
+				centerX + 'px ' + centerY + 'px';
+			node.style.transform = "rotateX(" + shape.rot.x + "deg) rotateY(" + shape.rot.y + "deg) rotateZ(" + shape.rot.z + "deg) translate3d(" + shape.pos.x + "px, " + shape.pos.y + "px, 0px)";
+		});
+	}
+});
 
 socket.on('create shape', function(data){
 	var slide = window.currentWorkspace.document.slides[data.slide];

@@ -47,7 +47,7 @@ function Slide(data, workspace){
 	this.morphGenerator.bindProperty(function(changes){
 		//TODO socket
 		_this.workspace.propertyEditor.update();
-		_this.onUpdate();
+		_this.onUpdate(changes);
 	});
 
 	socket.on('update slide', function(data){
@@ -77,6 +77,7 @@ function Slide(data, workspace){
 				z: data.rot.z
 			};
 		}
+
 
 		_this.onUpdate(false);
 		//console.log(data);
@@ -136,7 +137,8 @@ Slide.prototype.setSlideLayout = function(node){
 	$('#os-editor-layout').append(node);
 };
 
-Slide.prototype.onUpdate = function(emit){
+var lastSent = 0;
+Slide.prototype.onUpdate = function(changes){
 	if(this.previewNode && this.slideNode){
 		var baseSize = this.size.x;
 		if(this.size.x < this.size.y) baseSize = this.size.y;
@@ -160,17 +162,42 @@ Slide.prototype.onUpdate = function(emit){
 		this.previewNode.style.transform = "scale(" + resizeRate + ")";
 		this.previewNode.innerHTML = this.slideNode.innerHTML;
 
-		if(emit !== false){
+		if(Date.now() - lastSent > 50 && Array.isArray(changes) && changes.length > 0){
+			lastSent = Date.now();
+
+			var data = {};
+
+			var change;
+			while(change = changes.pop()){
+				switch(change){
+					case 'os-x':
+					case 'os-y':
+					case 'os-z':
+						data.pos = {
+							x: parseFloat(_this.pos.x), y: parseFloat(_this.pos.y), z: parseFloat(_this.pos.z)
+						};
+						break;
+					case 'os-rotation-x':
+					case 'os-rotation-y':
+					case 'os-rotation-z':
+						data.rot = {
+							x: parseFloat(_this.rot.x), y: parseFloat(_this.rot.y), z: parseFloat(_this.rot.z)
+						};
+						break;
+					case 'os-width':
+					case 'os-height':
+						data.size = {
+							x: parseFloat(_this.size.x), y: parseFloat(_this.size.y)
+						};
+						break;
+				}
+			}
+
+			data.slide = this.id;
 			socket.emit('update slide', {
 				document: documentId,
 				packets: [
-					{
-						pos: {x: parseFloat(this.pos.x), y: parseFloat(this.pos.y), z: parseFloat(this.pos.z)},
-						rot: {x: parseFloat(this.rot.x), y: parseFloat(this.rot.y), z: parseFloat(this.rot.z)},
-						slide: this.id,
-						size: {x: parseFloat(this.size.x), y: parseFloat(this.size.y)},
-						meta: this.meta
-					}
+					data
 				]
 			});
 		}
@@ -198,7 +225,6 @@ Slide.prototype.toExportableData = function(){
 };
 
 socket.on('update slide', function(data){
-	console.log(data); // FIXME position does not work, size is too sensitive
 	if(Array.isArray(data.packets)){
 		data.packets.forEach(function(packet){
 			if(!packet) return console.log('aa'); //FIXME packet is null
@@ -219,7 +245,53 @@ socket.on('update slide', function(data){
 				};
 			}
 
-			slide.onUpdate(false);
+			if(typeof packet.rot === 'object'
+				&& typeof packet.rot.x === 'number' && typeof packet.rot.y === 'number' && typeof packet.rot.z === 'number'){
+				slide.rot = {
+					x: packet.rot.x, y: packet.rot.y, z: packet.rot.z
+				};
+			}
+
+			var node = slide.layoutNode;
+
+			node.setAttribute('os-x', slide.pos.x);
+			node.setAttribute('os-y', slide.pos.y);
+			node.setAttribute('os-z', slide.pos.z);
+
+			node.setAttribute('os-rotation-x', slide.rot.x);
+			node.setAttribute('os-rotation-y', slide.rot.y);
+			node.setAttribute('os-rotation-z', slide.rot.z);
+
+			node.setAttribute('os-width', slide.size.x);
+			node.setAttribute('os-height', slide.size.y);
+
+			if(slide.morph){
+				slide.morph['os-x'] = slide.pos.x;
+				slide.morph['os-y'] = slide.pos.y;
+				slide.morph['os-z'] = slide.pos.z;
+				slide.morph['os-rotation-x'] = slide.rot.x;
+				slide.morph['os-rotation-y'] = slide.rot.y;
+				slide.morph['os-rotation-z'] = slide.rot.z;
+				slide.morph['os-width'] = slide.size.x;
+				slide.morph['os-height'] = slide.size.y;
+
+				slide.morph.updateAnchor();
+			}
+
+			slide.workspace.propertyEditor.update();
+			slide.onUpdate();
+			console.log('yes update!');
+
+			node.style.width = slide.size.x + 'px';
+			node.style.height = slide.size.y + 'px';
+
+			var centerX = slide.pos.x + Math.round(slide.size.x / 2);
+			var centerY = slide.pos.y + Math.round(slide.size.y / 2);
+
+			node.style.transformOrigin = node.style.webkitTransformOrigin = node.style.mozTransformOrigin = node.style.msTransformOrigin =
+				centerX + 'px ' + centerY + 'px';
+			node.style.transform = "rotateX(" + slide.rot.x + "deg) rotateY(" + slide.rot.y + "deg) rotateZ(" + slide.rot.z + "deg) translate3d(" + slide.pos.x + "px, " + slide.pos.y + "px, " + slide.pos.z + "px)";
+
 		});
 	}
 });

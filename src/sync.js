@@ -44,7 +44,6 @@ class Sync{
 				if(typeof data.document !== 'string' || !Array.isArray(data.packets)) return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
-				console.log('a');
 
 				data.packets.forEach((pk, index) => {
 					if(!pk || typeof pk.slide !== 'number'){
@@ -116,7 +115,7 @@ class Sync{
 				if(!group || !group.hasSession(session)) return;
 
 				data.packets.forEach((pk, index) =>{
-					if(typeof pk.slide !== 'number' || typeof pk.shape !== 'number'){
+					if(!pk || typeof pk.slide !== 'number' || typeof pk.shape !== 'number'){
 						delete data.packets[index];
 						return;
 					}
@@ -169,13 +168,13 @@ class Sync{
 				});
 
 				//socket.emit(data);
-				group.broadcast('update shape', data);
+				group.broadcast('update shape', data, session);
 			});
 			// end update shape
 
 			// create slide
 			socket.on('create slide', (data) => {
-				if(typeof data.document !== 'string' || !data.size || !data.pos || typeof data.order !== 'number') return;
+				if(typeof data.document !== 'string' || typeof data.size  !== 'object' || typeof data.pos !== 'object' || typeof data.order !== 'number') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
 

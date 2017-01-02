@@ -64,7 +64,9 @@ socket.once('send data', function(event){
 
 			var _slide = new slide(v, currentWorkspace);
 			v.shapes.forEach(function(s){
-				new shape(s, _slide);
+				if(s.type === 2){ // TYPE_IMAGE
+					new shape.ImageShape(s, _slide);
+				}
 			});
 		});
 

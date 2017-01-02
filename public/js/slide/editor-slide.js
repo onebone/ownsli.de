@@ -163,6 +163,8 @@ Slide.prototype.onUpdate = function(changes){
 		this.previewNode.innerHTML = this.slideNode.innerHTML;
 
 		if(Date.now() - lastSent > 50 && Array.isArray(changes) && changes.length > 0){
+			lastSent = Date.now();
+
 			var data = {};
 
 			var change;
@@ -276,7 +278,7 @@ socket.on('update slide', function(data){
 			}
 
 			slide.workspace.propertyEditor.update();
-			slide.onUpdate(false);
+			slide.onUpdate();
 			console.log('yes update!');
 
 			node.style.width = slide.size.x + 'px';

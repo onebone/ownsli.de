@@ -85,9 +85,25 @@ class Document{
 	 */
 	addSlide(slide){
 		if(!slide) return -1;
-
 		this._slides[slideId] = slide;
+
+		this.reorderSlides();
 		return slideId++;
+	}
+
+	reorderSlides(){
+		let i = 1;
+		this._slides = Object.keys(this._slides).sort((a, b) => {
+			const s1 = this._slides[a];
+			const s2 = this._slides[b];
+			return s1.getOrder() > s2.getOrder() ? 1 : -1;
+		}).reduce((obj, key) => {
+			const slide = this._slides[key];
+			slide.setOrder(i++);
+			obj[slide.getId()] = slide;
+
+			return obj;
+		}, {});
 	}
 
 	/**
@@ -183,7 +199,10 @@ class Slide{
 	 * @param {object} shapes       | Shapes which is included in slide
 	 */
 	constructor(id, vec, size, rotation, order, meta, shapes){
-		this._id = id || slideId++;
+		if(id < 0){
+			id = slideId++;
+		}
+		this._id = id;
 		if(this._id >= slideId){
 			slideId = this._id + 1;
 		}

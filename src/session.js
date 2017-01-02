@@ -26,8 +26,7 @@ class SessionManager{
 		if(sessions[token]){
 			const session = sessions[token];
 			require('./sync').leaveSession(session); // wtf...
-
-			sessions.delete(token);
+			delete sessions[token];
 			return true;
 		}
 

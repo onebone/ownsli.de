@@ -316,7 +316,9 @@ class Sync{
 		sessions.forEach((session) => {
 			const document = session.getGroup();
 
-			groups[document].removeSession(session);
+			if(document && groups[document]){
+				groups[document].removeSession(session);
+			}
 		});
 	}
 

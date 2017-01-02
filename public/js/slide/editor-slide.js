@@ -47,7 +47,7 @@ function Slide(data, workspace){
 	this.morphGenerator.bindProperty(function(changes){
 		//TODO socket
 		_this.workspace.propertyEditor.update();
-		_this.onUpdate();
+		_this.onUpdate(changes);
 	});
 
 	socket.on('update slide', function(data){
@@ -138,7 +138,7 @@ Slide.prototype.setSlideLayout = function(node){
 };
 
 var lastSent = 0;
-Slide.prototype.onUpdate = function(emit){
+Slide.prototype.onUpdate = function(changes){
 	if(this.previewNode && this.slideNode){
 		var baseSize = this.size.x;
 		if(this.size.x < this.size.y) baseSize = this.size.y;
@@ -162,18 +162,40 @@ Slide.prototype.onUpdate = function(emit){
 		this.previewNode.style.transform = "scale(" + resizeRate + ")";
 		this.previewNode.innerHTML = this.slideNode.innerHTML;
 
-		if(Date.now() - lastSent > 50 && emit !== false){
-			socket.emit('update slide', { // todo send delta
+		if(Date.now() - lastSent > 50 && Array.isArray(changes) && changes.length > 0){
+			var data = {};
+
+			var change;
+			while(change = changes.pop()){
+				switch(change){
+					case 'os-x':
+					case 'os-y':
+					case 'os-z':
+						data.pos = {
+							x: parseFloat(_this.pos.x), y: parseFloat(_this.pos.y), z: parseFloat(_this.pos.z)
+						};
+						break;
+					case 'os-rotation-x':
+					case 'os-rotation-y':
+					case 'os-rotation-z':
+						data.rot = {
+							x: parseFloat(_this.rot.x), y: parseFloat(_this.rot.y), z: parseFloat(_this.rot.z)
+						};
+						break;
+					case 'os-width':
+					case 'os-height':
+						data.size = {
+							x: parseFloat(_this.size.x), y: parseFloat(_this.size.y)
+						};
+						break;
+				}
+			}
+
+			data.slide = this.id;
+			socket.emit('update slide', {
 				document: documentId,
 				packets: [
-					{
-						pos: {x: parseFloat(this.pos.x), y: parseFloat(this.pos.y), z: parseFloat(this.pos.z)},
-						rot: {x: parseFloat(this.rot.x), y: parseFloat(this.rot.y), z: parseFloat(this.rot.z)},
-						slide: this.id,
-						order: this.order,
-						size: {x: parseFloat(this.size.x), y: parseFloat(this.size.y)},
-						meta: this.meta
-					}
+					data
 				]
 			});
 		}
@@ -201,7 +223,6 @@ Slide.prototype.toExportableData = function(){
 };
 
 socket.on('update slide', function(data){
-	console.log(data); // FIXME position does not work, size is too sensitive
 	if(Array.isArray(data.packets)){
 		data.packets.forEach(function(packet){
 			var slide = window.currentWorkspace.document.slides[packet.slide];

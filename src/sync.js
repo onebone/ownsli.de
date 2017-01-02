@@ -1,8 +1,9 @@
 'use strict';
 
-const {Document, Slide, Shape} = require('./document');
+const {DocumentManager, Document, Slide, Shape} = require('./document');
 const {SessionManager} = require('./session');
 const {Vector3, Vector2} = require('./math');
+const timers = require('timers');
 
 let io = null;
 let groups = {};
@@ -269,6 +270,14 @@ class Sync{
 				});
 			});
 			// end create shape
+
+			socket.on('save', (data) => {
+				if(typeof data.document !== 'string') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				DocumentManager.saveDocument(group.getDocument());
+			});
 		});
 	}
 
@@ -401,6 +410,14 @@ class Group{
 
 			session.__setGroup(document.getId());
 		});
+
+		timers.setTimeout(this.save.bind(this), 10000); // save every 10 seconds
+	}
+
+	save(){
+		DocumentManager.saveDocument(this._document);
+
+		timers.setTimeout(this.save.bind(this), 10000); // save every 10 seconds
 	}
 
 	/**

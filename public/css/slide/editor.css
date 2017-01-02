@@ -209,6 +209,11 @@ body, html {
 	position: absolute;
 }
 
+#os-editor-workspace>*[data-os-slide-id] {
+	background-size: cover !important;
+	background-position: center center !important;
+}
+
 #os-editor-layout-dialog {
 	background: #111;
 	display: flex;
@@ -307,9 +312,22 @@ body, html {
 	width: 100%;
 }
 
-#os-editor-text-edit-dialog {
+#os-editor-text-edit-dialog, #os-editor-code-edit-dialog {
 	width: 800px;
 	height: 750px;
+}
+
+#os-editor-code-edit-dialog .tabular-edit {
+	height: 600px;
+}
+
+#os-editor-slidenote-edit {
+	height: calc(100% - 30px);
+}
+
+.tabular-edit>div {
+	width: 100%;
+	height: 100%;
 }
 
 .material-tooltip .backdrop {

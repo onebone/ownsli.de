@@ -312,8 +312,45 @@
 					<a href="#!" class="waves-effect waves-orange btn-flat" id="shpdialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
 				</div>
 			</section>
-			<section id="os-editor-code-edit-dialog" class="os-dialog"></section>
-			<section id="os-editor-slidenote-edit-dialog" class="os-dialog"></section>
+
+			<section id="os-editor-code-edit-dialog" class="os-dialog">
+				<div class="row">
+					<div class="col s12">
+						<ul class="tabs">
+							<li class="tab col s4"><a class="active" href="#os-html-tab">HTML</a></li>
+							<li class="tab col s4"><a href="#os-css-tab">CSS</a></li>
+							<li class="tab col s4"><a href="#os-js-tab">JS</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div id="os-html-tab" class="tabular-edit">
+					<div id="htmleditor"></div>
+				</div>
+
+				<div id="os-css-tab" class="tabular-edit">
+					<div id="csseditor"></div>
+				</div>
+
+				<div id="os-js-tab" class="tabular-edit">
+					<div id="jseditor"></div>
+				</div>
+
+				<div class="dialog-bottom">
+					<a href="#!" class="waves-effect waves-blue btn-flat" id="codedialog-ok"><%= translator('slide.editor.edit.ok') %></a>
+					<a href="#!" class="waves-effect waves-orange btn-flat" id="codedialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
+				</div>
+			</section>
+
+			<section id="os-editor-slidenote-edit-dialog" class="os-dialog">
+				<textarea id="os-editor-slidenote-edit"></textarea>
+
+				<div class="dialog-bottom">
+					<a href="#!" class="waves-effect waves-blue btn-flat" id="sndialog-ok"><%= translator('slide.editor.edit.ok') %></a>
+					<a href="#!" class="waves-effect waves-orange btn-flat" id="sndialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
+				</div>
+			</section>
+
 			<section id="os-editor-background-edit-dialog" class="os-dialog">
 				<div class="input-field">
 					<input id="os-editor-background-src" type="text">
@@ -352,9 +389,21 @@
 
 				jQuery(document).ready(function() {
 					jQuery('select').material_select();
+					jQuery('ul.tabs').tabs({
+						onShow: function(){
+							if(window.htmleditor) htmleditor.resize();
+							if(window.jseditor) jseditor.resize();
+							if(window.csseditor) csseditor.resize();
+						}
+					});
 				});
 			})();
 		</script>
+		<script src="/ace-builds/src-min-noconflict/ace.js"></script>
+		<script src="/ace-builds/src-min-noconflict/theme-monokai.js"></script>
+		<script src="/ace-builds/src-min-noconflict/mode-html.js"></script>
+		<script src="/ace-builds/src-min-noconflict/mode-javascript.js"></script>
+		<script src="/ace-builds/src-min-noconflict/mode-css.js"></script>
 		<script src="/color-picker/color.all.min.js"></script>
 		<script src="/color-picker/javascript_implementation/jsColorPicker.min.js"></script>
 		<script src="/tinymce/tinymce.min.js"></script>

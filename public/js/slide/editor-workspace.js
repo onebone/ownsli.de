@@ -7,9 +7,22 @@ function Workspace(slideRoot, workspaceRoot){
 		slides: {}
 	};
 
+	var _this = this;
 	Sortable.create($('#os-editor-slidelist'), {
 		onUpdate: function(evt){
-			//TODO socket emit swap order
+			var newOrder = {};
+			Array.prototype.forEach.call($('#os-editor-slidelist').children, function(elem, index){
+				var id = parseInt(elem.querySelector('.os-editor-slidelist-slide').getAttribute('data-os-slide-id'));
+				_this.document.slides[id].order
+					= index + 1;
+				elem.querySelector('.os-editor-slidelist-indicator').innerText = index + 1;
+				newOrder[index + 1] = id;
+			});
+
+			socket.emit('update order', {
+				document: documentId,
+				orders: newOrder
+			});
 		}
 	});
 

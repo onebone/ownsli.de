@@ -67,7 +67,6 @@ slide| int | Id of slide
 shape| int | Id of shape
 ...args| mixed | Arguments
 
-
 # Packets
 ## update slide
 Name | Type | Description
@@ -124,12 +123,11 @@ document | string | Id of document
 slide| int | Id of slide
 shape | int | Id of shape
 
-## swap order
+## update order
 Name | Type | Description
 -----|------|------------
 document | string | Id of document
-slide1| int | Id of slide1
-slide2| int | Id of slide2
+orders| object | key: order, value: slideId
 
 ## request data
 Name | Type | Description

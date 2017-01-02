@@ -321,6 +321,10 @@ body, html {
 	height: 600px;
 }
 
+#os-editor-slidenote-edit {
+	height: calc(100% - 30px);
+}
+
 .tabular-edit>div {
 	width: 100%;
 	height: 100%;

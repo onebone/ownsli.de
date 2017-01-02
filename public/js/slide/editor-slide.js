@@ -8,6 +8,7 @@ function Slide(data, workspace){
 
 	this.type = 'slide';
 	this.meta.background = this.meta.background || '#fff';
+	this.meta.note = this.meta.note || '';
 
 	this.workspace.document.slides[this.id] = this;
 

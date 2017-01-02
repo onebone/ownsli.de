@@ -147,6 +147,27 @@ socket.once('send data', function(event){
 			}, slide);
 		});
 
+		$('#os-editor-menu-insert-note').addEventListener('click', function(){
+			var slide = currentWorkspace.getWorkingSlide();
+			if(!slide) return;
+
+			$('#os-editor-dialogs').style.display = 'flex';
+		    $('#os-editor-slidenote-edit-dialog').style.display = 'block';
+
+			$('#os-editor-slidenote-edit').value = slide.meta.note;
+			$('#sndialog-ok').onclick = function(){
+				slide.meta.note = $('#os-editor-slidenote-edit').value;
+				slide.onUpdate();
+				$('#os-editor-dialogs').style.display = 'none';
+				$('#os-editor-background-edit-dialog').style.display = 'none';
+			};
+
+			$('#sndialog-cancel').onclick = function(){
+				$('#os-editor-dialogs').style.display = 'none';
+				$('#os-editor-background-edit-dialog').style.display = 'none';
+			};
+		});
+
 		const URL_REGEX = /^url\((.+)\)$/;
 		$('#os-editor-menu-background').addEventListener('click', function(){
 			var slide = currentWorkspace.getWorkingSlide();

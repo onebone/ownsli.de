@@ -391,7 +391,7 @@ function ClickMorphWrapper(node, morphSpace, object, options){
 		evt.stopPropagation();
 		evt.preventDefault();
 	});
-};
+}
 
 ClickMorphWrapper.prototype.generate = function(noRegister){
 	var _this = this;

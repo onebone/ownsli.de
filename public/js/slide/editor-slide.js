@@ -50,7 +50,7 @@ function Slide(data, workspace){
 		_this.onUpdate();
 	});
 
-	socket.on('update slide', function(data){
+	socket.on('update slide', function(data)
 		if(typeof data.size === 'object'
 			&& typeof data.size.x === 'number' && typeof data.size.y === 'number'&& typeof data.size.z === 'number'){
 			this.size = {
@@ -77,6 +77,7 @@ function Slide(data, workspace){
 				z: data.rot.z
 			};
 		}
+
 
 		_this.onUpdate(false);
 		//console.log(data);
@@ -136,6 +137,7 @@ Slide.prototype.setSlideLayout = function(node){
 	$('#os-editor-layout').append(node);
 };
 
+var lastSent = 0;
 Slide.prototype.onUpdate = function(emit){
 	if(this.previewNode && this.slideNode){
 		var baseSize = this.size.x;
@@ -160,14 +162,15 @@ Slide.prototype.onUpdate = function(emit){
 		this.previewNode.style.transform = "scale(" + resizeRate + ")";
 		this.previewNode.innerHTML = this.slideNode.innerHTML;
 
-		if(emit !== false){
-			socket.emit('update slide', {
+		if(Date.now() - lastSent > 50 && emit !== false){
+			socket.emit('update slide', { // todo send delta
 				document: documentId,
 				packets: [
 					{
 						pos: {x: parseFloat(this.pos.x), y: parseFloat(this.pos.y), z: parseFloat(this.pos.z)},
 						rot: {x: parseFloat(this.rot.x), y: parseFloat(this.rot.y), z: parseFloat(this.rot.z)},
 						slide: this.id,
+						order: this.order,
 						size: {x: parseFloat(this.size.x), y: parseFloat(this.size.y)},
 						meta: this.meta
 					}
@@ -218,7 +221,53 @@ socket.on('update slide', function(data){
 				};
 			}
 
+			if(typeof packet.rot === 'object'
+				&& typeof packet.rot.x === 'number' && typeof packet.rot.y === 'number' && typeof packet.rot.z === 'number'){
+				slide.rot = {
+					x: packet.rot.x, y: packet.rot.y, z: packet.rot.z
+				};
+			}
+
+			var node = slide.layoutNode;
+
+			node.setAttribute('os-x', slide.pos.x);
+			node.setAttribute('os-y', slide.pos.y);
+			node.setAttribute('os-z', slide.pos.z);
+
+			node.setAttribute('os-rotation-x', slide.rot.x);
+			node.setAttribute('os-rotation-y', slide.rot.y);
+			node.setAttribute('os-rotation-z', slide.rot.z);
+
+			node.setAttribute('os-width', slide.size.x);
+			node.setAttribute('os-height', slide.size.y);
+
+			if(slide.morph){
+				slide.morph['os-x'] = slide.pos.x;
+				slide.morph['os-y'] = slide.pos.y;
+				slide.morph['os-z'] = slide.pos.z;
+				slide.morph['os-rotation-x'] = slide.rot.x;
+				slide.morph['os-rotation-y'] = slide.rot.y;
+				slide.morph['os-rotation-z'] = slide.rot.z;
+				slide.morph['os-width'] = slide.size.x;
+				slide.morph['os-height'] = slide.size.y;
+
+				slide.morph.updateAnchor();
+			}
+
+			slide.workspace.propertyEditor.update();
 			slide.onUpdate(false);
+			console.log('yes update!');
+
+			node.style.width = slide.size.x + 'px';
+			node.style.height = slide.size.y + 'px';
+
+			var centerX = slide.pos.x + Math.round(slide.size.x / 2);
+			var centerY = slide.pos.y + Math.round(slide.size.y / 2);
+
+			node.style.transformOrigin = node.style.webkitTransformOrigin = node.style.mozTransformOrigin = node.style.msTransformOrigin =
+				centerX + 'px ' + centerY + 'px';
+			node.style.transform = "rotateX(" + slide.rot.x + "deg) rotateY(" + slide.rot.y + "deg) rotateZ(" + slide.rot.z + "deg) translate3d(" + slide.pos.x + "px, " + slide.pos.y + "px, " + slide.pos.z + "px)";
+
 		});
 	}
 });

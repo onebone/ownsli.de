@@ -47,7 +47,7 @@ class Sync{
 				console.log('a');
 
 				data.packets.forEach((pk, index) => {
-					if(typeof pk.slide !== 'number'){
+					if(!pk || typeof pk.slide !== 'number'){
 						delete data.packets[index];
 						return;
 					}
@@ -105,7 +105,7 @@ class Sync{
 
 				//socket.emit('update slide', data);
 				console.log('send', data);
-				group.broadcast('update slide', data);
+				group.broadcast('update slide', data, session);
 			});
 			// end update slide
 
@@ -423,9 +423,11 @@ class Group{
 	/**
 	 * @param {string} type
 	 * @param {Object} data
+	 * @param {Session} except
 	 */
-	broadcast(type, data){
+	broadcast(type, data, except = null){
 		Object.keys(this._sockets).forEach(token => {
+			if(except && except.getToken() === token) return;
 			const socket = this._sockets[token];
 			socket.emit(type, data);
 		});

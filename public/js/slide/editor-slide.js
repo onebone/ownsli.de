@@ -50,7 +50,7 @@ function Slide(data, workspace){
 		_this.onUpdate();
 	});
 
-	socket.on('update slide', function(data)
+	socket.on('update slide', function(data){
 		if(typeof data.size === 'object'
 			&& typeof data.size.x === 'number' && typeof data.size.y === 'number'&& typeof data.size.z === 'number'){
 			this.size = {

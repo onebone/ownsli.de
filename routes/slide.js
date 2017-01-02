@@ -41,11 +41,6 @@ router.post('/create/', (req, res, next) => {
 	});
 });
 
-//TODO upload resource
-router.post('/upload/:id', (req, res, next) => {
-
-});
-
 router.get('/share/:id/:user', (req, res, next) => {
 	//TODO Add sharing function
 });
@@ -72,15 +67,37 @@ router.get('/edit/:id', (req, res, next) => {
 	}).catch(console.error);
 });
 
-router.post('/upload', (req, res) => {
+router.post('/upload', (req, res, next) => {
 	if(!req.session || !req.session.token) return res.redirect('/login');
 	const session = SessionManager.getSession(req.session.token);
 	if(session === null) return res.redirect('/login');
 
-	fs.readFile(req.files.uploadFile.path, (error, data) => {
-		const dest = path.join(__dirname, 'contents', req.files.uploadFile.name);
-		// todo
-	});
+	let group;
+	if(session.getGroup() && (group = Sync.getGroup(session.getGroup()))){
+		fs.readFile(req.files.uploadFile.path, (err, data) => {
+			if(err) return res.json({
+				res: false
+			});
+
+			try{
+				fs.mkdirSync(path.join(__dirname, 'contents', group.getDocument().getId()));
+			}catch(e){
+				if(e.code !== 'EEXIST') return res.json({
+					res: false
+				});
+			}
+			const dest = path.join(__dirname, 'contents', group.getDocument().getId(), req.files.uploadFile.name);
+			fs.writeFile(dest, data, (err) => {
+				if(err) return res.json({
+					res: false
+				});
+
+				res.json({
+					res: true
+				});
+			});
+		});
+	}
 });
 
 module.exports = router;

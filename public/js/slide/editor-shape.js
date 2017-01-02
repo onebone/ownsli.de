@@ -30,7 +30,18 @@ function Shape(data, parentSlide){
 	this.morphGenerator = new morph.ClickMorphWrapper(this.node, this.parent.slideNode, this, {
 		compareAttrName: 'data-os-shape-id',
 		remove: function(){
-			//TODO Removal
+			if(_this.morphGenerator && _this.morphGenerator.morph && _this.morphGenerator.morph.destroy)
+				_this.morphGenerator.morph.destroy();
+			socket.emit('delete shape', {
+				document: documentId,
+				slide: _this.parent.id,
+				shape: _this.id
+			});
+
+			_this.node.remove();
+			_this.parent.onUpdate();
+			delete _this.parent.shapes[_this.id];
+
 			_this.morph = undefined;
 			_this.workspace.propertyEditor.bind(null);
 		},

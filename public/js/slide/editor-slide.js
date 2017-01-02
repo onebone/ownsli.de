@@ -29,7 +29,24 @@ function Slide(data, workspace){
 	this.morphGenerator = new morph.ClickMorphWrapper(this.layoutNode, this.workspace.morphSpace, this, {
 		compareAttrName: 'data-os-slide-id',
 		remove: function(){
-			//TODO Removal
+			var _key = Object.keys(_this.workspace.document.slides);
+			if(_key[0] === _this.id) _key.shift();
+			if(_key.length === 0) return alert('Cannot delete last slide!');
+
+			if(_this.workspace.workingSlideId === _this.id) _this.workspace.setWorkingSlide(_key[0]);
+			socket.emit('delete slide', {
+				document: documentId,
+				slide: _this.id
+			});
+
+			if(_this.slideNode.remove) _this.slideNode.remove();
+			if(_this.morphGenerator && _this.morphGenerator.morph && _this.morphGenerator.morph.destroy)
+				_this.morphGenerator.morph.destroy();
+
+			_this.layoutNode.remove();
+			_this.previewNode.parentNode.remove();
+
+			delete _this.workspace.document.slides[_this.id];
 			_this.workspace.propertyEditor.bind(null);
 		},
 		destroy: function(){
@@ -38,14 +55,12 @@ function Slide(data, workspace){
 		create: function(morph){
 			_this.morph = morph;
 			_this.workspace.propertyEditor.bind(_this, function(change){
-				//TODO socket
 				_this.onUpdate();
 			});
 		}
 	});
 
 	this.morphGenerator.bindProperty(function(changes){
-		//TODO socket
 		_this.workspace.propertyEditor.update();
 		_this.onUpdate(changes);
 	});
@@ -77,7 +92,6 @@ function Slide(data, workspace){
 				z: data.rot.z
 			};
 		}
-
 
 		_this.onUpdate(false);
 		//console.log(data);

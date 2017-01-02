@@ -448,6 +448,89 @@ RectangleShape.createShape = function(shapeData, slide, emit){
 	}
 };
 
+function HTMLShape(data, parentSlide){
+	if(!data.meta) data.meta = {};
+	if(!data.meta.html) data.meta.html = '<div class="hello-world"></div>';
+	if(!data.meta.css) data.meta.css = '.hello-world{\n\twidth: 100%;\n\theight: 100%;\n\tbackground: #303030;\n}';
+	if(!data.meta.js) data.meta.js = 'document.querySelector(".hello-world").innerHTML = "Hello, World!";';
+	Shape.apply(this, arguments);
+}
+
+HTMLShape.prototype = Object.create(Shape.prototype);
+HTMLShape.prototype.constructor = HTMLShape;
+
+HTMLShape.prototype.init = function(){
+	this.node = document.createElement('div');
+	this.iframe = document.createElement('iframe');
+	this.iframe.style.border = 'none';
+	this.iframe.style.pointerEvents = 'none';
+	this.iframe.style.width = '100%';
+	this.iframe.style.height = '100%';
+	this.node.append(this.iframe);
+
+	this.onUpdate();
+};
+
+HTMLShape.prototype.onEdit = function(){
+	var _this = this;
+	$('#os-editor-dialogs').style.display = 'flex';
+	$('#os-editor-code-edit-dialog').style.display = 'block';
+
+	htmleditor.setValue(_this.meta.html);
+	csseditor.setValue(_this.meta.css);
+	jseditor.setValue(_this.meta.js);
+
+	$('#codedialog-ok').onclick = function(){
+		_this.meta.html = htmleditor.getValue();
+		_this.meta.css = csseditor.getValue();
+		_this.meta.js = jseditor.getValue();
+
+		_this.onUpdate();
+		$('#os-editor-dialogs').style.display = 'none';
+		$('#os-editor-code-edit-dialog').style.display = 'none';
+	};
+
+	$('#codedialog-cancel').onclick = function(){
+		$('#os-editor-dialogs').style.display = 'none';
+		$('#os-editor-code-edit-dialog').style.display = 'none';
+	};
+};
+
+HTMLShape.prototype.onUpdate = function(){
+	if(this.iframe.contentWindow){
+		this.iframe.contentWindow.document.body.innerHTML =
+			this.meta.html + '\n' +
+			'<style>' + '\n' +
+			this.meta.css + '\n' +
+			'</style>' + '\n';
+
+		var script = document.createElement('script');
+		script.innerHTML = this.meta.js;
+
+		this.iframe.contentWindow.document.body.append(script);
+	};
+	Shape.prototype.onUpdate.apply(this, arguments);
+};
+
+HTMLShape.createShape = function(shapeData, slide, emit){
+	shapeData.type = TYPE_HTML;
+	if(!shapeData.meta) shapeData.meta = {};
+	if(!shapeData.meta.html) shapeData.meta.html = '<div class="hello-world"></div>';
+	if(!shapeData.meta.css) shapeData.meta.css = '.hello-world{\n\twidth: 100%;\n\theight: 100%;\n\tbackground: #303030;\n}';
+	if(!shapeData.meta.js) shapeData.meta.js = 'document.querySelector(".hello-world").innerHTML = "Hello, World!";';
+
+	if(emit !== false){
+		socket.emit('create shape', {
+			document: documentId,
+			slide: slide.id,
+			pos: shapeData.pos,
+			size: shapeData.size,
+			meta: shapeData.meta,
+			type: shapeData.type
+		});
+	}
+};
+
 socket.on('update shape', function(data){
 	if(Array.isArray(data.packets)){
 		data.packets.forEach(function(packet){
@@ -532,6 +615,7 @@ Shape.ImageShape = ImageShape;
 Shape.TextShape = TextShape;
 Shape.VideoShape = VideoShape;
 Shape.RectangleShape = RectangleShape;
+Shape.HTMLShape = HTMLShape;
 Shape.fromType = function(data, slide){
 	if(data.id === undefined && data.slide !== undefined) data.id = data.shape;
 
@@ -547,6 +631,9 @@ Shape.fromType = function(data, slide){
 
 		case TYPE_RECTANGLE:
 			return new RectangleShape(data, slide);
+
+		case TYPE_HTML:
+			return new HTMLShape(data, slide);
 
 		default:
 			alert('Unknown data type from server!');

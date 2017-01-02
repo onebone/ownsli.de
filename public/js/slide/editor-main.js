@@ -25,6 +25,22 @@ socket.once('send data', function(event){
 		clock($('#os-editor-menu-clock'));
 		window.currentWorkspace = new workspace(null, $('#os-editor-workspace'));
 
+		window.htmleditor = ace.edit("htmleditor");
+		htmleditor.setTheme('ace/theme/monokai');
+		htmleditor.getSession().setMode('ace/mode/html');
+
+		window.jseditor = ace.edit("jseditor");
+		jseditor.setTheme('ace/theme/monokai');
+		jseditor.getSession().setMode('ace/mode/javascript');
+
+		window.csseditor = ace.edit('csseditor');
+		csseditor.setTheme('ace/theme/monokai');
+		csseditor.getSession().setMode('ace/mode/css');
+
+		window.onbeforeunload = function(){
+			return 'Are you sure you want to exit?';
+		};
+
 		$('#os-editor-menu-layout').addEventListener('click', function(){
 			$('#os-editor-layout-dialog').style.animationName = 'up';
 		});
@@ -114,6 +130,20 @@ socket.once('send data', function(event){
 				meta: {
 					type: 'circle'
 				}
+			}, slide);
+		});
+
+		$('#os-editor-menu-insert-html').addEventListener('click', function(){
+			if(currentWorkspace.workingSlideId === undefined) return;
+			var slide = currentWorkspace.document.slides[currentWorkspace.workingSlideId];
+
+			if(!slide) return;
+
+			shape.HTMLShape.createShape({
+				pos: {x: 0, y: 0},
+				rot: {x: 0, y: 0, z: 0},
+				size: {x: 100, y: 100},
+				meta: {}
 			}, slide);
 		});
 

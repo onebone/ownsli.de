@@ -290,15 +290,15 @@ body, html {
 	color: #fff;
 }
 
-#os-editor-property-editor label {
+#os-app label {
 	color: #ff5722;
 }
 
-#os-editor-property-editor input[type=number]:focus + label {
+#os-app input[type=number]:focus + label , #os-app input[type=text]:focus + label{
 	color: #ff5722;
 }
 
-#os-editor-property-editor input[type=number]:focus {
+#os-app input[type=number]:focus, #os-app input[type=text]:focus {
 	border-bottom: 1px solid #ff5722;
 	box-shadow: 0 1px 0 0 #ff5722;
 }
@@ -319,7 +319,33 @@ body, html {
 
 #os-editor-code-edit-dialog .tabular-edit {
 	height: 600px;
+	font-family: 'D2 coding', monospace !important;
 }
+
+#os-editor-upload-resource-dialog {
+	height: 500px;
+}
+
+#bower-result {
+	height: 200px;
+	background: #202020;
+	color: #fff;
+	overflow: auto;
+	white-space: nowrap;
+	font-family: 'D2 coding', monospace !important;
+}
+
+.dropzone {
+	border: 2px dashed #ff5722;
+}
+
+.dz-default.dz-message {
+	color: #ff5722;
+}
+
+.tabular-upload {
+	height: 250px;
+};
 
 #os-editor-slidenote-edit {
 	height: calc(100% - 30px);

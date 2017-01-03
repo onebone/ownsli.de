@@ -4,7 +4,10 @@ const {DocumentManager, Document, Slide, Shape} = require('./document');
 const {SessionManager} = require('./session');
 const {Vector3, Vector2} = require('./math');
 const timers = require('timers');
+const bower = require('bower');
+const path = require('path');
 
+const BOWER_REGEX = /^([a-zA-Z0-9](?:-?[a-zA-Z0-9]){0,38}\/[a-zA-Z0-9-_.]{1,100})|([a-zA-Z0-9-_.]{1,100})$/;
 let io = null;
 let groups = {};
 
@@ -28,6 +31,7 @@ class Sync{
 			}
 
 			socket.on('request data', (data) => {
+				if(typeof data !== 'object') return;
 				const group = Sync.getGroup(data.document);
 				if(!group){
 					socket.emit('send data', null); // there is no group found matching the document
@@ -41,6 +45,7 @@ class Sync{
 
 			// update slide
 			socket.on('update slide', (data) => {
+				if(typeof data !== 'object') return;
 				if(typeof data.document !== 'string' || !Array.isArray(data.packets)) return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
@@ -109,6 +114,7 @@ class Sync{
 
 			// update shape
 			socket.on('update shape', (data) => {
+				if(typeof data !== 'object') return;
 				if(typeof data.document !== 'string' || !Array.isArray(data.packets)) return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
@@ -173,6 +179,7 @@ class Sync{
 
 			// create slide
 			socket.on('create slide', (data) => {
+				if(typeof data !== 'object') return;
 				if(typeof data.document !== 'string' || typeof data.size  !== 'object' || typeof data.pos !== 'object' || typeof data.order !== 'number') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
@@ -228,10 +235,11 @@ class Sync{
 
 			// create shape
 			socket.on('create shape', (data) => {
+				if(typeof data !== 'object') return;
 				if(typeof data.document !== 'string' || !data.size || !data.pos || typeof data.type !== 'number' || typeof data.slide !== 'number') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
-
+				
 				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number'
 					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
 				const slide = group.getDocument().getSlide(data.slide);
@@ -269,11 +277,29 @@ class Sync{
 			// end create shape
 
 			socket.on('save', (data) => {
+				if(typeof data !== 'object') return;
 				if(typeof data.document !== 'string') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
 
 				DocumentManager.saveDocument(group.getDocument());
+			});
+
+			socket.on('bower', (data) => {
+				if(typeof data !== 'object') return;
+				if(typeof data.document !== 'string' || typeof data.bower !== 'string') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				if(!BOWER_REGEX.test(data.bower)) return;
+				bower.commands.install([data.bower], {}, {
+					cwd: path.join(__dirname, '..', 'contents', data.document),
+					directory: 'bower_components'
+				}).on('log', function(result){
+					socket.emit('bower', result);
+				}).on('end', function(){
+					socket.emit('bower', 'slide.editor.bower.complete');
+				});
 			});
 		});
 	}

@@ -232,7 +232,7 @@ socket.once('send data', function(event){
 			}, 2000);
 		});
 
-		var URL_REGEX = /^url\((.+)\)$/;
+		var URL_REGEX = /^url\("(.+)"\)$/;
 		var bgHandler = function(docMode){
 			return function(){
 				var slide = currentWorkspace.getWorkingSlide();
@@ -250,7 +250,7 @@ socket.once('send data', function(event){
 				}
 
 				$('#bgdialog-ok').onclick = function(){
-					if($('#os-editor-background-src').value) meta.background = 'url(' + $('#os-editor-background-src').value + ')';
+					if($('#os-editor-background-src').value) meta.background = 'url("' + $('#os-editor-background-src').value + '")';
 					else meta.background = $('#os-editor-background-color').value;
 
 					if(!docMode) slide.onUpdate(['meta']);

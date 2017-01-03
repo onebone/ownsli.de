@@ -1,8 +1,4 @@
 <!DOCTYPE html>
-<%
-	//TODO test code, removal required
-	const slideTitle = 'TEST';
-%>
 <html>
 	</head>
 		<%- include('../common/header', {
@@ -152,6 +148,13 @@
 						<%= translator('slide.editor.background') %>
 					</a>
 				</li>
+
+				<li>
+					<a id="os-editor-menu-background-doc" href="#!">
+						<i class="mdi mdi-terrain"></i>
+						<%= translator('slide.editor.background.doc') %>
+					</a>
+				</li>
 			</ul>
 
 			<!-- Slide Insert Menu -->
@@ -166,7 +169,7 @@
 			</span>
 
 			<!-- Other menu -->
-			<a id="os-editor-menu-present" href="#!" class="os-editor-menu">
+			<a id="os-editor-menu-present" href="/slide/present/<%= slideId %>/" target="_blank" class="os-editor-menu">
 				<i class="mdi mdi-projector-screen"></i>
 				<%= translator('slide.editor.present') %>
 			</a>

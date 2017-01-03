@@ -1,5 +1,6 @@
 const {DocumentManager} = require('../src/document');
 const {SessionManager} = require('../src/session');
+const {DocumentRenderer} = require('../src/renderer');
 const fs = require('fs');
 const express = require('express');
 const sanitize = require('sanitize-filename');
@@ -44,9 +45,62 @@ router.get('/view/:id', (req, res, next) => {
 	});
 });
 
+const serve = express.static(path.join(__dirname, '..', 'contents'));
+const authenticatedServe = (regex) => {
+	//DO NOT CHANGE THIS TO ARROW FUNCTION (because of this);
+	return function(req, res, next){
+		const match = req.originalUrl.match(regex);
+
+		if(!match) return next();
+
+		if(!req.session || !req.session.token) return res.redirect('/login');
+
+		const session = SessionManager.getSession(req.session.token);
+
+		if(session === null) return res.redirect('/login');
+
+		DocumentManager.getDocument(match[1]).then(document => {
+			if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId) === -1) return res.redirect('/login');
+			serve.apply(this, arguments);
+		});
+	};
+};
+router.use('/edit', authenticatedServe(/^\/slide\/edit\/([a-zA-Z0-9]+)/));
+router.use('/present', authenticatedServe(/^\/slide\/present\/([a-zA-Z0-9]+)/));
+
 router.get('/present/:id', (req, res, next) => {
-	//TODO Render presentation
-	res.send('');
+	if(!req.session || !req.session.token) return res.redirect('/login');
+	const session = SessionManager.getSession(req.session.token);
+	if(session === null) return res.redirect('/login');
+
+	DocumentManager.getDocument(req.params.id).then(document => {
+		if(!document){
+			return;
+		}
+
+		if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId) === -1)
+			return res.redirect('/login');
+
+		try{
+			fs.mkdirSync(path.join(__dirname, '..', 'contents', document.getId()));
+		}catch(e){
+			if(e.code !== 'EEXIST') return res.json({
+				res: false
+			});
+		}
+		const impressLocation = path.join(__dirname, '..', 'contents', document.getId(), 'impress.js');
+		fs.access(impressLocation, fs.F_OK | fs.R_OK, (err) => {
+			if(err){
+				fs.createReadStream(path.join(__dirname, '..', 'bower_components', 'impress-js', 'js', 'impress.js')).pipe(
+					fs.createWriteStream(impressLocation)
+				).on('finish', () => res.status(200).type('html').send((new DocumentRenderer(document.toArray())).render()));
+			}else{
+				res.status(200).type('html').send((new DocumentRenderer(document.toArray())).render());
+			}
+		});
+	}).catch((err) => {
+		console.error(err);
+	});
 });
 
 router.post('/create/', (req, res, next) => {
@@ -66,26 +120,6 @@ router.get('/share/:id/:user', (req, res, next) => {
 	//TODO Add sharing function
 });
 
-const serve = express.static(path.join(__dirname, '..', 'contents'));
-router.use('/edit', function(req, res, next){
-	const match = req.originalUrl.match(/^\/slide\/edit\/([a-zA-Z0-9]+)/);
-
-	if(!match) return next();
-
-	if(!req.session || !req.session.token) return res.redirect('/login');
-
-	const session = SessionManager.getSession(req.session.token);
-
-	if(session === null) return res.redirect('/login');
-
-	let group;
-	if(session.getGroup() && (group = Sync.getGroup(session.getGroup()))){
-		const id = group.getDocument().getId();
-		if(id !== match[1]) res.redirect('/login');
-		serve.apply(this, arguments);
-	}else next();
-});
-
 router.get('/edit/:id', (req, res, next) => {
 	if(typeof req.params.id !== 'string') return; // just quit; do not give anything
 
@@ -101,7 +135,12 @@ router.get('/edit/:id', (req, res, next) => {
 		}
 
 		if(Sync.createGroup(document, session)){
-			res.render('slide/editor');
+			res.render('slide/editor', {
+				slideTitle: document.getName(),
+				slideId: document.getId(),
+				slideOwner: document.getOwner(),
+				slideLastEdit: document.getLastSave()
+			});
 		}else{
 			// TODO: render document does not exist...
 		}

@@ -4,7 +4,8 @@ function Workspace(slideRoot, workspaceRoot){
 	this.root = slideRoot;
 	this.workspaceRoot = workspaceRoot;
 	this.document = {
-		slides: {}
+		slides: {},
+		meta: {}
 	};
 
 	var _this = this;

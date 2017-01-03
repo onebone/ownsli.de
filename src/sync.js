@@ -177,6 +177,16 @@ class Sync{
 			});
 			// end update shape
 
+			socket.on('document meta', (data) => {
+				if(typeof data !== 'object') return;
+				if(typeof data.document !== 'string'|| typeof data.name !== 'string' || typeof data.value !== 'string') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				group.getDocument().setMetadata(data.name, data.value);
+				group.broadcast('document meta', data, session);
+			});
+
 			// create slide
 			socket.on('create slide', (data) => {
 				if(typeof data !== 'object') return;

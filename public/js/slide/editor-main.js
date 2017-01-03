@@ -24,6 +24,7 @@ socket.once('send data', function(event){
 
 		clock($('#os-editor-menu-clock'));
 		window.currentWorkspace = new workspace(null, $('#os-editor-workspace'));
+		currentWorkspace.document.meta = event.meta;
 
 		window.htmleditor = ace.edit("htmleditor");
 		htmleditor.setTheme('ace/theme/monokai');
@@ -231,33 +232,50 @@ socket.once('send data', function(event){
 			}, 2000);
 		});
 
-		const URL_REGEX = /^url\((.+)\)$/;
-		$('#os-editor-menu-background').addEventListener('click', function(){
-			var slide = currentWorkspace.getWorkingSlide();
-			if(!slide) return;
+		var URL_REGEX = /^url\((.+)\)$/;
+		var bgHandler = function(docMode){
+			return function(){
+				var slide = currentWorkspace.getWorkingSlide();
+				if(!docMode && !slide) return;
 
-			$('#os-editor-dialogs').style.display = 'flex';
-			$('#os-editor-background-edit-dialog').style.display = 'block';
-			var match = slide.meta.background.match(URL_REGEX);
-			if(match){
-				$('#os-editor-background-src').value = match[1];
-			}else{
-				$('#os-editor-background-color').value = slide.meta.background;
-			}
+				$('#os-editor-dialogs').style.display = 'flex';
+				$('#os-editor-background-edit-dialog').style.display = 'block';
 
-			$('#bgdialog-ok').onclick = function(){
-				if($('#os-editor-background-src').value) slide.meta.background = 'url(' + $('#os-editor-background-src').value + ')';
-				else slide.meta.background = $('#os-editor-background-color').value;
+				var meta = docMode ? currentWorkspace.document.meta : slide.meta
+				var match = meta.background.match(URL_REGEX);
+				if(match){
+					$('#os-editor-background-src').value = match[1];
+				}else{
+					$('#os-editor-background-color').value = meta.background;
+				}
 
-				slide.onUpdate();
-				$('#os-editor-dialogs').style.display = 'none';
-				$('#os-editor-background-edit-dialog').style.display = 'none';
+				$('#bgdialog-ok').onclick = function(){
+					if($('#os-editor-background-src').value) meta.background = 'url(' + $('#os-editor-background-src').value + ')';
+					else meta.background = $('#os-editor-background-color').value;
+
+					if(!docMode) slide.onUpdate();
+					else socket.emit('document meta', {
+						document: documentId,
+						name: 'background',
+						value: meta.background
+					});
+
+					$('#os-editor-dialogs').style.display = 'none';
+					$('#os-editor-background-edit-dialog').style.display = 'none';
+				};
+
+				$('#bgdialog-cancel').onclick = function(){
+					$('#os-editor-dialogs').style.display = 'none';
+					$('#os-editor-background-edit-dialog').style.display = 'none';
+				};
 			};
+		};
 
-			$('#bgdialog-cancel').onclick = function(){
-				$('#os-editor-dialogs').style.display = 'none';
-				$('#os-editor-background-edit-dialog').style.display = 'none';
-			};
+		$('#os-editor-menu-background').addEventListener('click', bgHandler(false));
+		$('#os-editor-menu-background-doc').addEventListener('click', bgHandler(true));
+
+		socket.on('document meta', function(ev){
+			currentWorkspace.document.meta[ev.name] = ev.value;
 		});
 
 		Object.keys(event.slides).sort(function(a, b){

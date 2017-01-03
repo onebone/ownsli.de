@@ -15,7 +15,7 @@ class Document{
 	 * @param {string[]} invitation | Invited user id
 	 * @param {int} lastSave        | Timestamp of last saved
 	 */
-	constructor(id, owner, name, slides = {}, invitation = [], lastSave = Date.now()){
+	constructor(id, owner, name, slides = {}, invitation = [], lastSave = Date.now(), meta = {}){
 		this._id = id;
 		this._owner = owner;
 		this._name = name;
@@ -44,6 +44,7 @@ class Document{
 
 		this._invitation = invitation;
 		this._lastSave = lastSave;
+		this._meta = meta;
 	}
 
 	/**
@@ -77,6 +78,14 @@ class Document{
 	 */
 	getSlide(id){
 		return this._slides[id];
+	}
+
+	getMeta(){
+		return this._meta;
+	}
+
+	setMetadata(name, value){
+		this._meta[name] = value;
 	}
 
 	/**
@@ -169,7 +178,8 @@ class Document{
 			name: this._name,
 			slides: {},
 			invitation: this._invitation,
-			lastSave: this._lastSave
+			lastSave: this._lastSave,
+			meta: this._meta
 		};
 
 		Object.keys(this._slides).forEach((index) => {
@@ -484,7 +494,8 @@ class DocumentManager{
 				name: name,
 				owner: owner,
 				slides: [],
-				lastSave: Date.now()
+				lastSave: Date.now(),
+				meta: {background: '#ffffff'}
 			}).catch(err => reject(err)).then(() => resolve(id));
 		});
 	}
@@ -499,8 +510,7 @@ class DocumentManager{
 			}).toArray((err, rows) => {
 				if(err) return reject(err);
 				if(rows.length < 1) return resolve(null);
-
-				resolve(new Document(rows[0].id, rows[0].owner, rows[0].name, rows[0].slides, rows[0].invitation, rows[0].lastSave));
+				resolve(new Document(rows[0].id, rows[0].owner, rows[0].name, rows[0].slides, rows[0].invitation, rows[0].lastSave, rows[0].meta));
 			});
 		});
 	}
@@ -541,7 +551,7 @@ class DocumentManager{
 					if(err) return reject(err);
 					let data = [];
 					documents.forEach((document) => {
-						data.push(new Document(document.id, document.owner, document.name, document.slides, document.invitation, document.lastSave));
+						data.push(new Document(document.id, document.owner, document.name, document.slides, document.invitation, document.lastSave, document.meta));
 					});
 
 					resolve(data);

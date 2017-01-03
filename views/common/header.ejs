@@ -4,13 +4,11 @@
 <meta name="description" content="<%= translator('desc') %>">
 <meta name="viewport" content="width=device-width, user-scalable=no">
 
-<% if(typeof no_ogp === 'undefined' || !no_ogp){ %>
-	<meta property="og:title" content="<%= title %>">
-	<meta property="og:site_name" content="<%= translator('title') %>">
-	<meta property="og:type" content="game">
-	<meta property="og:url" content="<%= url %>">
-	<meta property="og:image" content="<%= config.url + config.imageUrl %>">
-<% } %>
+<meta property="og:title" content="<%= title %>">
+<meta property="og:site_name" content="<%= translator('title') %>">
+<meta property="og:type" content="website">
+<meta property="og:url" content="<%= url %>">
+<meta property="og:image" content="<%= config.url + config.imageUrl %>">
 
 <link rel="stylesheet" type="text/css" href="/materialize/dist/css/materialize.min.css">
 <link rel="stylesheet" type="text/css" href="/mdi/css/materialdesignicons.min.css">

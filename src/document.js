@@ -85,10 +85,13 @@ class Document{
 	 */
 	addSlide(slide){
 		if(!slide) return -1;
-		this._slides[slideId] = slide;
+		const id = slide.getId() > 0 ? slide.getId() : slideId++;
+		this._slides[id] = slide;
+
+		slide._id = id;
 
 		this.reorderSlides();
-		return slideId++;
+		return id;
 	}
 
 	/**

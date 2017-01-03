@@ -234,17 +234,17 @@ class Slide{
 			if(data instanceof Slide){
 				this._shapes[index] = data;
 			}else{
-				shapes[index].pos = shapes[index].pos || new Vector3();
-				shapes[index].size = shapes[index].size || new Vector2();
-				shapes[index].rot = shapes[index].rot || new Vector3();
+				data.pos = data.pos || new Vector3();
+				data.size = data.size || new Vector2();
+				data.rot = data.rot || new Vector3();
 
-				this._shapes[index] = new Shape(
-					parseInt(index),
-					new Vector2(shapes[index].pos.x, shapes[index].pos.y),
-					new Vector3(shapes[index].rot.x, shapes[index].rot.y, shapes[index].rot.z),
-					new Vector2(shapes[index].size.x, shapes[index].size.y),
-					shapes[index].type,
-					shapes[index].meta
+				this._shapes[data.shape] = new Shape(
+					data.shape,
+					new Vector2(data.pos.x, data.pos.y),
+					new Vector3(data.rot.x, data.rot.y, data.rot.z),
+					new Vector2(data.size.x, data.size.y),
+					data.type,
+					data.meta
 				);
 			}
 		});
@@ -371,8 +371,10 @@ class Shape{
 	 * @param {Object} meta	        | Other data needed to render shape
 	 */
 	constructor(id, vec, rotation, size, type, meta){
+		if(id < 0){
+			id = shapeId++;
+		}
 		this._id = id;
-		this._id = id || shapeId++;
 		if(this._id >= shapeId){
 			shapeId = this._id + 1;
 		}

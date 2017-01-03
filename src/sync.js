@@ -164,7 +164,8 @@ class Sync{
 									break;
 								// type cannot be changed
 								case 'meta':
-									// TODO
+									// TODO validate
+									shape.setMetadata(data);
 									break;
 							}
 						}

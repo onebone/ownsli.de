@@ -30,20 +30,11 @@ function Shape(data, parentSlide){
 	this.morphGenerator = new morph.ClickMorphWrapper(this.node, this.parent.slideNode, this, {
 		compareAttrName: 'data-os-shape-id',
 		remove: function(){
-			if(_this.morphGenerator && _this.morphGenerator.morph && _this.morphGenerator.morph.destroy)
-				_this.morphGenerator.morph.destroy();
 			socket.emit('delete shape', {
 				document: documentId,
 				slide: _this.parent.id,
 				shape: _this.id
 			});
-
-			_this.node.remove();
-			_this.parent.onUpdate();
-			delete _this.parent.shapes[_this.id];
-
-			_this.morph = undefined;
-			_this.workspace.propertyEditor.bind(null);
 		},
 		destroy: function(){
 			_this.morph = undefined;
@@ -73,10 +64,8 @@ function Shape(data, parentSlide){
 	parentSlide.slideNode.append(this.node);
 }
 
-var lastSent = 0;
 Shape.prototype.onUpdate = function(changes){
-	if(Date.now() - lastSent > 50 && Array.isArray(changes) && changes.length > 0){
-		lastSent = Date.now();
+	if(Array.isArray(changes) && changes.length > 0){
 		var data = {};
 
 		var change;
@@ -609,6 +598,23 @@ socket.on('create shape', function(data){
 	if(!slide) return;
 
 	Shape.fromType(data, slide);
+});
+
+socket.on('delete shape', function(data){
+	var slide = window.currentWorkspace.document.slides[data.slide];
+	if(!slide) return;
+	var shape = slide.shapes[data.shape];
+	if(!shape) return;
+
+	if(shape.morphGenerator && shape.morphGenerator.morph && shape.morphGenerator.morph.destroy)
+		shape.morphGenerator.morph.destroy();
+
+	shape.node.remove();
+	slide.onUpdate();
+	delete slide.shapes[data.shape];
+
+	shape.morph = undefined;
+	shape.workspace.propertyEditor.bind(null);
 });
 
 Shape.ImageShape = ImageShape;

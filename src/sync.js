@@ -66,7 +66,6 @@ class Sync{
 							const data = pk[property];
 							switch(property.toLowerCase()){
 								case 'pos':
-									console.log('pos',data, typeof data.x);
 									if(typeof data.x !== 'number' || typeof data.y !== 'number' || typeof data.z !== 'number'){
 										delete pk['pos'];
 										break;
@@ -88,7 +87,7 @@ class Sync{
 										break;
 									}
 
-									slide.setSize(new Vector2(data.x, data.y, data.z));
+									slide.setSize(new Vector2(data.x, data.y));
 									break;
 								case 'order':
 									if(typeof data !== 'number'){
@@ -236,10 +235,10 @@ class Sync{
 			// create shape
 			socket.on('create shape', (data) => {
 				if(typeof data !== 'object') return;
-				if(typeof data.document !== 'string' || !data.size || !data.pos || typeof data.type !== 'number' || typeof data.slide !== 'number') return;
+				if(typeof data.document !== 'string' || typeof data.size !== 'object' || typeof data.pos !== 'object' || typeof data.type !== 'number' || typeof data.slide !== 'number') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
-				
+
 				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number'
 					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
 				const slide = group.getDocument().getSlide(data.slide);
@@ -275,6 +274,44 @@ class Sync{
 				});
 			});
 			// end create shape
+
+			// delete slide
+			socket.on('delete slide', (data) => {
+				if(typeof data !== 'object') return;
+
+				if(typeof data.document !== 'string') return; // document validation
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				if(group.getDocument().removeSlide(data.slide)){
+					group.broadcast('delete slide', {
+						document: data.document,
+						slide: data.slide
+					});
+				}
+			});
+			// end delete slide
+
+			// delete shape
+			socket.on('delete shape', (data) => {
+				if(typeof data !== 'object') return;
+
+				if(typeof data.document !== 'string') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				const slide = group.getDocument().getSlide(data.slide);
+				if(!slide) return;
+
+				if(slide.removeShape(data.shape)){
+					group.broadcast('delete shape', {
+						document: data.document,
+						slide: data.slide,
+						shape: data.shape
+					});
+				}
+			});
+			// end delete shape
 
 			socket.on('save', (data) => {
 				if(typeof data !== 'object') return;

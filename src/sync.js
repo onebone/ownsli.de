@@ -233,7 +233,7 @@ class Sync{
 			socket.on('create shape', (data) => {
 				if(typeof data !== 'object') return;
 
-				if(typeof data.document !== 'string' || !data.size || !data.pos || typeof data.type !== 'number' || typeof data.slide !== 'number') return;
+				if(typeof data.document !== 'string' || typeof data.size !== 'object' || typeof data.pos !== 'object' || typeof data.type !== 'number' || typeof data.slide !== 'number') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
 

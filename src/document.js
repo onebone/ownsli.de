@@ -241,8 +241,8 @@ class Slide{
 				this._shapes[index] = new Shape(
 					parseInt(index),
 					new Vector2(shapes[index].pos.x, shapes[index].pos.y),
-					new Vector2(shapes[index].size.x, shapes[index].size.y),
 					new Vector3(shapes[index].rot.x, shapes[index].rot.y, shapes[index].rot.z),
+					new Vector2(shapes[index].size.x, shapes[index].size.y),
 					shapes[index].type,
 					shapes[index].meta
 				);

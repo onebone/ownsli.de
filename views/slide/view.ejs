@@ -1,11 +1,5 @@
 <!DOCTYPE html>
-<%
-	//TODO test code, removal required
-	const slideTitle = 'TEST';
-	const slideID = 'abc';
-	const slideOwner = 'Khinenw';
-	const slideLastEdit = new Date;
-%>
+<% slideLastEdit = new Date(slideLastEdit); %>
 
 <%
 	const pad2 = (str) => String(str).length === 1 ? '0' + str : str;
@@ -45,8 +39,22 @@
 			</div>
 
 			<section id="slide-view">
-				<iframe src="/slide/present/<%= slideID %>"></iframe>
+				<iframe src="/slide/present/<%= slideId %>"></iframe>
 			</section>
+			<div class="row">
+				<a class="btn waves-effect waves-orange btn-flat deep-orange-text col s4" href="/slide/edit/<%= slideId %>">
+					<i class="mdi mdi-pencil"></i>
+					<%= translator('slide.view.edit') %>
+				</a>
+				<a class="btn waves-effect waves-orange btn-flat deep-orange-text col s4" href="/slide/present/<%= slideId %>">
+					<i class="mdi mdi-presentation"></i>
+					<%= translator('slide.view.present') %>
+				</a>
+				<a class="btn waves-effect waves-orange btn-flat deep-orange-text col s4" href="/slide/export/<%= slideId %>">
+					<i class="mdi mdi-download"></i>
+					<%= translator('slide.view.export') %>
+				</a>
+			</div>
 		</main>
 	</body>
 </html>

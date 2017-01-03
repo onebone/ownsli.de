@@ -31,6 +31,7 @@ class Document{
 				slides[index].rot = slides[index].rot || new Vector3();
 
 				this._slides[index] = new Slide(
+					this,
 					parseInt(index),
 					new Vector3(slides[index].pos.x, slides[index].pos.y, slides[index].pos.z),
 					new Vector2(slides[index].size.x, slides[index].size.y),
@@ -86,10 +87,11 @@ class Document{
 	addSlide(slide){
 		if(!slide) return -1;
 		const id = slide.getId() > 0 ? slide.getId() : slideId++;
+
+		this.pushSlides(slide.getOrder());
 		this._slides[id] = slide;
 
 		slide._id = id;
-
 		this.reorderSlides();
 		return id;
 	}
@@ -104,6 +106,17 @@ class Document{
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Push slide orders after certain slide
+	 * @param {int} order
+	 */
+	pushSlides(order){
+		Object.keys(this._slides).forEach(id => {
+			const slide = this._slides[id];
+			if(slide.getOrder() >= order) slide.setOrder(slide.getOrder() + 1);
+		});
 	}
 
 	reorderSlides(){
@@ -205,7 +218,8 @@ let slideId = 1;
 // Slide is a wrapper of slide which is included in Document
 class Slide{
 	/**
-	 * @param {int} id           | id of slide
+	 * @param {Document} document   | Document
+	 * @param {int} id              | id of slide
 	 * @param {Vector3} vec         | Position of slide where slide will be placed
 	 * @param {Vector2} size        | Size of slide
 	 * @param {Vector3} rotation    | Rotation of slide
@@ -213,7 +227,8 @@ class Slide{
 	 * @param {object} meta         | Metadata of slide
 	 * @param {object} shapes       | Shapes which is included in slide
 	 */
-	constructor(id, vec, size, rotation, order, meta, shapes){
+	constructor(document, id, vec, size, rotation, order, meta, shapes){
+		this._document = document;
 		if(id < 0){
 			id = slideId++;
 		}
@@ -310,6 +325,8 @@ class Slide{
 	 * @param {int} order
 	 */
 	setOrder(order){
+		this._document.pushSlides(order);
+
 		this._order = order;
 	}
 

@@ -16,7 +16,7 @@ function Workspace(slideRoot, workspaceRoot){
 				_this.document.slides[id].order
 					= index + 1;
 				elem.querySelector('.os-editor-slidelist-indicator').innerText = index + 1;
-				newOrder[index + 1] = id;
+				newOrder[id] = index + 1;
 			});
 
 			socket.emit('update order', {
@@ -111,5 +111,11 @@ Workspace.prototype.deleteSlide = function(id){
 Workspace.prototype.addToWorkspace = function(node){
 	this.workspaceRoot.append(node);
 };
+
+socket.on('update order', function(data){
+	if(typeof data.orders !== 'object') return;
+
+	// TODO: sort slides
+});
 
 module.exports = Workspace;

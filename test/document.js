@@ -19,6 +19,7 @@ describe('Document', () => {
 			document._slides = {};
 			for(let i = 0; i < len; i++){
 				document.addSlide(new Slide(
+					document,
 					0,
 					new Vector3(Utils.rand(-100, 100), Utils.rand(-100, 100), Utils.rand(-100, 100)), // position
 					new Vector2(Utils.rand(-100, 100), Utils.rand(-100, 100)), // size

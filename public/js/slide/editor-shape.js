@@ -90,6 +90,8 @@ Shape.prototype.onUpdate = function(changes){
 						x: parseFloat(this.size.x), y: parseFloat(this.size.y)
 					};
 					break;
+				case 'meta':
+					data.meta = this.meta;
 			}
 		}
 
@@ -150,7 +152,7 @@ ImageShape.prototype.onEdit = function(){
 			_this.size.x = preImg.naturalWidth;
 			_this.size.y = preImg.naturalHeight;
 			_this.meta.src = $('#os-editor-image-src').value;
-			_this.onUpdate();
+			_this.onUpdate(['meta']);
 			$('#os-editor-dialogs').style.display = 'none';
 			$('#os-editor-image-edit-dialog').style.display = 'none';
 			$('#os-editor-image-src').value = '';
@@ -210,7 +212,7 @@ TextShape.prototype.onEdit = function(){
 
 	$('#txtdialog-ok').onclick = function(){
 		_this.meta.html = tinymce.activeEditor.getContent();
-		_this.onUpdate();
+		_this.onUpdate(['meta']);
 		$('#os-editor-dialogs').style.display = 'none';
 		$('#os-editor-text-edit-dialog').style.display = 'none';
 		tinymce.activeEditor.setContent('');
@@ -293,7 +295,7 @@ VideoShape.prototype.onEdit = function(){
 			_this.meta.src = '';
 			_this.meta.source = 'youtube';
 			setSize(640, 360);
-			_this.onUpdate();
+			_this.onUpdate(['meta']);
 			$('#os-editor-dialogs').style.display = 'none';
 			$('#os-editor-video-edit-dialog').style.display = 'none';
 			$('#os-editor-video-src-raw').value = '';
@@ -339,6 +341,7 @@ VideoShape.prototype.onUpdate = function(){
 		this.vnode.style.pointerEvents = 'none';													}
 
 	//It's so beautiful!!!
+	// ㄴRE: there is brace wrapping if statement...
 
 	this.vnode.style.width = this.size.x + 'px';
 	this.vnode.style.height = this.size.y + 'px';
@@ -393,7 +396,7 @@ RectangleShape.prototype.onEdit = function(){
 		_this.meta.type = $('#os-editor-shape-type').value;
 		_this.meta.color = $('#os-editor-shape-color').value;
 
-		_this.onUpdate();
+		_this.onUpdate(['meta']);
 		$('#os-editor-dialogs').style.display = 'none';
 		$('#os-editor-image-edit-dialog').style.display = 'none';
 		$('#os-editor-shape-type').value = 'rectangle';
@@ -474,7 +477,7 @@ HTMLShape.prototype.onEdit = function(){
 		_this.meta.css = csseditor.getValue();
 		_this.meta.js = jseditor.getValue();
 
-		_this.onUpdate();
+		_this.onUpdate(['meta']);
 		$('#os-editor-dialogs').style.display = 'none';
 		$('#os-editor-code-edit-dialog').style.display = 'none';
 	};
@@ -551,6 +554,10 @@ socket.on('update shape', function(data){
 				};
 			}
 
+			if(typeof packet.meta === 'object'){
+				shape.meta = packet.meta;
+			}
+
 			var node = shape.node;
 
 			node.setAttribute('os-x', shape.pos.x);
@@ -578,7 +585,6 @@ socket.on('update shape', function(data){
 
 			shape.workspace.propertyEditor.update();
 			shape.onUpdate();
-			console.log('yes shape update!');
 
 			node.style.width = shape.size.x + 'px';
 			node.style.height = shape.size.y + 'px';

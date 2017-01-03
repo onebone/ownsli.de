@@ -73,10 +73,8 @@ function Shape(data, parentSlide){
 	parentSlide.slideNode.append(this.node);
 }
 
-var lastSent = 0;
 Shape.prototype.onUpdate = function(changes){
-	if(Date.now() - lastSent > 50 && Array.isArray(changes) && changes.length > 0){
-		lastSent = Date.now();
+	if(Array.isArray(changes) && changes.length > 0){
 		var data = {};
 
 		var change;

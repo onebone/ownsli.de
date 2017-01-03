@@ -63,7 +63,6 @@ class Sync{
 							const data = pk[property];
 							switch(property.toLowerCase()){
 								case 'pos':
-									console.log('pos',data, typeof data.x);
 									if(typeof data.x !== 'number' || typeof data.y !== 'number' || typeof data.z !== 'number'){
 										delete pk['pos'];
 										break;

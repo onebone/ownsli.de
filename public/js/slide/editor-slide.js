@@ -39,16 +39,6 @@ function Slide(data, workspace){
 				document: documentId,
 				slide: _this.id
 			});
-
-			if(_this.slideNode.remove) _this.slideNode.remove();
-			if(_this.morphGenerator && _this.morphGenerator.morph && _this.morphGenerator.morph.destroy)
-				_this.morphGenerator.morph.destroy();
-
-			_this.layoutNode.remove();
-			_this.previewNode.parentNode.remove();
-
-			delete _this.workspace.document.slides[_this.id];
-			_this.workspace.propertyEditor.bind(null);
 		},
 		destroy: function(){
 			_this.workspace.propertyEditor.bind(null);
@@ -152,7 +142,6 @@ Slide.prototype.setSlideLayout = function(node){
 	$('#os-editor-layout').append(node);
 };
 
-var lastSent = 0;
 Slide.prototype.onUpdate = function(changes){
 	if(this.previewNode && this.slideNode){
 		var baseSize = this.size.x;
@@ -177,9 +166,7 @@ Slide.prototype.onUpdate = function(changes){
 		this.previewNode.style.transform = "scale(" + resizeRate + ")";
 		this.previewNode.innerHTML = this.slideNode.innerHTML;
 
-		if(Date.now() - lastSent > 50 && Array.isArray(changes) && changes.length > 0){
-			lastSent = Date.now();
-
+		if(Array.isArray(changes) && changes.length > 0){
 			var data = {};
 
 			var change;
@@ -240,7 +227,7 @@ Slide.prototype.toExportableData = function(){
 };
 
 socket.on('update slide', function(data){
-	if(Array.isArray(data.packets)){
+	if(typeof data === 'object' && Array.isArray(data.packets)){
 		data.packets.forEach(function(packet){
 			if(!packet) return console.log('aa'); //FIXME packet is null
 			var slide = window.currentWorkspace.document.slides[packet.slide];
@@ -312,8 +299,27 @@ socket.on('update slide', function(data){
 });
 
 socket.on('create slide', function(data){
+	if(typeof data !== 'object') return;
+
 	data.id = data.slide;
 	new Slide(data, window.currentWorkspace);
+});
+
+socket.on('delete slide', function(data){
+	if(typeof data !== 'object') return;
+
+	if(window.currentWorkspace.document.slides[data.slide]){
+		var slide = window.currentWorkspace.document.slides[data.slide];
+		if(slide.slideNode.remove) slide.slideNode.remove();
+		if(slide.morphGenerator && slide.morphGenerator.morph && slide.morphGenerator.morph.destroy)
+			slide.morphGenerator.morph.destroy();
+
+		slide.layoutNode.remove();
+		slide.previewNode.parentNode.remove();
+
+		delete slide.workspace.document.slides[data.slide];
+		slide.workspace.propertyEditor.bind(null);
+	}
 });
 
 module.exports = Slide;

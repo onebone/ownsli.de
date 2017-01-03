@@ -4,7 +4,10 @@ const {DocumentManager, Document, Slide, Shape} = require('./document');
 const {SessionManager} = require('./session');
 const {Vector3, Vector2} = require('./math');
 const timers = require('timers');
+const bower = require('bower');
+const path = require('path');
 
+const BOWER_REGEX = /^([a-zA-Z0-9](?:-?[a-zA-Z0-9]){0,38}\/[a-zA-Z0-9-_.]{1,100})|([a-zA-Z0-9-_.]{1,100})$/;
 let io = null;
 let groups = {};
 
@@ -232,7 +235,6 @@ class Sync{
 			// create shape
 			socket.on('create shape', (data) => {
 				if(typeof data !== 'object') return;
-
 				if(typeof data.document !== 'string' || typeof data.size !== 'object' || typeof data.pos !== 'object' || typeof data.type !== 'number' || typeof data.slide !== 'number') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
@@ -312,11 +314,29 @@ class Sync{
 			// end delete shape
 
 			socket.on('save', (data) => {
+				if(typeof data !== 'object') return;
 				if(typeof data.document !== 'string') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
 
 				DocumentManager.saveDocument(group.getDocument());
+			});
+
+			socket.on('bower', (data) => {
+				if(typeof data !== 'object') return;
+				if(typeof data.document !== 'string' || typeof data.bower !== 'string') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				if(!BOWER_REGEX.test(data.bower)) return;
+				bower.commands.install([data.bower], {}, {
+					cwd: path.join(__dirname, '..', 'contents', data.document),
+					directory: 'bower_components'
+				}).on('log', function(result){
+					socket.emit('bower', result);
+				}).on('end', function(){
+					socket.emit('bower', 'slide.editor.bower.complete');
+				});
 			});
 		});
 	}

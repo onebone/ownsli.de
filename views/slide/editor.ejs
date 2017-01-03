@@ -11,10 +11,12 @@
 			})
 		}) %>
 
+		<link rel="stylesheet" type="text/css" href="/font-d2coding/d2coding.css">
+		<link rel="stylesheet" href="/dropzone/dist/min/dropzone.min.css"></link>
 		<link rel="stylesheet" href="/css/slide/editor.css">
 	<head>
 
-	<body>
+	<body id="os-app">
 		<header id="os-editor-menubar">
 			<!-- File menu -->
 			<span id="os-editor-logo" class="os-editor-menu">
@@ -38,12 +40,6 @@
 					<a href="#!" id="os-editor-menu-file-save">
 						<i class="mdi mdi-content-save"></i>
 						<%= translator('slide.editor.file.save') %>
-					</a>
-				</li>
-				<li>
-					<a href="#!">
-						<i class="mdi mdi-content-save-settings"></i>
-						<%= translator('slide.editor.file.saveas') %>
 					</a>
 				</li>
 			</ul>
@@ -107,11 +103,17 @@
 						<%= translator('slide.editor.insert.html') %>
 					</a>
 				</li>
-				<li class="divider"></li>
 				<li>
 					<a href="#!" id="os-editor-menu-insert-note">
 						<i class="mdi mdi-book-plus"></i>
 						<%= translator('slide.editor.insert.note') %>
+					</a>
+				</li>
+				<li class="divider"></li>
+				<li>
+					<a id="os-editor-menu-upload" href="#!">
+						<i class="mdi mdi-upload"></i>
+						<%= translator('slide.editor.upload') %>
 					</a>
 				</li>
 			</ul>
@@ -242,6 +244,7 @@
 			<section id="os-editor-share-dialog" class="os-dialog"></section>
 			<section id="os-editor-image-edit-dialog" class="os-dialog">
 				<div class="input-field">
+					<%= translator('slide.editor.edit.refurl') %>
 					<input id="os-editor-image-src" type="text">
 					<label for="os-editor-image-src">
 						<%= translator('slide.editor.edit.imagesrc') %>
@@ -365,11 +368,59 @@
 					<a href="#!" class="waves-effect waves-orange btn-flat" id="bgdialog-cancel"><%= translator('slide.editor.edit.cancel') %></a>
 				</div>
 			</section>
-			<section id="os-editor-upload-resource-dialog" class="os-dialog"></section>
+			<section id="os-editor-upload-resource-dialog" class="os-dialog">
+				<div class="row">
+					<div class="col s12">
+						<ul class="tabs">
+							<li class="tab col s6"><a class="active" href="#os-bower-tab">Bower</a></li>
+							<li class="tab col s6"><a href="#os-upload-tab">File</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div id="os-bower-tab" class="tabular-upload">
+					<div class="row">
+						<div class="input-field col s10">
+							<input id="os-bower-package" type="text" autocorrect="off" autocomplete="off" autocapitalize="none">
+							<label for="os-bower-package"><%= translator('slide.editor.package') %></label>
+						</div>
+
+						<div class="input-field col s2">
+							<button class="btn deep-orange waves-effect waves-light" type="button" id="bower-send">
+								<i class="mdi mdi-send"></i>
+							</button>
+						</div>
+					</div>
+
+					<div id="bower-result"></div>
+				</div>
+
+				<div id="os-upload-tab" class="tabular-upload">
+					<form action="/slide/upload" class="dropzone" id="upload-dropzone" enctype="multipart/form-data"></form>
+				</div>
+
+				<div class="dialog-bottom">
+					<a href="#!" class="waves-effect waves-blue btn-flat" id="updialog-ok"><%= translator('slide.editor.edit.ok') %></a>
+				</div>
+			</section>
 		</section>
 
+		<script src="/dropzone/dist/min/dropzone.min.js"></script>
 		<script>
 			(function(){
+				window.TRANSLATIONS = {
+					'slide.editor.bower.complete': "<%= translator('slide.editor.bower.complete') %>"
+				};
+
+				Dropzone.autoDiscover = false;
+				jQuery('#upload-dropzone').dropzone({
+					url: '/slide/upload',
+					paramName: 'uploadFile',
+					uploadMultiple: false,
+					autoProcessQueue: true,
+					parallelUploads: 1
+				});
+
 				jQuery('#os-editor-menu-insert-shape').dropdown({
 					inDuration: 300,
 					outDuration: 225,

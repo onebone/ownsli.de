@@ -168,6 +168,55 @@ socket.once('send data', function(event){
 			};
 		});
 
+		socket.on('bower', function(data){
+			if(typeof data === 'object'){
+				var name = '';
+				if(data.data.endpoint) {
+					name = data.data.endpoint.name;
+				}
+
+				if(data.data.pkgMeta) {
+					name = data.data.pkgMeta.name;
+				}
+
+			 	$('#bower-result').innerHTML +=
+					'<div>' +
+						'bower ' +
+						'<span style="color: #c6ff00">' +
+							data.data.pkgMeta.name +
+							data.data.endpoint.target + ' ' +
+						'</span>' +
+						'<span style="color: #2196f3">' +
+							data.id +
+						'</span>' + ' ' +
+						data.message +
+					'</div>';
+			}else $('#bower-result').innerHTML += (TRANSLATIONS[data] || data) + '<br>';
+		});
+
+		$('#bower-send').addEventListener('click', function(){
+			socket.emit('bower', {
+				document: documentId,
+				bower: $('#os-bower-package').value
+			});
+		});
+
+		$('#os-editor-menu-upload').addEventListener('click', function(){
+			$('#os-editor-dialogs').style.display = 'flex';
+			$('#os-editor-upload-resource-dialog').style.display = 'block';
+		});
+
+		$('#updialog-ok').addEventListener('click', function(){
+			$('#os-editor-dialogs').style.display = 'none';
+			$('#os-editor-upload-resource-dialog').style.display = 'none';
+		});
+
+		$('#os-editor-menu-file-save').addEventListener('click', function(){
+			socket.emit('save', {
+				document: documentId
+			});
+		});
+
 		const URL_REGEX = /^url\((.+)\)$/;
 		$('#os-editor-menu-background').addEventListener('click', function(){
 			var slide = currentWorkspace.getWorkingSlide();

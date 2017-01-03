@@ -332,10 +332,12 @@ class Sync{
 				bower.commands.install([data.bower], {}, {
 					cwd: path.join(__dirname, '..', 'contents', data.document),
 					directory: 'bower_components'
-				}).on('log', function(result){
+				}).on('log', (result) => {
 					socket.emit('bower', result);
-				}).on('end', function(){
+				}).on('end', () => {
 					socket.emit('bower', 'slide.editor.bower.complete');
+				}).on('error', (err) => {
+					socket.emit('bower', 'ERROR: ' + err.code);
 				});
 			});
 		});

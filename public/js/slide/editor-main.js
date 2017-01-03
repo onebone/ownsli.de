@@ -159,7 +159,7 @@ socket.once('send data', function(event){
 			$('#os-editor-slidenote-edit').value = slide.meta.note;
 			$('#sndialog-ok').onclick = function(){
 				slide.meta.note = $('#os-editor-slidenote-edit').value;
-				slide.onUpdate();
+				slide.onUpdate(['meta']);
 				$('#os-editor-dialogs').style.display = 'none';
 				$('#os-editor-background-edit-dialog').style.display = 'none';
 			};
@@ -253,7 +253,7 @@ socket.once('send data', function(event){
 					if($('#os-editor-background-src').value) meta.background = 'url(' + $('#os-editor-background-src').value + ')';
 					else meta.background = $('#os-editor-background-color').value;
 
-					if(!docMode) slide.onUpdate();
+					if(!docMode) slide.onUpdate(['meta']);
 					else socket.emit('document meta', {
 						document: documentId,
 						name: 'background',

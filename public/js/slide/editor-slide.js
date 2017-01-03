@@ -84,7 +84,7 @@ function Slide(data, workspace){
 			};
 		}
 
-		_this.onUpdate(false);
+		_this.onUpdate();
 		//console.log(data);
 	});
 }
@@ -192,6 +192,8 @@ Slide.prototype.onUpdate = function(changes){
 							x: parseFloat(_this.size.x), y: parseFloat(_this.size.y)
 						};
 						break;
+					case 'meta':
+						data.meta = _this.meta;
 				}
 			}
 
@@ -254,6 +256,10 @@ socket.on('update slide', function(data){
 				};
 			}
 
+			if(typeof packet.meta === 'object'){
+				slide.meta = packet.meta;
+			}
+
 			var node = slide.layoutNode;
 
 			node.setAttribute('os-x', slide.pos.x);
@@ -282,7 +288,6 @@ socket.on('update slide', function(data){
 
 			slide.workspace.propertyEditor.update();
 			slide.onUpdate();
-			console.log('yes update!');
 
 			node.style.width = slide.size.x + 'px';
 			node.style.height = slide.size.y + 'px';

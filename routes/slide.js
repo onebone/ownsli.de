@@ -31,8 +31,8 @@ router.get('/view/:id', (req, res, next) => {
 			return;
 		}
 
-		if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId) === -1)
-			return res.redirect('/login');
+		if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId()) === -1)
+			return res.redirect('/login'); // TODO: Maybe forbidden page is better?
 
 		res.render('slide/view', {
 			slideTitle: document.getName(),

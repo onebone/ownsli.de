@@ -123,11 +123,17 @@ document | string | Id of document
 slide| int | Id of slide
 shape | int | Id of shape
 
-## update order
+## update order (from client)
 Name | Type | Description
 -----|------|------------
 document | string | Id of document
-orders| object | key: order, value: slideId
+orders| object | key: slideId, value: order
+
+## update order (from server)
+Name | Type | Description
+----|-----|------
+document | string | Id of document
+orders | object | key: slideId, value: order. Will send all slides, not delta
 
 ## request data
 Name | Type | Description

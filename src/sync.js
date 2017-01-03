@@ -196,6 +196,7 @@ class Sync{
 				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
 					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
 				const slide = new Slide(
+					group.getDocument(),
 					-1,
 					new Vector3(data.pos.x, data.pos.y, data.pos.z),
 					new Vector2(data.size.x, data.size.y),
@@ -210,21 +211,6 @@ class Sync{
 				const rot = slide.getRotation();
 				const size = slide.getSize();
 
-				/*socket.emit('create slide', {
-					document: data.document,
-					slide: slideId,
-					pos: {
-						x: pos.x, y: pos.y, z: pos.z
-					},
-					rot: {
-						x: rot.x, y: rot.y, z: rot.z
-					},
-					size: {
-						x: size.x, y: size.y
-					},
-					order: slide.getOrder(),
-					meta: slide.getMetadata()
-				});*/
 				group.broadcast('create slide', {
 					document: data.document,
 					slide: slideId,
@@ -266,12 +252,6 @@ class Sync{
 					data.meta || {}
 				);
 				const shapeId = slide.addShape(shape);
-
-				/*socket.emit('create shape', {
-					document: data.document,
-					slide: data.slide,
-					shape: shapeId
-				});*/
 
 				group.broadcast('create shape', {
 					document: data.document,
@@ -323,6 +303,35 @@ class Sync{
 				}
 			});
 			// end delete shape
+
+			socket.on('update order', (data) => {
+				if(typeof data !== 'object') return;
+
+				if(typeof data.document !== 'string' || typeof data.orders !== 'object') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				Object.keys(data.orders).forEach(id => {
+					const slide = group.getDocument().getSlide(id);
+					if(!slide) return;
+
+					slide.setOrder(data.orders[id]);
+				});
+				group.getDocument().reorderSlides();
+
+				const newOrders = {};
+				const slides = group.getDocument().getSlides();
+				Object.keys(slides).forEach(id => {
+					const slide = slides[id];
+					newOrders[slide.getId()] = slide.getOrder();
+				});
+
+				group.broadcast('update order', {
+					document: data.document,
+					orders: newOrders
+				});
+			});
+			// end update order
 
 			socket.on('save', (data) => {
 				if(typeof data !== 'object') return;

@@ -204,6 +204,7 @@ socket.once('send data', function(event){
 
 			var _slide = new slide(v, currentWorkspace);
 			v.shapes.forEach(function(s){
+				s.slide = _slide.id;
 				shape.fromType(s, _slide);
 			});
 		});

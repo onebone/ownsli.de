@@ -26,13 +26,13 @@ class Document{
 			if(data instanceof Slide){
 				this._slides[index] = data;
 			}else{
-				slides[index].vec = slides[index].vec || new Vector3();
+				slides[index].pos = slides[index].pos || new Vector3();
 				slides[index].size = slides[index].size || new Vector2();
 				slides[index].rot = slides[index].rot || new Vector3();
 
 				this._slides[index] = new Slide(
 					parseInt(index),
-					new Vector3(slides[index].vec.x, slides[index].vec.y, slides[index].vec.z),
+					new Vector3(slides[index].pos.x, slides[index].pos.y, slides[index].pos.z),
 					new Vector2(slides[index].size.x, slides[index].size.y),
 					new Vector3(slides[index].rot.x, slides[index].rot.y, slides[index].rot.z),
 					slides[index].order,
@@ -89,6 +89,18 @@ class Document{
 
 		this.reorderSlides();
 		return slideId++;
+	}
+
+	/**
+	 * @param {string|int} id
+	 */
+	removeSlide(id){
+		if(this._slides[id]){
+			delete this._slides[id];
+			this.reorderSlides();
+			return true;
+		}
+		return false;
 	}
 
 	reorderSlides(){
@@ -173,9 +185,9 @@ class Document{
 
 			data.slides[slide.getId()] = {
 				id: slide.getId(),
-				pos: [pos.getX(), pos.getY(), pos.getZ()],
-				rot: [rot.getX(), rot.getY(), rot.getZ()],
-				size: [size.getX(), size.getY()],
+				pos: {x: pos.getX(), y: pos.getY(), z: pos.getZ()},
+				rot: {x: rot.getX(), y: rot.getY(), z: rot.getZ()},
+				size: {x: size.getX(), y: size.getY()},
 				order: slide.getOrder(),
 				meta: slide.getMetadata(),
 				shapes: shapesArr
@@ -219,14 +231,14 @@ class Slide{
 			if(data instanceof Slide){
 				this._shapes[index] = data;
 			}else{
-				shapes[index].vec = shapes[index].vec || new Vector3();
+				shapes[index].pos = shapes[index].pos || new Vector3();
 				shapes[index].size = shapes[index].size || new Vector2();
 				shapes[index].rot = shapes[index].rot || new Vector3();
 
 				this._shapes[index] = new Shape(
-					index,
-					new Vector2(shapes[index].vec.x, shapes[index].vec.y),
-					new Vector2(shapes[index].size.x, shapes[index].pos.y),
+					parseInt(index),
+					new Vector2(shapes[index].pos.x, shapes[index].pos.y),
+					new Vector2(shapes[index].size.x, shapes[index].size.y),
 					new Vector3(shapes[index].rot.x, shapes[index].rot.y, shapes[index].rot.z),
 					shapes[index].type,
 					shapes[index].meta
@@ -318,6 +330,14 @@ class Slide{
 
 		this._shapes[shapeId] = shape;
 		return shapeId++;
+	}
+
+	removeShape(id){
+		if(this._shapes[id]){
+			delete this._shapes[id];
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -434,9 +454,9 @@ class Shape{
 	toArray(){
 		return {
 			shape: this._id,
-			pos: [this._vec.x, this._vec.y],
-			size: [this._size.x, this._size.y],
-			rot: [this._rotation.x, this._rotation.y, this._rotation.z],
+			pos: {x: this._vec.x, y: this._vec.y},
+			size: {x: this._size.x, y: this._size.y},
+			rot: {x: this._rotation.x, y: this._rotation.y, z: this._rotation.z},
 			type: this._type,
 			meta: this._meta
 		};

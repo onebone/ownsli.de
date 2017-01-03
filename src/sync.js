@@ -28,6 +28,7 @@ class Sync{
 			}
 
 			socket.on('request data', (data) => {
+				if(typeof data !== 'object') return;
 				const group = Sync.getGroup(data.document);
 				if(!group){
 					socket.emit('send data', null); // there is no group found matching the document
@@ -41,6 +42,7 @@ class Sync{
 
 			// update slide
 			socket.on('update slide', (data) => {
+				if(typeof data !== 'object') return;
 				if(typeof data.document !== 'string' || !Array.isArray(data.packets)) return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
@@ -83,7 +85,7 @@ class Sync{
 										break;
 									}
 
-									slide.setSize(new Vector2(data.x, data.y, data.z));
+									slide.setSize(new Vector2(data.x, data.y));
 									break;
 								case 'order':
 									if(typeof data !== 'number'){
@@ -109,6 +111,7 @@ class Sync{
 
 			// update shape
 			socket.on('update shape', (data) => {
+				if(typeof data !== 'object') return;
 				if(typeof data.document !== 'string' || !Array.isArray(data.packets)) return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
@@ -173,6 +176,7 @@ class Sync{
 
 			// create slide
 			socket.on('create slide', (data) => {
+				if(typeof data !== 'object') return;
 				if(typeof data.document !== 'string' || typeof data.size  !== 'object' || typeof data.pos !== 'object' || typeof data.order !== 'number') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
@@ -228,6 +232,8 @@ class Sync{
 
 			// create shape
 			socket.on('create shape', (data) => {
+				if(typeof data !== 'object') return;
+
 				if(typeof data.document !== 'string' || !data.size || !data.pos || typeof data.type !== 'number' || typeof data.slide !== 'number') return;
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
@@ -267,6 +273,44 @@ class Sync{
 				});
 			});
 			// end create shape
+
+			// delete slide
+			socket.on('delete slide', (data) => {
+				if(typeof data !== 'object') return;
+
+				if(typeof data.document !== 'string') return; // document validation
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				if(group.getDocument().removeSlide(data.slide)){
+					group.broadcast('delete slide', {
+						document: data.document,
+						slide: data.slide
+					});
+				}
+			});
+			// end delete slide
+
+			// delete shape
+			socket.on('delete shape', (data) => {
+				if(typeof data !== 'object') return;
+
+				if(typeof data.document !== 'string') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				const slide = group.getDocument().getSlide(data.slide);
+				if(!slide) return;
+
+				if(slide.removeShape(data.shape)){
+					group.broadcast('delete shape', {
+						document: data.document,
+						slide: data.slide,
+						shape: data.shape
+					});
+				}
+			});
+			// end delete shape
 
 			socket.on('save', (data) => {
 				if(typeof data.document !== 'string') return;

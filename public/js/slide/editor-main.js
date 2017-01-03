@@ -37,8 +37,9 @@ socket.once('send data', function(event){
 		csseditor.setTheme('ace/theme/monokai');
 		csseditor.getSession().setMode('ace/mode/css');
 
+		var exit = false;
 		window.onbeforeunload = function(){
-			return 'Are you sure you want to exit?';
+			if(!exit) return 'Are you sure you want to exit?';
 		};
 
 		$('#os-editor-menu-layout').addEventListener('click', function(){
@@ -215,6 +216,19 @@ socket.once('send data', function(event){
 			socket.emit('save', {
 				document: documentId
 			});
+			Materialize.toast('<i class="mdi mdi-content-save"></i><i class="mdi mdi-check"></i>', 4000);
+		});
+
+		$('#os-editor-menu-finish').addEventListener('click', function(){
+			socket.emit('save', {
+				document: documentId
+			});
+
+			Materialize.toast('<i class="mdi mdi-content-save"></i><i class="mdi mdi-check"></i>', 4000);
+			exit = true;
+			setTimeout(function(){
+				location.href = "/slide/view/" + documentId;
+			}, 2000);
 		});
 
 		const URL_REGEX = /^url\((.+)\)$/;

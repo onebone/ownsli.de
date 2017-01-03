@@ -21,8 +21,27 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/view/:id', (req, res, next) => {
-	//TODO Send presentation data
-	res.render('slide/view');
+	if(!req.session || !req.session.token) return res.redirect('/login');
+	const session = SessionManager.getSession(req.session.token);
+	if(session === null) return res.redirect('/login');
+
+	DocumentManager.getDocument(req.params.id).then(document => {
+		if(!document){
+			return;
+		}
+
+		if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId) === -1)
+			return res.redirect('/login');
+
+		res.render('slide/view', {
+			slideTitle: document.getName(),
+			slideId: document.getId(),
+			slideOwner: document.getOwner(),
+			slideLastEdit: document.getLastSave()
+		});
+	}).catch((err) => {
+		console.error(err);
+	});
 });
 
 router.get('/present/:id', (req, res, next) => {

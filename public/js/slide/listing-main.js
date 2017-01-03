@@ -22,7 +22,6 @@ include({
 			currentMode = MODE_CREATE;
 			return false;
 		}
-		console.log(currentMode);
 		return true;
 	};
 

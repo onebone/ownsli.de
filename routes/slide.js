@@ -82,6 +82,12 @@ router.get('/present/:id', (req, res, next) => {
 		if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId) === -1)
 			return res.redirect('/login');
 
+		let renderer = DocumentRenderer;
+		if(devmode){
+			delete require.cache[require.resolve('../src/renderer.js')];
+			renderer = require('../src/renderer.js').DocumentRenderer;
+		}
+
 		try{
 			fs.mkdirSync(path.join(__dirname, '..', 'contents', document.getId()));
 		}catch(e){
@@ -94,9 +100,9 @@ router.get('/present/:id', (req, res, next) => {
 			if(err){
 				fs.createReadStream(path.join(__dirname, '..', 'bower_components', 'impress-js', 'js', 'impress.js')).pipe(
 					fs.createWriteStream(impressLocation)
-				).on('finish', () => res.status(200).type('html').send((new DocumentRenderer(document.toArray())).render()));
+				).on('finish', () => res.status(200).type('html').send((new renderer(document.toArray())).render()));
 			}else{
-				res.status(200).type('html').send((new DocumentRenderer(document.toArray())).render());
+				res.status(200).type('html').send((new renderer(document.toArray())).render());
 			}
 		});
 	}).catch((err) => {

@@ -241,12 +241,19 @@ body, html {
 	transition: color 500ms;
 }
 
+#os-editor-layout-wrapper {
+	position: absolute;
+	width: 1000px;
+	height: 750px;
+	overflow: auto;
+}
+
 #os-editor-layout {
-	width: 1024px;
-	height: 768px;
+	width: 5000px;
+	height: 5000px;
 	background: #333;
 	overflow: scroll;
-	position: relative;
+	position: absolute;
 }
 
 .os-editor-layout-slide {
@@ -257,7 +264,7 @@ body, html {
 	align-items: center;
 	justify-content: center;
 	position: absolute;
-	font-size: 1rem;
+	font-size: 5rem; /* rmt = remuring maji tenshi */
 	font-weight: 600;
 	top: 0;
 	left: 0;

@@ -44,10 +44,12 @@ socket.once('send data', function(event){
 		};
 
 		$('#os-editor-menu-layout').addEventListener('click', function(){
+			currentWorkspace.setLayoutEditing(true);
 			$('#os-editor-layout-dialog').style.animationName = 'up';
 		});
 
 		$('#os-editor-layout-close').addEventListener('click', function(){
+			currentWorkspace.setLayoutEditing(false);
 			$('#os-editor-layout-dialog').style.animationName = 'down';
 		});
 
@@ -55,7 +57,7 @@ socket.once('send data', function(event){
 			slide.createSlide({
 				pos: {x: 0, y: 0, z: 0},
 				rot: {x: 0, y: 0, z: 0},
-				size: {x: 300, y: 200},
+				size: {x: 900, y: 700},
 				order: currentWorkspace.lastOrder(),
 				meta: {}
 			}, currentWorkspace);
@@ -232,6 +234,21 @@ socket.once('send data', function(event){
 			}, 2000);
 		});
 
+		$('#os-editor-menu-present').addEventListener('click', function(){
+			socket.emit('save', {
+				document: documentId
+			});
+
+			Materialize.toast('<i class="mdi mdi-content-save"></i><i class="mdi mdi-check"></i>', 4000);
+			exit = true;
+			setTimeout(function(){
+				var link = document.createElement('a');
+				link.href = "/slide/present/" + documentId + '/';
+				link.target = "_blank";
+				link.click();
+			}, 2000);
+		});
+
 		var URL_REGEX = /^url\("(.+)"\)$/;
 		var bgHandler = function(docMode){
 			return function(){
@@ -245,8 +262,10 @@ socket.once('send data', function(event){
 				var match = meta.background.match(URL_REGEX);
 				if(match){
 					$('#os-editor-background-src').value = match[1];
+					$('#os-editor-background-color').value = '';
 				}else{
 					$('#os-editor-background-color').value = meta.background;
+					$('#os-editor-background-src').value = ''
 				}
 
 				$('#bgdialog-ok').onclick = function(){
@@ -294,6 +313,7 @@ socket.once('send data', function(event){
 			if(e.ctrlKey){
 				e.stopPropagation();
 				e.preventDefault();
+				if(currentWorkspace.isLayoutEditing()) currentWorkspace.resizeLayout(e.deltaY);
 				currentWorkspace.resize(e.deltaY);
 			}
 		});

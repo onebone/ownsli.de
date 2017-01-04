@@ -29,6 +29,9 @@ function Slide(data, workspace){
 
 	this.morphGenerator = new morph.ClickMorphWrapper(this.layoutNode, this.workspace.morphSpace, this, {
 		compareAttrName: 'data-os-slide-id',
+		logCallback: function(){
+			return _this.workspace.getLayoutScale();
+		},
 		remove: function(){
 			var _key = Object.keys(_this.workspace.document.slides);
 			if(_key[0] === _this.id) _key.shift();
@@ -206,8 +209,19 @@ Slide.prototype.onUpdate = function(changes){
 			});
 		}
 
+		var editRate = 1;
 		var wantedWidth = window.innerWidth - 420;
-		var editRate = wantedWidth / this.size.x;
+		var wantedHeight = window.innerHeight - 50;
+		if(wantedWidth - this.size.x > wantedHeight - this.size.y){
+			//Fit to height
+			editRate = wantedHeight / this.size.y;
+		}else{
+			//Fit to width
+			editRate = wantedWidth / this.size.y;
+		}
+		if(!isFinite(editRate)) editRate = 1;
+		if(editRate < 0) editRate = Math.abs(editRate);
+
 		this.slideNode.style.transform = "scale(" + editRate + ")";
 		this.slideNode.style.transformOrigin = "0 0";
 	}

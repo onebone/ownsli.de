@@ -198,7 +198,7 @@ TextShape.prototype = Object.create(Shape.prototype);
 TextShape.prototype.constructor = TextShape;
 
 TextShape.prototype.init = function(){
-	this.node = document.createElement('p');
+	this.node = document.createElement('div');
 	this.node.innerHTML = this.meta.html;
 
 	this.onUpdate();

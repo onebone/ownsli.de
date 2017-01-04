@@ -30,6 +30,7 @@ function Workspace(slideRoot, workspaceRoot){
 	this.workingSlideId = undefined;
 	this.morphSpace = $('#os-editor-layout');
 	this.propertyEditor = new propertyEditor();
+	this._isLayoutEditing = false;
 }
 
 Workspace.prototype.setWorkingSlide = function(id){
@@ -89,6 +90,43 @@ Workspace.prototype.getWorkingSlideScale = function(){
 	if(!isFinite(scale)) return null;
 
 	return scale;
+};
+
+Workspace.prototype.isLayoutEditing = function(){
+	return this._isLayoutEditing;
+};
+
+Workspace.prototype.setLayoutEditing = function(value){
+	this._isLayoutEditing = value;
+};
+
+Workspace.prototype.getLayoutScale = function(){
+	var transform = $('#os-editor-layout').style.transform;
+	if(!transform) return null;
+
+	var scaleMatch = transform.match(SCALE_REGEX);
+	if(!scaleMatch) return null;
+
+	var scale = parseFloat(scaleMatch[1]);
+	if(!isFinite(scale)) return null;
+
+	return scale;
+};
+
+const WRAPPER_WIDTH = 1000;
+const WRAPPER_HEIGHT = 750;
+Workspace.prototype.resizeLayout = function(amount){
+	var scale = this.getLayoutScale();
+	if(scale === null) return;
+
+	if(amount < 0) scale = Math.min(1000, scale + 0.05);
+	else scale = Math.max(0.0001, scale - 0.05);
+
+	$('#os-editor-layout').style.transform = 'scale(' + scale + ')';
+
+	var margin = -5000 / 2 * (1 - scale);
+	$('#os-editor-layout').style.top = (margin + (WRAPPER_HEIGHT / 2 - scale * 2500)) + 'px';
+	$('#os-editor-layout').style.left = (margin + (WRAPPER_WIDTH / 2 - scale * 2500)) + 'px';
 };
 
 //Misaka 20001

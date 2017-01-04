@@ -4,7 +4,7 @@ const renderMorph = (pos, rot, size) =>	{
 	const centerX = pos.x + Math.round(size.x / 2);
 	const centerY = pos.y + Math.round(size.y / 2);
 
-	let transformBase = `width: ${size.x}px; height: ${size.y}px; transform: rotateX(${rot.x}deg) rotateY(${rot.y}deg) rotateZ(${rot.z}deg) `;
+	let transformBase = `position: absolute; width: ${size.x}px; height: ${size.y}px; transform: rotateX(${rot.x}deg) rotateY(${rot.y}deg) rotateZ(${rot.z}deg) `;
 	if(pos.z) transformBase += `translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px)`;
 	else transformBase += `translate(${pos.x}px, ${pos.y}px)`;
 
@@ -40,7 +40,7 @@ class TextRenderer extends ShapeRenderer{
 	}
 
 	render(){
-		return `<p style="${renderMorph(this.pos, this.rot, this.size)}">${this.meta.html}</p>`;
+		return `<div style="${renderMorph(this.pos, this.rot, this.size)}">${this.meta.html}</div>`;
 	}
 }
 
@@ -147,13 +147,13 @@ class SlideRenderer{
 		return `<div
 			id="slide-${this.id}"
 			data-x="${this.pos.x}"
-			data-y="${this.pos.y}
+			data-y="${this.pos.y}"
 			data-z="${this.pos.z}"
 			data-rotate-x="${this.rot.x}"
 			data-rotate-y="${this.rot.y}"
 			data-rotate-z="${this.rot.z}"
 			class="step"
-			style="background: ${this.meta.background || '#fff'}; position: absolute; background-size: cover; background-position: center center; ${renderMorph(this.pos, this.rot, this.size)}">
+			style="background: ${this.meta.background || '#fff'}; background-size: cover; background-position: center center; ${renderMorph(this.pos, this.rot, this.size)}">
 				${shapes}
 			</div>`
 	}
@@ -174,7 +174,7 @@ class DocumentRenderer{
 				<meta charset="utf-8">
 			</head>
 
-			<body style="background: ${this.meta.background || '#fff'}; background-size: cover; background-position: center center; width: 100vw; height: 100vh; margin: 0;">
+			<body style='background: ${this.meta.background || '#fff'}; background-size: cover; background-position: center center; width: 100vw; height: 100vh; margin: 0;'>
 				<div id="impress" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh">
 					${Object.keys(this.slides).map((k) => this.slides[k]).map((v) => (new SlideRenderer(v)).render()).join('\n')}
 				</div>

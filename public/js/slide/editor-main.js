@@ -249,6 +249,23 @@ socket.once('send data', function(event){
 			}, 2000);
 		});
 
+		$('#os-editor-menu-undo').addEventListener('click', function(){
+			if(currentWorkspace.workingSlideId){
+				socket.emit('undo', {
+					document: documentId,
+					slide: currentWorkspace.workingSlideId
+				});
+			}
+		});
+		$('#os-editor-menu-redo').addEventListener('click', function(){
+			if(currentWorkspace.workingSlideId){
+				socket.emit('redo', {
+					document: documentId,
+					slide: currentWorkspace.workingSlideId
+				});
+			}
+		});
+
 		var URL_REGEX = /^url\("(.+)"\)$/;
 		var bgHandler = function(docMode){
 			return function(){

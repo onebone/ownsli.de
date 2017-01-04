@@ -1,11 +1,15 @@
 'use strict';
 
+const Action = require('./action');
 const {DocumentManager, Document, Slide, Shape} = require('./document');
 const {SessionManager} = require('./session');
 const {Vector3, Vector2} = require('./math');
 const timers = require('timers');
 const bower = require('bower');
 const path = require('path');
+
+const MAX_REDO = 20;
+const MAX_UNDO = 20;
 
 const BOWER_REGEX = /^([a-zA-Z0-9](?:-?[a-zA-Z0-9]){0,38}\/[a-zA-Z0-9-_.]{1,100})|([a-zA-Z0-9-_.]{1,100})$/;
 let io = null;
@@ -253,6 +257,7 @@ class Sync{
 				);
 				const shapeId = slide.addShape(shape);
 
+				group.addUndo(data.slide, 'create shape', shapeId);
 				group.broadcast('create shape', {
 					document: data.document,
 					slide: data.slide,
@@ -274,7 +279,8 @@ class Sync{
 				const group = Sync.getGroup(data.document);
 				if(!group || !group.hasSession(session)) return;
 
-				if(group.getDocument().removeSlide(data.slide)){
+				const slide = group.getDocument().getSlide(data.slide);
+				if(slide && group.getDocument().removeSlide(data.slide)){
 					group.broadcast('delete slide', {
 						document: data.document,
 						slide: data.slide
@@ -294,7 +300,9 @@ class Sync{
 				const slide = group.getDocument().getSlide(data.slide);
 				if(!slide) return;
 
-				if(slide.removeShape(data.shape)){
+				const shape = slide.getShape(data.shape);
+				if(shape && slide.removeShape(data.shape)){
+					group.addUndo(data.slide, 'delete shape', shape);
 					group.broadcast('delete shape', {
 						document: data.document,
 						slide: data.slide,
@@ -340,6 +348,108 @@ class Sync{
 				if(!group || !group.hasSession(session)) return;
 
 				DocumentManager.saveDocument(group.getDocument());
+			});
+
+			socket.on('undo', (data) => {
+				if(typeof data !== 'object') return;
+				if(typeof data.document !== 'string') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+				if(typeof data.slide !== 'number' && typeof data.slide !== 'string') return;
+
+				const action = group.popUndo(data.slide);
+				const slide = group.getDocument().getSlide(data.slide);
+				if(!action || !slide) return;
+				const d = action.getData();
+				switch(action.getType()){
+					case 'delete shape':{
+						const shape = slide.getShape(d);
+						if(!shape) return;
+						group.broadcast('delete shape', {
+							document: group.getDocument().getId(),
+							slide: data.slide,
+							shape: d
+						});
+
+						group.addRedo(data.slide, 'delete shape', shape);
+						}
+						break;
+					case 'create shape':{
+						const shape = new Shape(
+							-1,
+							d.getPosition(),
+							d.getRotation(),
+							d.getSize(),
+							d.getType(),
+							d.getMetadata()
+						);
+
+						const shapeId = slide.addShape(shape);
+						group.addRedo(data.slide, 'create shape', shapeId);
+						group.broadcast('create shape', {
+							document: group.getDocument().getId(),
+							slide: slide.getId(),
+							shape: shapeId,
+							pos: shape.getPosition(),
+							rot: shape.getRotation(),
+							size: shape.getSize(),
+							meta: shape.getMetadata(),
+							type: shape.getType()
+						});
+						}
+						break;
+				}
+			});
+
+			socket.on('redo', (data) => {
+				if(typeof data !== 'object') return;
+				if(typeof data.document !== 'string') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+				if(typeof data.slide !== 'number' && typeof data.slide !== 'string') return;
+
+				const action = group.popRedo(data.slide);
+				const slide = group.getDocument().getSlide(data.slide);
+				if(!action || !slide) return;
+				const d = action.getData();
+				switch(action.getType()){
+					case 'delete shape':{
+						const shape = slide.getShape(d);
+						if(!shape) return;
+						group.broadcast('delete shape', {
+							document: group.getDocument().getId(),
+							slide: data.slide,
+							shape: d
+						});
+
+						group.addUndo(data.slide, 'delete shape', shape);
+					}
+						break;
+					case 'create shape':{
+						const shape = new Shape(
+							-1,
+							d.getPosition(),
+							d.getRotation(),
+							d.getSize(),
+							d.getType(),
+							d.getMetadata()
+						);
+
+						const shapeId = slide.addShape(shape);
+						group.addUndo(data.slide, 'create shape', shapeId);
+						group.broadcast('create shape', {
+							document: group.getDocument().getId(),
+							slide: slide.getId(),
+							shape: shapeId,
+							pos: shape.getPosition(),
+							rot: shape.getRotation(),
+							size: shape.getSize(),
+							meta: shape.getMetadata(),
+							type: shape.getType()
+						});
+					}
+						break;
+				}
 			});
 
 			socket.on('bower', (data) => {
@@ -484,6 +594,8 @@ class Group{
 		this._sessions = sessions;
 		this._sockets = {};
 		this._creationTime = Date.now();
+		this._undo = {};
+		this._redo = {};
 
 		this._sessions.forEach((session) => {
 			if(session.getGroup() !== null){
@@ -500,6 +612,42 @@ class Group{
 		DocumentManager.saveDocument(this._document);
 
 		timers.setTimeout(this.save.bind(this), 10000); // save every 10 seconds
+	}
+
+	addUndo(slide, type, data){
+		if(this._undo.length >= MAX_UNDO){
+			this._undo.shift();
+		}
+
+		this._undo[slide] = this._undo[slide] || [];
+		this._undo[slide].push(new Action(slide, type, data));
+	}
+
+	popUndo(slide){
+		if(!this._undo[slide]) return null;
+		const action = this._undo[slide].pop();
+		if(action){
+			return action;
+		}
+		return null;
+	}
+
+	addRedo(slide, type, data){
+		if(this._redo.length >= MAX_REDO){
+			this._redo.shift();
+		}
+
+		this._redo[slide] = this._redo[slide] || [];
+		this._redo[slide].push(new Action(slide, type, data));
+	}
+
+	popRedo(slide){
+		if(!this._redo[slide]) return null;
+		const action = this._redo[slide].pop();
+		if(action){
+			return action;
+		}
+		return null;
 	}
 
 	/**

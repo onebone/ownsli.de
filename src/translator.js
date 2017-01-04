@@ -41,7 +41,7 @@ const translate = (lang, key, options) => {
 	});
 
 	translation = translation.replace(/\{\{([^{}]+?)\}\}(?!})/g, (match, p1) => {
-		return translate(p1, options);
+		return translate(lang, p1, options);
 	});
 
 	translation = translation.replace(/\}\}\}/g, '}}').replace(/\{\{\{/g, '{');

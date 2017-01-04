@@ -5,7 +5,86 @@
 			title: translator('login.title')
 		}) %>
 
+		<link rel="stylesheet" href="/css/login.css">
+	</head>
+	<body>
+		<main class="login-main">
+			<header>
+				<h1><%= translator('login.title') %></h1>
+				<p><%= translator('login.desc') %></p>
+			</header>
+			<section>
+				<form onsubmit="return false">
+					<input id="userId" name="userId" type="text" placeholder="<%= translator('login.id') %>"/>
+					<input id="password" name="password" type="password" placeholder="<%= translator('login.password') %>"/>
+					<button id="login"><%= translator('login.title') %></button>
+					<p id="info"></p>
+					<button id="signup"><i class="mdi mdi-chevron-double-down rotation"></i><%= translator('signup.title') %></button>
+					<input id="token" name="token" type="text" placeholder="<%= translator('signup.token') %>" class="opacity"/>
+				</form>
+			</section>
+		</main>
+
+		<script src="/geometryangle/geometryangle.min.js"></script>
 		<script>
+			jQuery('body').Geometryangle({mesh:{}, lights: [{}], line: {}, vertex: {}});
+			jQuery.noConflict();
+
+			var sendXHR = function(formData, target){
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', target, true);
+				xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+				xhr.onreadystatechange = function(){
+					if(xhr.readyState === XMLHttpRequest.DONE){
+						var data = JSON.parse(xhr.responseText);
+						if(data){
+							if(data.status){
+								if(data.error){
+									switch(data.errCode){
+										case ERROR_INVALID_FORM:
+											$('#info').innerHTML = '<%= translator("error.login.0") %>';
+											break;
+										case ERROR_INVALID_DATA:
+											$('#info').innerHTML = '<%= translator("error.login.1") %>';
+											break;
+										case ERROR_SERVER_SIDE:
+											$('#info').innerHTML = '<%= translator("error.login.2") %>';
+											break;
+										//case ERROR_OTHER_ALREADY_LOGGED_IN:
+										//	elements.info.innerHTML = '<%= translator("error.login.3") %>';
+										//	break;
+										case ERROR_ALREADY_LOGGED_IN:
+											$('#info').innerHTML = '<%= translator("error.login.4") %>';
+											break;
+									}
+								}else{
+									location.href = "/";
+								}
+							}
+						}else{
+							$('#info').innerHTML = '<%= translator("error.login.invalid") %>';
+						}
+					}
+				};
+				xhr.send(formData);
+			};
+
+			var getLoginForm = function(){
+				return 'userId=' + $('#userId').value + '&password=' + $('#password').value;
+			};
+
+			var $ = document.querySelector.bind(document);
+			var CURRENT_MODE = 'login';
+			$('#signup').addEventListener('click', function(){
+				if(CURRENT_MODE === 'login'){
+					$('.login-main').classList.add('signup');
+					$('.rotation').classList.add('rotated');
+					$('#token').classList.add('opaque');
+					CURRENT_MODE = 'signup';
+				}else{
+					sendXHR(getLoginForm() + '&token=' + $('#token').value, '/login/create');
+				}
+			});
 			var ERROR_INVALID_FORM = 0;
 			var ERROR_INVALID_DATA = 1;
 			var ERROR_SERVER_SIDE = 2;
@@ -15,73 +94,9 @@
 
 			var elements = {};
 
-			window.onload = function(){
-				elements.info = document.getElementById('info');
-				elements.userId = document.getElementById('userId');
-				elements.password = document.getElementById('password');
-
-				document.getElementById('sbBtn').onclick = function(){
-					var xhr = new XMLHttpRequest();
-					xhr.open('POST', '/login', true);
-		            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-		            xhr.onreadystatechange = function(){
-			            if(xhr.readyState === XMLHttpRequest.DONE){
-			            	var data = JSON.parse(xhr.responseText);
-			            	if(data){
-			            		if(data.status){
-									if(data.error){
-										switch(data.errCode){
-											case ERROR_INVALID_FORM:
-												elements.info.innerHTML = '<%= translator("error.login.0") %>';
-												break;
-											case ERROR_INVALID_DATA:
-												elements.info.innerHTML = '<%= translator("error.login.1") %>';
-												break;
-											case ERROR_SERVER_SIDE:
-												elements.info.innerHTML = '<%= translator("error.login.2") %>';
-												break;
-											//case ERROR_OTHER_ALREADY_LOGGED_IN:
-											//	elements.info.innerHTML = '<%= translator("error.login.3") %>';
-											//	break;
-											case ERROR_ALREADY_LOGGED_IN:
-												elements.info.innerHTML = '<%= translator("error.login.4") %>';
-												break;
-										}
-									}else{
-										location.href = "/";
-									}
-								}
-							}else{
-								elements.info.innerHTML = '<%= translator("error.login.invalid") %>';
-							}
-			            }
-		            };
-		            xhr.send('userId=' + elements.userId.value + '&password=' + elements.password.value);
-				};
-			};
-		</script>
-
-		<link rel="stylesheet" href="/css/login.css">
-	</head>
-	<body>
-		<main class="login-main">
-			<header>
-				<h1><%= title %></h1>
-				<p>Welcome to <%= translator('title') %></p>
-			</header>
-			<section>
-				<form onsubmit="return false">
-					<input id="userId" name="userId" type="text" placeholder="<%= translator('login.id') %>"/>
-					<input id="password" name="password" type="password" placeholder="<%= translator('login.password') %>"/>
-					<button id="sbBtn"><%= translator('login.title') %></button>
-				</form>
-				<p id="info"></p>
-			</section>
-		</main>
-
-		<script src="/geometryangle/geometryangle.min.js"></script>
-		<script>
-			$('body').Geometryangle({mesh:{}, lights: [{}], line: {}, vertex: {}});
+			$('#login').addEventListener('click', function(){
+				sendXHR(getLoginForm(), '/login');
+			});
 		</script>
 	</body>
 </html>

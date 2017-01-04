@@ -96,9 +96,11 @@ router.post('/', (req, res, next) => {
 router.post('/create', (req, res, next) => {
 	const userId = req.body.userId;
 	const password = req.body.password;
+	const creationToken = req.body.token;
 
 	if(!userId || !password
 	|| typeof userId !== 'string' || typeof password !== 'string'
+	|| typeof creationToken !== 'string'
 	|| !ID_REGEX.test(userId)){
 		res.send(JSON.stringify({
 			status: true,
@@ -106,6 +108,14 @@ router.post('/create', (req, res, next) => {
 			errCode: ERROR_INVALID_FORM
 		}));
 		return;
+	}
+
+	if(creationToken !== userCreationToken){
+		return res.send(JSON.stringify({
+			status: true,
+			error: true,
+			errCode: ERROR_INVALID_FORM
+		}));
 	}
 
 	AccountManager.createAccount(userId, password).then(() =>

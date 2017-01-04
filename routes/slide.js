@@ -1,6 +1,7 @@
 const {DocumentManager} = require('../src/document');
 const {SessionManager} = require('../src/session');
 const {DocumentRenderer} = require('../src/renderer');
+const archiver = require('archiver');
 const fs = require('fs');
 const express = require('express');
 const sanitize = require('sanitize-filename');
@@ -98,6 +99,36 @@ router.get('/present/:id', (req, res, next) => {
 				res.status(200).type('html').send((new DocumentRenderer(document.toArray())).render());
 			}
 		});
+	}).catch((err) => {
+		console.error(err);
+	});
+});
+
+const ID_REGEX = /^[a-zA-Z0-9]+$/;
+router.get('/export/:id', (req, res, next) => {
+	if(typeof req.params.id !== 'string') return;
+	if(!req.session || !req.session.token) return res.redirect('/login');
+	const session = SessionManager.getSession(req.session.token);
+	if(session === null) return res.redirect('/login');
+
+	DocumentManager.getDocument(req.params.id).then(document => {
+		if(!document){
+			return;
+		}
+
+		if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId()) === -1)
+			return res.redirect('/login');	// TODO: Maybe forbidden page is better?
+
+		if(!ID_REGEX.test(req.params.id)) return; //TODO I don't think that this is not needed but just added.
+
+		const archive = archiver('zip', {store: true});
+		archive.pipe(res.status(200).set({
+			'Content-Disposition': `attachment; filename="exported-slide-${document.getName()}.zip"`,
+			'Content-Type': 'application/octet-stream'
+		}));
+		archive.directory(path.join(__dirname, '..', 'contents', req.params.id), '/');
+		archive.append((new DocumentRenderer(document.toArray())).render(), {name: 'slide.html'});
+		archive.finalize();
 	}).catch((err) => {
 		console.error(err);
 	});

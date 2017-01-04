@@ -167,6 +167,15 @@ class DocumentRenderer{
 	}
 
 	render(){
+		const slides = Object.keys(this.slides).map((k) => this.slides[k]);
+		const centerX = slides.reduce((prev, curr) => {
+			return prev + curr.pos.x + curr.size.x / 2;
+		}, 0) / slides.length;
+
+		const centerY = slides.reduce((prev, curr) => {
+			return prev + curr.pos.y + curr.size.y / 2;
+		}, 0) / slides.length;
+
 		return `<!DOCTYPE html>
 		<html>
 			<head>
@@ -176,10 +185,83 @@ class DocumentRenderer{
 
 			<body style='background: ${this.meta.background || '#fff'}; background-size: cover; background-position: center center; width: 100vw; height: 100vh; margin: 0;'>
 				<div id="impress" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh">
-					${Object.keys(this.slides).map((k) => this.slides[k]).map((v) => (new SlideRenderer(v)).render()).join('\n')}
+					${slides.map((v) => (new SlideRenderer(v)).render()).join('\n')}
+					<div id="overview" class="step" data-x="${centerX}" data-y="${centerY}" data-scale="7"></div>
 				</div>
+				<div class="progressbar"><div></div></div>
+				<div class="progress"></div>
 				<script src="./impress.js"></script>
+				<script>
+					// FROM m42e/impress.js-progress
+					(function ( document, window ) {
+						'use strict';
+
+						var stepids = [];
+						// wait for impress.js to be initialized
+						document.addEventListener("impress:init", function (event) {
+							var steps = event.target.querySelectorAll('.step');
+							for (var i = 0; i < steps.length; i++)
+							{
+							  stepids[i+1] = steps[i].id;
+							}
+						});
+						var progressbar = document.querySelector('div.progressbar div');
+						var progress = document.querySelector('div.progress');
+
+						if (null !== progressbar || null !== progress) {
+							document.addEventListener("impress:starttransition", function (event) {
+								updateProgressbar(event.detail.next.id);
+							});
+
+							document.addEventListener("impress:stepenter", function (event) {
+								updateProgressbar(event.target.id);
+							});
+						}
+
+						function updateProgressbar(slideId) {
+							var slideNumber = stepids.indexOf(slideId);
+							if (null !== progressbar) {
+								progressbar.style.width = (100 / (stepids.length - 1) * (slideNumber)).toFixed(2) + '%';
+							}
+							if (null !== progress) {
+								progress.innerHTML = slideNumber + '/' + (stepids.length-1);
+							}
+						}
+					})(document, window);
+				</script>
 				<script>var api = impress(); api.init();</script>
+				<style>
+					/* FROM m42e/impress.js-progress */
+					.progressbar {
+						position:fixed;
+						left:0;
+						right: 0;
+						bottom:0;
+					}
+
+					.progressbar div {
+						width:0;
+						height:10px;
+						background:rgba(0, 128, 255, 0.7);
+						-webkit-transition:width 1s linear;
+						-moz-transition:width 1s linear;
+						-ms-transition:width 1s linear;
+						-o-transition:width 1s linear;
+						transition:width 1s linear;
+					}
+					.progress-off {
+						z-index:2999;
+					}
+					.progress {
+						display: none;
+						position:absolute;
+						right:50px;
+						bottom:15px;
+						font-size: 50px;
+						text-align: right;
+						color: rgba(0, 128, 255, 0.7);
+					}
+				</style>
 			</body>
 		</html>`;
 	}

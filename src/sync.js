@@ -148,6 +148,16 @@ class Sync{
 										break;
 									}
 
+									if(typeof data.start === 'object'){
+										if(typeof data.start.x === 'number' && typeof data.start.y === 'number'){
+											group.addUndo(slide.getId(), 'update shape', {
+												shape: shape.getId(),
+												pos: [data.start.x, data.start.y]
+											});
+										}
+										delete pk['start'];
+									}
+
 									shape.setPosition(new Vector2(data.x, data.y));
 									break;
 								case 'rot':
@@ -162,6 +172,16 @@ class Sync{
 									if(typeof data.x !== 'number' || typeof data.y !== 'number'){
 										delete pk['size'];
 										break;
+									}
+
+									if(typeof data.start === 'object'){
+										if(typeof data.start.x === 'number' && typeof data.start.y === 'number'){
+											group.addUndo(slide.getId(), 'update shape', {
+												shape: shape.getId(),
+												size: [data.start.x, data.start.y]
+											});
+										}
+										delete pk['start'];
 									}
 
 									shape.setSize(new Vector2(data.x, data.y));
@@ -398,6 +418,61 @@ class Sync{
 						});
 						}
 						break;
+					case 'update shape': {
+						if(d.size){
+							const shape = slide.getShape(d.shape);
+							if(shape){
+								const size = shape.getSize();
+								group.addRedo(slide.getId(), 'update shape', {
+									shape: d.shape,
+									size: [size.x, size.y]
+								});
+								group.broadcast('update shape', {
+									document: group.getDocument().getId(),
+									packets: [{
+										slide: slide.getId(),
+										shape: d.shape,
+										size: {x: d.size[0], y: d.size[1]}
+									}]
+								});
+
+								shape.setSize(new Vector2(d.size[0], d.size[1]));
+							}
+						}
+
+						if(d.pos){
+							const shape = slide.getShape(d.shape);
+							if(shape){
+								const pos = shape.getPosition();
+								group.addRedo(slide.getId(), 'update shape', {
+									shape: d.shape,
+									pos: [pos.x, pos.y]
+								});
+
+								shape.setPosition(new Vector2(d.pos[0], d.pos[1]));
+								group.broadcast('update shape', {
+									document: group.getDocument().getId(),
+									packets: [{
+										slide: slide.getId(),
+										shape: d.shape,
+										pos: {x: d.pos[0], y: d.pos[1]}
+									}]
+								});
+							}
+						}
+
+						if(d.meta){
+							group.broadcast('update shape', {
+								document: group.getDocument().getId(),
+								slide: slide.getId(),
+								packets: [{
+									shape: d.shape,
+									meta: d.meta
+								}]
+							});
+						}
+						break;
+					}
 				}
 			});
 
@@ -448,6 +523,61 @@ class Sync{
 							type: shape.getType()
 						});
 					}
+						break;
+					case 'update shape':{
+						if(d.size){
+							const shape = slide.getShape(d.shape);
+							if(shape){
+								const size = shape.getSize();
+								group.addUndo(slide.getId(), 'update shape', {
+									shape: d.shape,
+									size: [size.x, size.y]
+								});
+								group.broadcast('update shape', {
+									document: group.getDocument().getId(),
+									packets: [{
+										slide: slide.getId(),
+										shape: d.shape,
+										size: {x: d.size[0], y: d.size[1]}
+									}]
+								});
+
+								shape.setSize(new Vector2(d.size[0], d.size[1]));
+							}
+						}
+
+						if(d.pos){
+							const shape = slide.getShape(d.shape);
+							if(shape){
+								const pos = shape.getPosition();
+								group.addUndo(slide.getId(), 'update shape', {
+									shape: d.shape,
+									pos: [pos.x, pos.y]
+								});
+
+								shape.setPosition(new Vector2(d.pos[0], d.pos[1]));
+								group.broadcast('update shape', {
+									document: group.getDocument().getId(),
+									packets: [{
+										slide: slide.getId(),
+										shape: d.shape,
+										pos: {x: d.pos[0], y: d.pos[1]}
+									}]
+								});
+							}
+						}
+
+						if(d.meta){
+							group.broadcast('update shape', {
+								document: group.getDocument().getId(),
+								slide: slide.getId(),
+								packets: [{
+									shape: d.shape,
+									meta: d.meta
+								}]
+							});
+						}
+						}
 						break;
 				}
 			});

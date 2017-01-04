@@ -493,6 +493,10 @@ class Shape{
 			meta: this._meta
 		};
 	}
+
+	clone(){
+		return new Shape(this._id, this.getPosition(), this.getRotation(), this.getSize(), this.getType(), this.getMetadata());
+	}
 }
 
 class DocumentManager{

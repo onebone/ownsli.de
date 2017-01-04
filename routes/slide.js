@@ -61,7 +61,7 @@ const authenticatedServe = (regex) => {
 		if(session === null) return res.redirect('/login');
 
 		DocumentManager.getDocument(match[1]).then(document => {
-			if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId) === -1) return res.redirect('/login');
+			if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId()) === -1) return res.redirect('/login');
 			serve.apply(this, arguments);
 		});
 	};
@@ -79,7 +79,7 @@ router.get('/present/:id', (req, res, next) => {
 			return;
 		}
 
-		if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId) === -1)
+		if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId()) === -1)
 			return res.redirect('/login');
 
 		let renderer = DocumentRenderer;

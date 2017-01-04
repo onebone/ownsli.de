@@ -13,9 +13,9 @@ const buildRedo = (type, data) => {
 				data: data // data: {Shape}
 			};
 		case 'update shape':
-			// todo
 			return {
-
+				type: 'update shape',
+				data: data
 			};
 	}
 };

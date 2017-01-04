@@ -78,7 +78,7 @@ var ANCHORS = [
 Object.freeze(ANCHORS);
 
 //Morph 제작
-function Morph(node, target, is2D, deleteCallback, logCallback){
+function Morph(node, target, is2D, deleteCallback, logCallback, wrapper){
 	this.object = node;
 	this.boundObjects = [];
 	this.workspace = target;
@@ -95,10 +95,26 @@ function Morph(node, target, is2D, deleteCallback, logCallback){
 	});
 
 	var lastNode = {x: parseInt(this['os-x']), y: parseInt(this['os-y'])};
+	var start = {x: parseInt(this['os-x']), y: parseInt(this['os-y'])};
 
 	this.interactableObject = interact(node)
 		//.origin('self')
 		.draggable({})
+		.on('dragstart', function(event){
+			start = {x: parseInt(_this['os-x']), y: parseInt(_this['os-y'])};
+		})
+		.on('dragend', function(event){
+			if(wrapper && wrapper.object instanceof shape){
+				socket.emit('update shape', {
+					document: documentId,
+					packets: [{
+						slide: wrapper.object.parent.id,
+						shape: wrapper.object.id,
+						pos: {x: parseInt(_this['os-x']), y: parseInt(_this['os-y']), start: start},
+					}]
+				});
+			}
+		})
 		.on('dragmove', function(event){
 			var ox = parseInt(_this['os-x']);
 			var oy = parseInt(_this['os-y']);
@@ -133,6 +149,11 @@ function Morph(node, target, is2D, deleteCallback, logCallback){
 			h: parseInt(_this['os-height'])
 		};
 
+		var startPos = {
+			x: parseInt(_this['os-x']),
+			y: parseInt(_this['os-y'])
+		};
+
 		var last = {w: initialScale.w, h: initialScale.h};
 
 		interact(anchor)
@@ -147,6 +168,21 @@ function Morph(node, target, is2D, deleteCallback, logCallback){
 			})
 			.on('dragend', function(event){
 				_this.updateAnchor();
+
+				if(wrapper && wrapper.object instanceof shape){
+					socket.emit('update shape', { // for undo
+						document: documentId,
+						packets: [{
+							slide: wrapper.object.parent.id,
+							shape: wrapper.object.id,
+							size: {
+								x: parseInt(_this['os-width']),
+								y: parseInt(_this['os-height']),
+								start: {x: initialScale.w, y: initialScale.h}
+							}
+						}]
+					});
+				}
 			})
 			.on('dragmove', function(event){
 				//Original XYWH of object
@@ -399,7 +435,7 @@ ClickMorphWrapper.prototype.generate = function(noRegister){
 
 	_this.morph = new Morph(_this.node, _this.morphSpace, false, function(){
 		_this.remove();
-	}, this.logCallback);
+	}, this.logCallback, this);
 	_this.create(_this.morph);
 
 	if(!noRegister){

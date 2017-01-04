@@ -33,7 +33,10 @@
 				</li>
 				<li class="divider"></li>
 				<li>
-					<a href="#!" id="os-editor-menu-file-save">
+					<a href="#!" id="os-editor-menu-file-save" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + s">
 						<i class="mdi mdi-content-save"></i>
 						<%= translator('slide.editor.file.save') %>
 					</a>
@@ -69,19 +72,28 @@
 
 			<ul id="insert-dropdown" class="dropdown-content nested">
 				<li>
-					<a href="#!" id="os-editor-menu-insert-richtext">
+					<a href="#!" id="os-editor-menu-insert-richtext" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + t">
 						<i class="mdi mdi-textbox"></i>
 						<%= translator('slide.editor.insert.richtext') %>
 					</a>
 				</li>
 				<li>
-					<a href="#!" id="os-editor-menu-insert-image">
+					<a href="#!" id="os-editor-menu-insert-image" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + i">
 						<i class="mdi mdi-image"></i>
 						<%= translator('slide.editor.insert.image') %>
 					</a>
 				</li>
 				<li>
-					<a href="#!" id="os-editor-menu-insert-video">
+					<a href="#!" id="os-editor-menu-insert-video" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + m">
 						<i class="mdi mdi-file-video"></i>
 						<%= translator('slide.editor.insert.video') %>
 					</a>
@@ -94,20 +106,29 @@
 					</a>
 				</li>
 				<li>
-					<a href="#!" id="os-editor-menu-insert-html">
+					<a href="#!" id="os-editor-menu-insert-html" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + h">
 						<i class="mdi mdi-code-tags"></i>
 						<%= translator('slide.editor.insert.html') %>
 					</a>
 				</li>
 				<li>
-					<a href="#!" id="os-editor-menu-insert-note">
+					<a href="#!" id="os-editor-menu-insert-note" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + n">
 						<i class="mdi mdi-book-plus"></i>
 						<%= translator('slide.editor.insert.note') %>
 					</a>
 				</li>
 				<li class="divider"></li>
 				<li>
-					<a id="os-editor-menu-upload" href="#!">
+					<a id="os-editor-menu-upload" href="#!" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + u">
 						<i class="mdi mdi-upload"></i>
 						<%= translator('slide.editor.upload') %>
 					</a>
@@ -116,13 +137,19 @@
 
 			<ul id="shape-dropdown" class="dropdown-content">
 				<li>
-					<a href="#!" id="os-editor-menu-insert-rectangle">
+					<a href="#!" id="os-editor-menu-insert-rectangle" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + q">
 						<i class="mdi mdi-shape-rectangle-plus"></i>
 						<%= translator('slide.editor.insert.rectangle') %>
 					</a>
 				</li>
 				<li>
-					<a href="#!" id="os-editor-menu-insert-circle">
+					<a href="#!" id="os-editor-menu-insert-circle" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + r">
 						<i class="mdi mdi-shape-circle-plus"></i>
 						<%= translator('slide.editor.insert.circle') %>
 					</a>
@@ -136,21 +163,30 @@
 
 			<ul id="edit-dropdown" class="dropdown-content">
 				<li>
-					<a id="os-editor-menu-layout" href="#!">
+					<a id="os-editor-menu-layout" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + l" href="#!">
 						<i class="mdi mdi-view-dashboard"></i>
 						<%= translator('slide.editor.layout') %>
 					</a>
 				</li>
 
 				<li>
-					<a id="os-editor-menu-background" href="#!">
+					<a id="os-editor-menu-background" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + b" href="#!">
 						<i class="mdi mdi-terrain"></i>
 						<%= translator('slide.editor.background') %>
 					</a>
 				</li>
 
 				<li>
-					<a id="os-editor-menu-background-doc" href="#!">
+					<a id="os-editor-menu-background-doc" class="tooltipped"
+					data-position="right"
+					data-delay="50"
+					data-tooltip="ctrl + shit + b" href="#!">
 						<i class="mdi mdi-terrain"></i>
 						<%= translator('slide.editor.background.doc') %>
 					</a>
@@ -158,7 +194,10 @@
 			</ul>
 
 			<!-- Slide Insert Menu -->
-			<a id="os-editor-menu-insert-slide" href="#!" class="os-editor-menu">
+			<a id="os-editor-menu-insert-slide" href="#!" class="os-editor-menu tooltipped"
+			data-position="bottom"
+			data-delay="50"
+			data-tooltip="<%= translator('slide.editor.insert.slide') %> (ctrl + d)">
 				<i class="mdi mdi-shape-rectangle-plus"></i>
 				<%= translator('slide.editor.insert.slide') %>
 			</a>
@@ -169,7 +208,10 @@
 			</span>
 
 			<!-- Other menu -->
-			<a id="os-editor-menu-present" href="#!" class="os-editor-menu">
+			<a id="os-editor-menu-present" href="#!" class="os-editor-menu tooltipped"
+			data-position="bottom"
+			data-delay="50"
+			data-tooltip="<%= translator('slide.editor.present') %> (shift + f5)">
 				<i class="mdi mdi-projector-screen"></i>
 				<%= translator('slide.editor.present') %>
 			</a>
@@ -245,7 +287,7 @@
 			</div>
 		</section>
 
-		<section id="os-editor-dialogs">
+		<section id="os-editor-dialogs" style="display: none">
 			<section id="os-editor-share-dialog" class="os-dialog"></section>
 			<section id="os-editor-image-edit-dialog" class="os-dialog">
 				<div class="input-field">

@@ -335,6 +335,50 @@ socket.once('send data', function(event){
 			}
 		});
 
+		var CTRL_KEYMAP = {
+			'b': '#os-editor-menu-background',
+			'd': '#os-editor-menu-insert-slide',
+			'h': '#os-editor-menu-insert-html',
+			'i': '#os-editor-menu-insert-image',
+			'l': '#os-editor-menu-layout',
+			'm': '#os-editor-menu-insert-video',
+			'n': '#os-editor-menu-insert-note',
+			'q': '#os-editor-menu-insert-rectangle',
+			'r': '#os-editor-menu-insert-circle',
+			's': '#os-editor-menu-file-save',
+			't': '#os-editor-menu-insert-richtext',
+			'u': '#os-editor-menu-upload',
+			'z': '#os-editor-menu-undo'
+		};
+
+		var SHIFT_KEYMAP = {
+			'b': '#os-editor-menu-background-doc',
+			'z': '#os-editor-menu-redo',
+			'f5': '#os-editor-menu-present'
+		};
+
+		document.addEventListener('keydown', function(e){
+			if($('#os-editor-dialogs').style.display !== 'none') return;
+			if(e.metaKey) return;
+			if(e.altKey) return;
+			if(e.ctrlKey && e.shiftKey){
+				if(SHIFT_KEYMAP[e.key]){
+					e.preventDefault();
+					e.stopPropagation();
+					$(SHIFT_KEYMAP[e.key]).click();
+				}
+				return;
+			}
+
+			if(e.ctrlKey){
+				if(CTRL_KEYMAP[e.key]){
+					e.preventDefault();
+					e.stopPropagation();
+					$(CTRL_KEYMAP[e.key]).click();
+				}
+			}
+		});
+
 		tinymce.init({
 			selector: '#os-editor-tinymce-attachment',
 			height: 500,

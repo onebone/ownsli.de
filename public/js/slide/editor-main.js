@@ -272,7 +272,7 @@ socket.once('send data', function(event){
 
 		var refreshInvitation = function(){
 			var xhr = new XMLHttpRequest();
-			xhr.open('GET', '/slide/invitee');
+			xhr.open('GET', '/document/invitee');
 			xhr.onreadystatechange = function(){
 				if(req.readyState !== 4) return;
 				if(req.status !== 200) return;
@@ -289,7 +289,7 @@ socket.once('send data', function(event){
 					a.href = '/invite/delete';
 					a.onclick = function(){
 						var xhr = new XMLHttpRequest();
-						xhr.open('GET', '/slide/invite?username=' + $('#os-editor-share-new').value);
+						xhr.open('GET', '/document/invite/delete?username=' + $('#os-editor-share-new').value);
 						xhr.onreadystatechange = function(){
 							if(req.readyState !== 4) return;
 							if(req.status !== 200) return;
@@ -317,7 +317,7 @@ socket.once('send data', function(event){
 
 			$('#shraddbtn').onclick = function(){
 				var xhr = new XMLHttpRequest();
-				xhr.open('GET', '/slide/invite?username=' + $('#os-editor-share-new').value);
+				xhr.open('GET', '/document/invite?username=' + $('#os-editor-share-new').value);
 				xhr.onreadystatechange = function(){
 					if(req.readyState !== 4) return;
 					if(req.status !== 200) return;

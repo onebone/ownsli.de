@@ -153,10 +153,6 @@ router.post('/create/', (req, res, next) => {
 	});
 });
 
-router.get('/share/:id/:user', (req, res, next) => {
-	//TODO
-});
-
 router.get('/edit/:id', (req, res, next) => {
 	if(typeof req.params.id !== 'string') return; // just quit; do not give anything
 

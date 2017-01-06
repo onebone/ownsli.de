@@ -358,10 +358,11 @@ class Slide{
 
 	addShape(shape){
 		if(!shape) return -1;
-		if(shape._id === -1) shape._id = shapeId;
+		if(shape._id === -1) shape._id = shapeId++;
+		const id = shape._id;
 
-		this._shapes[shapeId] = shape;
-		return shapeId++;
+		this._shapes[id] = shape;
+		return id;
 	}
 
 	removeShape(id){

@@ -460,13 +460,14 @@ socket.once('send data', function(event){
 						}else if(window.copying instanceof shape){
 							var _slide = window.currentWorkspace.document.slides[window.currentWorkspace.workingSlideId];
 							if(_slide){
+								var _shape = window.copying;
 								socket.emit('create shape', {
 									document: documentId,
 									slide: _slide.id,
-									pos: window.copying.pos,
-									size: window.copying.size,
-									meta: window.copying.meta,
-									type: window.copying.type
+									pos: {x: parseFloat(_shape.pos.x), y: parseFloat(_shape.pos.y), z: parseFloat(_shape.pos.z)},
+									size: {x: parseFloat(_shape.size.x), y: parseFloat(_shape.size.y)},
+									meta: _shape.meta,
+									type: parseInt(_shape.type)
 								});
 							}
 						}

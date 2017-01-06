@@ -276,16 +276,16 @@ socket.on('update slide', function(data){
 
 			var node = slide.layoutNode;
 
-			node.setAttribute('os-x', slide.pos.x);
-			node.setAttribute('os-y', slide.pos.y);
-			node.setAttribute('os-z', slide.pos.z);
+			node.setAttribute('data-os-x', slide.pos.x);
+			node.setAttribute('data-os-y', slide.pos.y);
+			node.setAttribute('data-os-z', slide.pos.z);
 
-			node.setAttribute('os-rotation-x', slide.rot.x);
-			node.setAttribute('os-rotation-y', slide.rot.y);
-			node.setAttribute('os-rotation-z', slide.rot.z);
+			node.setAttribute('data-os-rotation-x', slide.rot.x);
+			node.setAttribute('data-os-rotation-y', slide.rot.y);
+			node.setAttribute('data-os-rotation-z', slide.rot.z);
 
-			node.setAttribute('os-width', slide.size.x);
-			node.setAttribute('os-height', slide.size.y);
+			node.setAttribute('data-os-width', slide.size.x);
+			node.setAttribute('data-os-height', slide.size.y);
 
 			if(slide.morph){
 				slide.morph['os-x'] = slide.pos.x;
@@ -297,7 +297,7 @@ socket.on('update slide', function(data){
 				slide.morph['os-width'] = slide.size.x;
 				slide.morph['os-height'] = slide.size.y;
 
-				slide.morph.updateAnchor();
+				slide.morph.updateNode();
 			}
 
 			slide.workspace.propertyEditor.update();

@@ -322,7 +322,7 @@ function Morph(node, target, is2D, deleteCallback, logCallback, wrapper){
 	});
 
 	if(deleteCallback && typeof deleteCallback === 'function'){
-		var anchor = document.createElement('div');
+		var anchor = document.createElement('a');
 		anchor.setAttribute('class', 'os-morph-anchor os-morph-delete-anchor');
 		anchor.setAttribute('data-os-morph-anchor-x', '-30px');
 		anchor.setAttribute('data-os-morph-anchor-y', '-30px');

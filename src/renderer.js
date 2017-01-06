@@ -153,7 +153,7 @@ class SlideRenderer{
 			data-rotate-y="${this.rot.y}"
 			data-rotate-z="${this.rot.z}"
 			class="step"
-			style="background: ${this.meta.background || '#fff'}; background-size: cover; background-position: center center; ${renderMorph(this.pos, this.rot, this.size)}">
+			style='background: ${this.meta.background || '#fff'}; background-size: cover; background-position: center center; ${renderMorph(this.pos, this.rot, this.size)}'>
 				${shapes}
 			</div>`
 	}
@@ -185,7 +185,7 @@ class DocumentRenderer{
 
 			<body style='background: ${this.meta.background || '#fff'}; background-size: cover; background-position: center center; width: 100vw; height: 100vh; margin: 0;'>
 				<div id="impress" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh">
-					${slides.map((v) => (new SlideRenderer(v)).render()).join('\n')}
+					${slides.sort((v1, v2) => v1.order - v2.order).map((v) => (new SlideRenderer(v)).render()).join('\n')}
 					<div id="overview" class="step" data-x="${centerX}" data-y="${centerY}" data-scale="7"></div>
 				</div>
 				<div class="progressbar"><div></div></div>

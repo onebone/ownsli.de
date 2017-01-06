@@ -11,18 +11,14 @@ function Workspace(slideRoot, workspaceRoot){
 	var _this = this;
 	Sortable.create($('#os-editor-slidelist'), {
 		onUpdate: function(evt){
-			var newOrder = {};
-			Array.prototype.forEach.call($('#os-editor-slidelist').children, function(elem, index){
-				var id = parseInt(elem.querySelector('.os-editor-slidelist-slide').getAttribute('data-os-slide-id'));
-				_this.document.slides[id].order
-					= index + 1;
-				elem.querySelector('.os-editor-slidelist-indicator').innerText = index + 1;
-				newOrder[id] = index + 1;
-			});
+			var changedId = evt.item.querySelector('.os-editor-slidelist-slide').getAttribute('data-os-slide-id');
+			var changedOrder = Array.prototype.indexOf.call($('#os-editor-slidelist').childNodes, evt.item);
 
 			socket.emit('update order', {
 				document: documentId,
-				orders: newOrder
+				orders: {
+					changedId: changedOrder
+				}
 			});
 		}
 	});
@@ -115,8 +111,8 @@ Workspace.prototype.getLayoutScale = function(){
 	return scale;
 };
 
-const WRAPPER_WIDTH = 1000;
-const WRAPPER_HEIGHT = 750;
+var WRAPPER_WIDTH = 1000;
+var WRAPPER_HEIGHT = 700;
 Workspace.prototype.resizeLayout = function(amount){
 	var scale = this.getLayoutScale();
 	if(scale === null) return;
@@ -156,7 +152,11 @@ Workspace.prototype.addToWorkspace = function(node){
 socket.on('update order', function(data){
 	if(typeof data.orders !== 'object') return;
 
-	// TODO: sort slides
+	Object.keys(data.orders).sort(function(v1, v2){
+		return data.orders[v1] - data.orders[v2];
+	}).forEach(function(k){
+		$('#os-editor-slidelist').appendChild($('#os-editor-slidelist').querySelector('*[data-os-slide-id="' + k + '"]').parentNode);
+	});
 });
 
 module.exports = Workspace;

@@ -481,6 +481,13 @@ socket.once('send data', function(event){
 					$(ALT_KEYMAP[e.key]).click();
 				}
 			}
+
+			if(e.key === 'Delete' && !e.altKey && !e.ctrlKey && !e.shiftKey){
+				if(!$('.os-morph-delete-anchor')) return;
+				$('.os-morph-delete-anchor').click();
+				e.preventDefault();
+				e.stopPropagation();
+			}
 		});
 
 		tinymce.init({
@@ -493,6 +500,7 @@ socket.once('send data', function(event){
 				'insertdatetime media nonbreaking save table contextmenu directionality',
 				'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'
 			],
+			fontsize_formats: '5pt 6pt 7pt 8pt 9pt 10pt 11pt 12pt 26pt 36pt 72pt 180pt',
 			toolbar1: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
 			toolbar2: 'print preview media | forecolor backcolor emoticons | codesample | fontsizeselect fontselect customfont',
 			setup: function(editor){

@@ -55,6 +55,8 @@ Workspace.prototype.setWorkingSlide = function(id){
 	}
 
 	this.workingSlideId = id;
+
+	window.currentSelected = this.document.slides[id]; // current selected slide
 };
 
 //WORKING!!

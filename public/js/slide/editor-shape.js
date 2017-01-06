@@ -42,6 +42,7 @@ function Shape(data, parentSlide){
 		},
 		create: function(morph){
 			_this.morph = morph;
+			window.currentSelected = _this; // shape selected
 			_this.workspace.propertyEditor.bind(_this, function(change){
 				//TODO socket
 

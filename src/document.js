@@ -154,7 +154,9 @@ class Document{
 	 * @param {string} userId
 	 */
 	addInvitation(userId){
-		this._invitation.push(userId);
+		if(this._invitation.indexOf(userId) === -1){
+			this._invitation.push(userId);
+		}
 	}
 
 	/**
@@ -256,7 +258,7 @@ class Slide{
 		this._shapes = {};
 		Object.keys(shapes).forEach((index) => {
 			const data = shapes[index];
-			if(data instanceof Slide){
+			if(data instanceof Shape){
 				this._shapes[index] = data;
 			}else{
 				data.pos = data.pos || new Vector3();
@@ -383,6 +385,10 @@ class Slide{
 	 */
 	getShapes(){
 		return this._shapes;
+	}
+
+	clone(){
+		return new Slide(this._document, this._id, this.getPosition(), this.getSize(), this.getRotation(), this.getOrder(), this.getMetadata(), this.getShapes());
 	}
 }
 

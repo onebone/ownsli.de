@@ -219,6 +219,7 @@ class Sync{
 				if(!group || !group.hasSession(session)) return;
 				if(typeof data.pos.x !== 'number' || typeof data.pos.y !== 'number' || typeof data.pos.z !== 'number'
 					|| typeof data.size.x !== 'number' || typeof data.size.y !== 'number') return;
+
 				const slide = new Slide(
 					group.getDocument(),
 					-1,
@@ -252,6 +253,49 @@ class Sync{
 				});
 			});
 			// end create slide
+
+			socket.on('copy slide', (data) => {
+				if(typeof data !== 'object') return;
+				if(typeof data.document !== 'string' || typeof data.slide !== 'number' || typeof data.order !== 'number') return;
+				const group = Sync.getGroup(data.document);
+				if(!group || !group.hasSession(session)) return;
+
+				const slide = group.getDocument().getSlide(data.slide);
+				if(!slide) return;
+				const clone = slide.clone();
+				clone._id = -1;
+				clone._order = data.order;
+				const slideId = group.getDocument().addSlide(clone);
+
+				const pos = slide.getPosition();
+				const rot = slide.getRotation();
+				const size = slide.getSize();
+
+				let shapesArr = [];
+
+				const shapes = slide.getShapes();
+				Object.keys(shapes).forEach((index) => {
+					const shape = shapes[index];
+					shapesArr.push(shape.toArray());
+				});
+
+				group.broadcast('create slide', {
+					document: data.document,
+					slide: slideId,
+					pos: {
+						x: pos.x, y: pos.y, z: pos.z
+					},
+					rot: {
+						x: rot.x, y: rot.y, z: rot.z
+					},
+					size: {
+						x: size.x, y: size.y
+					},
+					order: slide.getOrder(),
+					meta: slide.getMetadata(),
+					shapes: shapesArr
+				});
+			});
 
 			// create shape
 			socket.on('create shape', (data) => {

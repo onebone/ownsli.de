@@ -65,6 +65,34 @@ router.get('/invite', (req, res) => {
 	});
 });
 
+router.get('/invite/remove', (req, res) => {
+	if(!req.session.token) return res.send('null');
+
+	const session = SessionManager.getSession(req.session.token);
+
+	const username = req.query.username;
+	if(typeof username !== 'string') return;
+
+	if(session.getGroup() !== null){
+		const group = Sync.getGroup(session.getGroup());
+		if(group){
+			res.json({
+				status: true,
+				error: false,
+				result: group.getDocument().removeInvitation(username)
+			});
+		}else{
+			res.json({
+				status: true,
+				error: true
+			})
+		}
+	}else res.json({
+		status: true,
+		error: true
+	})
+});
+
 router.get('/invitee', (req, res) => {
 	if(!req.session.token) return res.send('null');
 
@@ -87,7 +115,7 @@ router.get('/invitee', (req, res) => {
 	}else res.json({
 		status: true,
 		error: true
-	})
+	});
 });
 
 module.exports = router;

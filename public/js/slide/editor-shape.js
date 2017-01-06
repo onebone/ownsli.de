@@ -563,7 +563,7 @@ socket.on('update shape', function(data){
 
 			node.setAttribute('data-os-x', shape.pos.x);
 			node.setAttribute('data-os-y', shape.pos.y);
-			node.setAttribute('data-os-z', shape.pos.z);
+			//node.setAttribute('data-os-z', shape.pos.z);
 
 			node.setAttribute('data-os-rotation-x', shape.rot.x);
 			node.setAttribute('data-os-rotation-y', shape.rot.y);

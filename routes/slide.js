@@ -33,7 +33,7 @@ router.get('/view/:id', (req, res, next) => {
 		}
 
 		if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId()) === -1)
-			return res.redirect('/login'); // TODO: Maybe forbidden page is better?
+			return next(res.locals.e('errors.403', 403));
 
 		res.render('slide/view', {
 			slideTitle: document.getName(),
@@ -123,7 +123,7 @@ router.get('/export/:id', (req, res, next) => {
 		}
 
 		if(document.getOwner() !== session.getUserId() && document.getInvitations().indexOf(session.getUserId()) === -1)
-			return res.redirect('/login');	// TODO: Maybe forbidden page is better?
+			return next(res.locals.e('errors.403', 403));
 
 		if(!ID_REGEX.test(req.params.id)) return; //TODO I don't think that this is not needed but just added.
 
@@ -154,7 +154,7 @@ router.post('/create/', (req, res, next) => {
 });
 
 router.get('/share/:id/:user', (req, res, next) => {
-	//TODO Add sharing function
+	//TODO
 });
 
 router.get('/edit/:id', (req, res, next) => {

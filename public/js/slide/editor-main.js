@@ -257,6 +257,7 @@ socket.once('send data', function(event){
 				});
 			}
 		});
+
 		$('#os-editor-menu-redo').addEventListener('click', function(){
 			if(currentWorkspace.workingSlideId){
 				socket.emit('redo', {
@@ -264,6 +265,66 @@ socket.once('send data', function(event){
 					slide: currentWorkspace.workingSlideId
 				});
 			}
+		});
+
+		var refreshInvitation = function(){
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', '/slide/invitee');
+			xhr.onreadystatechange = function(){
+				if(req.readyState !== 4) return;
+				if(req.status !== 200) return;
+				var json = JSON.parse(req.responseText);
+				if(json.error) return alert('Oops! An error occured during getting invitations...');
+
+				$('#os-editor-sharelist').innerHTML = '';
+
+				json.result.forEach(function(v){
+					var li = document.createElement('li');
+					li.innerText = v;
+
+					var a = document.createElement('a');
+					a.href = '/invite/delete';
+					a.onclick = function(){
+						var xhr = new XMLHttpRequest();
+						xhr.open('GET', '/slide/invite?username=' + $('#os-editor-share-new').value);
+						xhr.onreadystatechange = function(){
+							if(req.readyState !== 4) return;
+							if(req.status !== 200) return;
+
+							refreshInvitation();
+						};
+					};
+					a.innerHTML = '<i class="mdi mdi-delete right"></i>';
+
+					li.append(a);
+					$('#os-editor-sharelist').append(a);
+				});
+			};
+		};
+
+		$('#os-editor-menu-file-share').addEventListener('click', function(){
+			$('#os-editor-dialogs').style.display = 'flex';
+		    $('#os-editor-share-dialog').style.display = 'block';
+			refreshInvitation();
+
+			$('#shrdialog-ok').onclick = function(){
+				$('#os-editor-dialogs').style.display = 'none';
+				$('#os-editor-share-dialog').style.display = 'none';
+			};
+
+			$('#shraddbtn').onclick = function(){
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', '/slide/invite?username=' + $('#os-editor-share-new').value);
+				xhr.onreadystatechange = function(){
+					if(req.readyState !== 4) return;
+					if(req.status !== 200) return;
+
+					var json = JSON.parse(req.responseText);
+					if(json.error) return alert('No such username!');
+
+					refreshInvitation();
+				};
+			};
 		});
 
 		var URL_REGEX = /^url\("(.+)"\)$/;
@@ -346,7 +407,6 @@ socket.once('send data', function(event){
 			'q': '#os-editor-menu-insert-rectangle',
 			'r': '#os-editor-menu-insert-circle',
 			's': '#os-editor-menu-file-save',
-			't': '#os-editor-menu-insert-richtext',
 			'u': '#os-editor-menu-upload',
 			'z': '#os-editor-menu-undo'
 		};
@@ -357,11 +417,14 @@ socket.once('send data', function(event){
 			'f5': '#os-editor-menu-present'
 		};
 
+		var ALT_KEYMAP = {
+			't': '#os-editor-menu-insert-richtext'
+		};
+
 		document.addEventListener('keydown', function(e){
 			if($('#os-editor-dialogs').style.display !== 'none') return;
 			if(e.metaKey) return;
-			if(e.altKey) return;
-			if(e.ctrlKey && e.shiftKey){
+			if(e.ctrlKey && e.shiftKey && !e.altKey){
 				if(SHIFT_KEYMAP[e.key]){
 					e.preventDefault();
 					e.stopPropagation();
@@ -370,11 +433,19 @@ socket.once('send data', function(event){
 				return;
 			}
 
-			if(e.ctrlKey){
+			if(e.ctrlKey && !e.altKey){
 				if(CTRL_KEYMAP[e.key]){
 					e.preventDefault();
 					e.stopPropagation();
 					$(CTRL_KEYMAP[e.key]).click();
+				}
+			}
+
+			if(e.altKey && !e.ctrlKey && !e.shiftKey){
+				if(ALT_KEYMAP[e.key]){
+					e.preventDefault();
+					e.stopPropagation();
+					$(ALT_KEYMAP[e.key]).click();
 				}
 			}
 		});

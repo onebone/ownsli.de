@@ -288,7 +288,26 @@
 		</section>
 
 		<section id="os-editor-dialogs" style="display: none">
-			<section id="os-editor-share-dialog" class="os-dialog"></section>
+			<section id="os-editor-share-dialog" class="os-dialog" style="display: block; height: 300px;">
+				<ul id="os-editor-sharelist">
+
+				</ul>
+
+				<div class="row">
+					<div class="input-field col s10">
+						<input type="text" id="os-editor-share-new" placeholder="Username">
+					</div>
+
+					<button class="btn btn-flat waves-effect waves-orange input-field col s2" id="shraddbtn" type="button">
+						<i class="mdi mdi-account-plus"></i>
+					</button>
+				</div>
+
+				<div class="dialog-bottom">
+					<a href="#!" class="waves-effect waves-blue btn-flat" id="shrdialog-ok"><%= translator('slide.editor.edit.ok') %></a>
+				</div>
+			</section>
+
 			<section id="os-editor-image-edit-dialog" class="os-dialog">
 				<div class="input-field">
 					<%= translator('slide.editor.edit.refurl') %>

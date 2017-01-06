@@ -341,6 +341,10 @@ body, html {
 	font-family: 'D2 coding', monospace !important;
 }
 
+#os-editor-sharelist {
+	height: 160px;
+	overflow: auto;
+}
 .dropzone {
 	border: 2px dashed #ff5722;
 }

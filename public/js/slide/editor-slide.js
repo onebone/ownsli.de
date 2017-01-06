@@ -322,6 +322,15 @@ socket.on('create slide', function(data){
 
 	data.id = data.slide;
 	new Slide(data, window.currentWorkspace);
+
+	if(Array.isArray(data.shapes)){
+		var slide = window.currentWorkspace.document.slides[data.slide];
+		if(!slide) return;
+
+		data.shapes.forEach(function(data){
+			shape.fromType(data, slide);
+		});
+	}
 });
 
 socket.on('delete slide', function(data){

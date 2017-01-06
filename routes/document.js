@@ -65,4 +65,29 @@ router.get('/invite', (req, res) => {
 	});
 });
 
+router.get('/invitee', (req, res) => {
+	if(!req.session.token) return res.send('null');
+
+	const session = SessionManager.getSession(req.session.token);
+
+	if(session.getGroup() !== null){
+		const group = Sync.getGroup(session.getGroup());
+		if(group){
+			res.json({
+				status: true,
+				error: false,
+				result: group.getDocument().getInvitations()
+			});
+		}else{
+			res.json({
+				status: true,
+				error: true
+			})
+		}
+	}else res.json({
+		status: true,
+		error: true
+	})
+});
+
 module.exports = router;

@@ -399,14 +399,14 @@ RectangleShape.prototype.onEdit = function(){
 
 		_this.onUpdate(['meta']);
 		$('#os-editor-dialogs').style.display = 'none';
-		$('#os-editor-image-edit-dialog').style.display = 'none';
+		$('#os-editor-shape-edit-dialog').style.display = 'none';
 		$('#os-editor-shape-type').value = 'rectangle';
 		$('#os-editor-shape-color').value = '';
 	};
 
 	$('#shpdialog-cancel').onclick = function(){
 		$('#os-editor-dialogs').style.display = 'none';
-		$('#os-editor-image-edit-dialog').style.display = 'none';
+		$('#os-editor-shape-edit-dialog').style.display = 'none';
 		$('#os-editor-shape-type').value = 'rectangle';
 		$('#os-editor-shape-color').value = '';
 	};

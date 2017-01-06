@@ -51,7 +51,7 @@ class RectangleRenderer extends ShapeRenderer{
 
 	render(){
 		const border = (this.meta.type === 'rectangle') ? '0' : '50%';
-		return `<div style="${renderMorph(this.pos, this.rot, this.size)}; background: ${this.meta.shape}; border: ${border};"></div>`;
+		return `<div style="${renderMorph(this.pos, this.rot, this.size)}; background: ${this.meta.color}; border-radius: ${border};"></div>`;
 	}
 }
 
@@ -83,9 +83,8 @@ class HTMLRenderer extends ShapeRenderer{
 	}
 
 	render(){
-		const random = `${this.id}-${Math.random().toString(36).slice(2)}`;
-		return
-			`<iframe id="os-iframe-${random}"></iframe>
+		const random = `${Math.random().toString(36).slice(2)}`;
+		return `<iframe id="os-iframe-${random}" style="${renderMorph(this.pos, this.rot, this.size)}; border: 0;"></iframe>
 			<script id="os-html-${random}" type="text/osprescript">
 				${escape(this.meta.html)}
 			</script>
@@ -97,23 +96,45 @@ class HTMLRenderer extends ShapeRenderer{
 			</script>
 			<script>
 				(function(){
+					var decodeEntities = (function() {
+						// this prevents any overhead from creating the object each time
+						var element = document.createElement('div');
+
+						function decodeHTMLEntities (str) {
+							if(str && typeof str === 'string') {
+								// strip script/html tags
+								str = str.replace(/<script[^>]*>([\\S\\s]*?)<\\/script>/gmi, '');
+								str = str.replace(/<\\/?\\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
+								element.innerHTML = str;
+								str = element.textContent;
+								element.textContent = '';
+							}
+
+							return str;
+						}
+
+						return decodeHTMLEntities;
+					})();
+
 					var $ = document.getElementById.bind(document);
 					var iframe = $('os-iframe-${random}');
 					var html = $('os-html-${random}');
 					var css = $('os-css-${random}');
 					var js = $('os-js-${random}');
-					this.iframe.contentWindow.document.body.innerHTML =
-						html.innerText +
-						'<style>' +
-						css.innerText +
-						'</style>';
 
-					var script = document.createElement('script');
-					script.innerHTML = js.innerText;
+					window.addEventListener('load',function(){
+						iframe.contentWindow.document.body.innerHTML = decodeEntities(html.innerText) +
+							'<style>' +
+							decodeEntities(css.innerText) +
+							'</style>';
 
-					this.iframe.contentWindow.document.body.append(script);
+						var script = document.createElement('script');
+						script.innerHTML = decodeEntities(js.innerText);
+
+						iframe.contentWindow.document.body.append(script);
+					});
 				})();
-			</script>`
+			</script>`;
 	}
 }
 

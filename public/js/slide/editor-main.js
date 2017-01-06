@@ -419,8 +419,7 @@ socket.once('send data', function(event){
 
 		var SHIFT_KEYMAP = {
 			'b': '#os-editor-menu-background-doc',
-			'z': '#os-editor-menu-redo',
-			'f5': '#os-editor-menu-present'
+			'z': '#os-editor-menu-redo'
 		};
 
 		var ALT_KEYMAP = {
@@ -430,6 +429,13 @@ socket.once('send data', function(event){
 		document.addEventListener('keydown', function(e){
 			if($('#os-editor-dialogs').style.display !== 'none') return;
 			if(e.metaKey) return;
+			if(e.shiftKey && !e.ctrlKey && !e.altKey){
+				e.preventDefault();
+				e.stopPropagation();
+				if(e.key === 'F5') $('#os-editor-menu-present').click();
+				return;
+			}
+
 			if(e.ctrlKey && e.shiftKey && !e.altKey){
 				if(SHIFT_KEYMAP[e.key]){
 					e.preventDefault();
@@ -483,7 +489,7 @@ socket.once('send data', function(event){
 				}
 			}
 
-			if(e.key === 'Delete' && !e.altKey && !e.ctrlKey && !e.shiftKey){
+			if(e.key === 'Delete' && !e.altKey && !e.ctrlKey && !e.shiftKey && $('*:focus') === null){
 				if(!$('.os-morph-delete-anchor')) return;
 				$('.os-morph-delete-anchor').click();
 				e.preventDefault();

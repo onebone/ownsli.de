@@ -26,6 +26,9 @@ socket.once('send data', function(event){
 		window.currentWorkspace = new workspace(null, $('#os-editor-workspace'));
 		currentWorkspace.document.meta = event.meta;
 
+		window.currentSelected = null; // currently selected shape, or slide; used to copy objects
+		window.copying = null;
+
 		window.htmleditor = ace.edit("htmleditor");
 		htmleditor.setTheme('ace/theme/monokai');
 		htmleditor.getSession().setMode('ace/mode/html');
@@ -375,6 +378,33 @@ socket.once('send data', function(event){
 					e.preventDefault();
 					e.stopPropagation();
 					$(CTRL_KEYMAP[e.key]).click();
+				}else if(e.key === 'c'){
+					// copy
+					window.copying = window.currentSelected;
+				}else if(e.key === 'v'){
+					// paste
+					console.log(window.copying, window.currentWorkspace);
+					if(window.copying && window.currentWorkspace){
+						if(window.copying instanceof slide){
+							socket.emit('copy slide', {
+								document: documentId,
+								slide: window.copying.id,
+								order: window.currentWorkspace.lastOrder()
+							});
+						}else if(window.copying instanceof shape){
+							var _slide = window.currentWorkspace.document.slides[window.currentWorkspace.workingSlideId];
+							if(_slide){
+								socket.emit('create shape', {
+									document: documentId,
+									slide: _slide.id,
+									pos: window.copying.pos,
+									size: window.copying.size,
+									meta: window.copying.meta,
+									type: window.copying.type
+								});
+							}
+						}
+					}
 				}
 			}
 		});

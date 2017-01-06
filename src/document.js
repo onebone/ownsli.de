@@ -256,7 +256,7 @@ class Slide{
 		this._shapes = {};
 		Object.keys(shapes).forEach((index) => {
 			const data = shapes[index];
-			if(data instanceof Slide){
+			if(data instanceof Shape){
 				this._shapes[index] = data;
 			}else{
 				data.pos = data.pos || new Vector3();
@@ -383,6 +383,10 @@ class Slide{
 	 */
 	getShapes(){
 		return this._shapes;
+	}
+
+	clone(){
+		return new Slide(this._document, this._id, this.getPosition(), this.getSize(), this.getRotation(), this.getOrder(), this.getMetadata(), this.getShapes());
 	}
 }
 

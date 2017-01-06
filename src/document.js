@@ -154,7 +154,9 @@ class Document{
 	 * @param {string} userId
 	 */
 	addInvitation(userId){
-		this._invitation.push(userId);
+		if(this._invitation.indexOf(userId) === -1){
+			this._invitation.push(userId);
+		}
 	}
 
 	/**

@@ -561,16 +561,16 @@ socket.on('update shape', function(data){
 
 			var node = shape.node;
 
-			node.setAttribute('os-x', shape.pos.x);
-			node.setAttribute('os-y', shape.pos.y);
-			node.setAttribute('os-z', shape.pos.z);
+			node.setAttribute('data-os-x', shape.pos.x);
+			node.setAttribute('data-os-y', shape.pos.y);
+			node.setAttribute('data-os-z', shape.pos.z);
 
-			node.setAttribute('os-rotation-x', shape.rot.x);
-			node.setAttribute('os-rotation-y', shape.rot.y);
-			node.setAttribute('os-rotation-z', shape.rot.z);
+			node.setAttribute('data-os-rotation-x', shape.rot.x);
+			node.setAttribute('data-os-rotation-y', shape.rot.y);
+			node.setAttribute('data-os-rotation-z', shape.rot.z);
 
-			node.setAttribute('os-width', shape.size.x);
-			node.setAttribute('os-height', shape.size.y);
+			node.setAttribute('data-os-width', shape.size.x);
+			node.setAttribute('data-os-height', shape.size.y);
 
 			if(shape.morph){
 				shape.morph['os-x'] = shape.pos.x;
@@ -581,7 +581,7 @@ socket.on('update shape', function(data){
 				shape.morph['os-width'] = shape.size.x;
 				shape.morph['os-height'] = shape.size.y;
 
-				shape.morph.updateAnchor();
+				shape.morph.updateNode();
 			}
 
 			shape.workspace.propertyEditor.update();

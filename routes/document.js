@@ -65,7 +65,7 @@ router.get('/invite', (req, res) => {
 	});
 });
 
-router.get('/invite/remove', (req, res) => {
+router.get('/invite/delete', (req, res) => {
 	if(!req.session.token) return res.send('null');
 
 	const session = SessionManager.getSession(req.session.token);

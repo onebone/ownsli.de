@@ -1,6 +1,6 @@
 const escape = require('escape-html');
 
-const renderMorph = (pos, rot, size) =>	{
+const renderMorph = (pos, rot, size, notTransformBase) =>	{
 	const centerX = pos.x + Math.round(size.x / 2);
 	const centerY = pos.y + Math.round(size.y / 2);
 
@@ -8,7 +8,7 @@ const renderMorph = (pos, rot, size) =>	{
 	if(pos.z) transformBase += `translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px)`;
 	else transformBase += `translate(${pos.x}px, ${pos.y}px)`;
 
-	transformBase += `; transform-origin: ${centerX}px ${centerY}px`
+	if(!notTransformBase) transformBase += `; transform-origin: ${centerX}px ${centerY}px`
 	return transformBase;
 };
 const copyProperty = (thisArg, target) => ['id', 'pos', 'rot', 'size', 'type', 'meta', 'shapes'].forEach((v) => thisArg[v] = target[v]);
@@ -153,7 +153,7 @@ class SlideRenderer{
 			data-rotate-y="${this.rot.y}"
 			data-rotate-z="${this.rot.z}"
 			class="step"
-			style='background: ${this.meta.background || '#fff'}; background-size: cover; background-position: center center; ${renderMorph(this.pos, this.rot, this.size)}'>
+			style='background: ${this.meta.background || '#fff'}; background-size: cover; background-position: center center; ${renderMorph(this.pos, this.rot, this.size, true)}'>
 				${shapes}
 			</div>`
 	}

@@ -12,7 +12,7 @@ function Workspace(slideRoot, workspaceRoot){
 	Sortable.create($('#os-editor-slidelist'), {
 		onUpdate: function(evt){
 			var changedId = evt.item.querySelector('.os-editor-slidelist-slide').getAttribute('data-os-slide-id');
-			var changedOrder = Array.prototype.indexOf.call($('#os-editor-slidelist').childNodes, evt.item);
+			var changedOrder = Array.prototype.indexOf.call($('#os-editor-slidelist').childNodes, evt.item) + 1;
 
 			var send = {
 				document: documentId,
@@ -112,7 +112,7 @@ Workspace.prototype.getLayoutScale = function(){
 };
 
 var WRAPPER_WIDTH = 1000;
-var WRAPPER_HEIGHT = 700;
+var WRAPPER_HEIGHT = 1000;
 Workspace.prototype.resizeLayout = function(amount){
 	var scale = this.getLayoutScale();
 	if(scale === null) return;
@@ -156,6 +156,7 @@ socket.on('update order', function(data){
 		return data.orders[v1] - data.orders[v2];
 	}).forEach(function(k){
 		$('#os-editor-slidelist').appendChild($('#os-editor-slidelist').querySelector('*[data-os-slide-id="' + k + '"]').parentNode);
+		$('#os-editor-slidelist').querySelector('*[data-os-slide-id="' + k + '"]').parentNode.querySelector('.os-editor-slidelist-indicator').innerText =  data.orders[k];
 	});
 });
 

@@ -274,9 +274,9 @@ socket.once('send data', function(event){
 			var xhr = new XMLHttpRequest();
 			xhr.open('GET', '/document/invitee');
 			xhr.onreadystatechange = function(){
-				if(req.readyState !== 4) return;
-				if(req.status !== 200) return;
-				var json = JSON.parse(req.responseText);
+				if(xhr.readyState !== 4) return;
+				if(xhr.status !== 200) return;
+				var json = JSON.parse(xhr.responseText);
 				if(json.error) return alert('Oops! An error occured during getting invitations...');
 
 				$('#os-editor-sharelist').innerHTML = '';
@@ -286,23 +286,25 @@ socket.once('send data', function(event){
 					li.innerText = v;
 
 					var a = document.createElement('a');
-					a.href = '/invite/delete';
+					a.href = '#!';
 					a.onclick = function(){
 						var xhr = new XMLHttpRequest();
 						xhr.open('GET', '/document/invite/delete?username=' + $('#os-editor-share-new').value);
 						xhr.onreadystatechange = function(){
-							if(req.readyState !== 4) return;
-							if(req.status !== 200) return;
+							if(xhr.readyState !== 4) return;
+							if(xhr.status !== 200) return;
 
 							refreshInvitation();
 						};
+						xhr.send(null);
 					};
 					a.innerHTML = '<i class="mdi mdi-delete right"></i>';
 
 					li.append(a);
-					$('#os-editor-sharelist').append(a);
+					$('#os-editor-sharelist').append(li);
 				});
 			};
+			xhr.send(null);
 		};
 
 		$('#os-editor-menu-file-share').addEventListener('click', function(){
@@ -319,14 +321,15 @@ socket.once('send data', function(event){
 				var xhr = new XMLHttpRequest();
 				xhr.open('GET', '/document/invite?username=' + $('#os-editor-share-new').value);
 				xhr.onreadystatechange = function(){
-					if(req.readyState !== 4) return;
-					if(req.status !== 200) return;
+					if(xhr.readyState !== 4) return;
+					if(xhr.status !== 200) return;
 
-					var json = JSON.parse(req.responseText);
-					if(json.error) return alert('No such username!');
+					var json = JSON.parse(xhr.responseText);
+					if(json.error) return alert('Wrong username!');
 
 					refreshInvitation();
 				};
+				xhr.send(null);
 			};
 		});
 

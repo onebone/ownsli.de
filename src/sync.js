@@ -384,6 +384,8 @@ class Sync{
 				if(!group || !group.hasSession(session)) return;
 
 				Object.keys(data.orders).forEach(id => {
+					if(typeof data.orders[id] !== 'number') return;
+
 					const slide = group.getDocument().getSlide(id);
 					if(!slide) return;
 

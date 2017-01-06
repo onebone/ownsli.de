@@ -81,7 +81,7 @@ class Document{
 		return this._slides[id];
 	}
 
-	getMeta(){
+	getMetadata(){
 		return this._meta;
 	}
 
@@ -124,7 +124,7 @@ class Document{
 	pushSlides(order){
 		Object.keys(this._slides).forEach(id => {
 			const slide = this._slides[id];
-			if(slide.getOrder() >= order) slide.setOrder(slide.getOrder() + 1);
+			if(slide.getOrder() >= order) slide._order++;
 		});
 	}
 
@@ -136,7 +136,7 @@ class Document{
 			return s1.getOrder() > s2.getOrder() ? 1 : -1;
 		}).reduce((obj, key) => {
 			const slide = this._slides[key];
-			slide.setOrder(i++);
+			slide._order = (i++);
 			obj[slide.getId()] = slide;
 
 			return obj;
@@ -147,7 +147,7 @@ class Document{
 	 * @return {int}
 	 */
 	getSlideCount(){
-		return this._slides.length;
+		return Object.keys(this._slides).length;
 	}
 
 	/**
@@ -337,9 +337,12 @@ class Slide{
 	 * @param {int} order
 	 */
 	setOrder(order){
-		this._document.pushSlides(order);
+		if(order > this._order){
+			this._document.pushSlides(++order);
+		}else this._document.pushSlides(order);
 
 		this._order = order;
+		this._document.reorderSlides();
 	}
 
 	/**

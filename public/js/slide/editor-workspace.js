@@ -14,12 +14,12 @@ function Workspace(slideRoot, workspaceRoot){
 			var changedId = evt.item.querySelector('.os-editor-slidelist-slide').getAttribute('data-os-slide-id');
 			var changedOrder = Array.prototype.indexOf.call($('#os-editor-slidelist').childNodes, evt.item);
 
-			socket.emit('update order', {
+			var send = {
 				document: documentId,
-				orders: {
-					changedId: changedOrder
-				}
-			});
+				orders: {}
+			};
+			send.orders[changedId] = changedOrder;
+			socket.emit('update order', send);
 		}
 	});
 

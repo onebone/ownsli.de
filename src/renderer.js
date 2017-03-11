@@ -84,57 +84,72 @@ class HTMLRenderer extends ShapeRenderer{
 
 	render(){
 		const random = `${Math.random().toString(36).slice(2)}`;
-		return `<iframe id="os-iframe-${random}" style="${renderMorph(this.pos, this.rot, this.size)}; border: 0;"></iframe>
-			<script id="os-html-${random}" type="text/osprescript">
-				${escape(this.meta.html)}
-			</script>
-			<script id="os-css-${random}" type="text/osprescript">
-				${escape(this.meta.css)}
-			</script>
-			<script id="os-js-${random}" type="text/osprescript">
-				${escape(this.meta.js)}
-			</script>
-			<script>
-				(function(){
-					var decodeEntities = (function() {
-						// this prevents any overhead from creating the object each time
-						var element = document.createElement('div');
 
-						function decodeHTMLEntities (str) {
-							if(str && typeof str === 'string') {
-								// strip script/html tags
-								str = str.replace(/<script[^>]*>([\\S\\s]*?)<\\/script>/gmi, '');
-								str = str.replace(/<\\/?\\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
-								element.innerHTML = str;
-								str = element.textContent;
-								element.textContent = '';
+		if(this.meta.scoped){
+			return `<iframe id="os-iframe-${random}" style="${renderMorph(this.pos, this.rot, this.size)}; border: 0;"></iframe>
+				<script id="os-html-${random}" type="text/osprescript">
+					${escape(this.meta.html)}
+				</script>
+				<script id="os-css-${random}" type="text/osprescript">
+					${escape(this.meta.css)}
+				</script>
+				<script id="os-js-${random}" type="text/osprescript">
+					${escape(this.meta.js)}
+				</script>
+				<script>
+					(function(){
+						var decodeEntities = (function() {
+							// this prevents any overhead from creating the object each time
+							var element = document.createElement('div');
+
+							function decodeHTMLEntities (str) {
+								if(str && typeof str === 'string') {
+									// strip script/html tags
+									str = str.replace(/<script[^>]*>([\\S\\s]*?)<\\/script>/gmi, '');
+									str = str.replace(/<\\/?\\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
+									element.innerHTML = str;
+									str = element.textContent;
+									element.textContent = '';
+								}
+
+								return str;
 							}
 
-							return str;
-						}
+							return decodeHTMLEntities;
+						})();
 
-						return decodeHTMLEntities;
+						var $ = document.getElementById.bind(document);
+						var iframe = $('os-iframe-${random}');
+						var html = $('os-html-${random}');
+						var css = $('os-css-${random}');
+						var js = $('os-js-${random}');
+
+						window.addEventListener('load',function(){
+							iframe.contentWindow.document.body.innerHTML = decodeEntities(html.innerText) +
+								'<style>' +
+								decodeEntities(css.innerText) +
+								'</style>';
+
+							var script = document.createElement('script');
+							script.innerHTML = decodeEntities(js.innerText);
+
+							iframe.contentWindow.document.body.append(script);
+						});
 					})();
+				</script>`;
+		}else{
+			return `<div style="${renderMorph(this.pos, this.rot, this.size)}">
+					${this.meta.html}
+				</div>
 
-					var $ = document.getElementById.bind(document);
-					var iframe = $('os-iframe-${random}');
-					var html = $('os-html-${random}');
-					var css = $('os-css-${random}');
-					var js = $('os-js-${random}');
+				<style>
+					${this.meta.css}
+				</style>
 
-					window.addEventListener('load',function(){
-						iframe.contentWindow.document.body.innerHTML = decodeEntities(html.innerText) +
-							'<style>' +
-							decodeEntities(css.innerText) +
-							'</style>';
-
-						var script = document.createElement('script');
-						script.innerHTML = decodeEntities(js.innerText);
-
-						iframe.contentWindow.document.body.append(script);
-					});
-				})();
-			</script>`;
+				<script>
+					${this.meta.js}
+				</script>`;
+		}
 	}
 }
 

@@ -446,6 +446,7 @@ function HTMLShape(data, parentSlide){
 	if(!data.meta.html) data.meta.html = '<div class="hello-world"></div>';
 	if(!data.meta.css) data.meta.css = '.hello-world{\n\twidth: 100%;\n\theight: 100%;\n\tbackground: #303030;\n}';
 	if(!data.meta.js) data.meta.js = 'document.querySelector(".hello-world").innerHTML = "Hello, World!";';
+	if(!data.meta.scoped) data.meta.scoped = true;
 	Shape.apply(this, arguments);
 }
 
@@ -472,11 +473,15 @@ HTMLShape.prototype.onEdit = function(){
 	htmleditor.setValue(_this.meta.html);
 	csseditor.setValue(_this.meta.css);
 	jseditor.setValue(_this.meta.js);
+	if(_this.meta.scoped){
+		$('#os-html-scoped').setAttribute('checked', 'checked');
+	}else $('#os-html-scoped').setAttribute('checked');
 
 	$('#codedialog-ok').onclick = function(){
 		_this.meta.html = htmleditor.getValue();
 		_this.meta.css = csseditor.getValue();
 		_this.meta.js = jseditor.getValue();
+		_this.meta.scoped = $('#os-html-scoped').getAttribute('checked') !== null;
 
 		_this.onUpdate(['meta']);
 		$('#os-editor-dialogs').style.display = 'none';
@@ -511,6 +516,7 @@ HTMLShape.createShape = function(shapeData, slide, emit){
 	if(!shapeData.meta.html) shapeData.meta.html = '<div class="hello-world"></div>';
 	if(!shapeData.meta.css) shapeData.meta.css = '.hello-world{\n\twidth: 100%;\n\theight: 100%;\n\tbackground: #303030;\n}';
 	if(!shapeData.meta.js) shapeData.meta.js = 'document.querySelector(".hello-world").innerHTML = "Hello, World!";';
+	if(!shapeData.meta.scoped) shapeData.meta.scoped = true;
 
 	if(emit !== false){
 		socket.emit('create shape', {

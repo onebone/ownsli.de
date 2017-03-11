@@ -11,7 +11,7 @@ const renderMorph = (pos, rot, size, notTransformBase) =>	{
 	if(!notTransformBase) transformBase += `; transform-origin: ${centerX}px ${centerY}px`
 	return transformBase;
 };
-const copyProperty = (thisArg, target) => ['id', 'pos', 'rot', 'size', 'type', 'meta', 'shapes'].forEach((v) => thisArg[v] = target[v]);
+const copyProperty = (thisArg, target) => ['id', 'pos', 'rot', 'size', 'type', 'meta', 'shapes', 'order'].forEach((v) => thisArg[v] = target[v]);
 
 class ShapeRenderer{
 	constructor(shape){
@@ -181,7 +181,7 @@ class SlideRenderer{
 			.join('\n');
 
 		return `<div
-			id="slide-${this.id}"
+			id="slide-${this.order}"
 			data-x="${this.pos.x}"
 			data-y="${this.pos.y}"
 			data-z="${this.pos.z}"

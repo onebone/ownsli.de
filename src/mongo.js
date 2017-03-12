@@ -33,6 +33,17 @@ class MongoConnection{
 	static replace(dbname, query, replace){
 		return db.collection(dbname).replaceOne(query, replace);
 	}
+
+	static db(cb){
+		//BLAME onebone!
+		if(db === null){
+			setTimeout(() => {
+				this.db(cb);
+			}, 100);
+		}else{
+			cb(db);
+		}
+	}
 }
 
 module.exports = MongoConnection;

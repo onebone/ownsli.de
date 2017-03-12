@@ -1,0 +1,11 @@
+{
+	"database": {
+		"url": "127.0.0.1",
+		"port": 27017,
+		"database": "ownslide"
+	},
+	"lang": "ko",
+	"langs": ["ko-KR"],
+	"url": "https://docs.onebone.me/",
+	"imageUrl": "img/logo.svg"
+}

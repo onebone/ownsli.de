@@ -5,7 +5,10 @@
 		"database": "ownslide"
 	},
 	"lang": "ko",
-	"langs": ["ko-KR"],
-	"url": "https://docs.onebone.me/",
-	"imageUrl": "img/logo.svg"
+	"langs": [
+		"ko-KR"
+	],
+	"url": "https://slides.khinenw.tk/",
+	"imageUrl": "img/logo.svg",
+	"sessionKey": "T0aECVpWhHGEciWAmi8vGQoK5JKKzxhu4oIqhd321Bn5FNENV0rGvBB4o0wwxfWK"
 }
